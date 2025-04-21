@@ -11,10 +11,13 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^22.14.1",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongoose": "^8.13.2"
   }
 }
