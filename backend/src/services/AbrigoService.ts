@@ -1,4 +1,4 @@
-import AbrigoModel from '../models/Abrigo'; // Substitua por sua model Mongoose
+import AbrigoModel from '../models/Abrigo';
 
 export const createAbrigo = async (abrigoData: any) => {
     try {
