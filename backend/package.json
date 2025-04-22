@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/express": "^5.0.1",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^22.14.1",
     "tsx": "^4.19.3",

@@ -3,6 +3,7 @@ import AbrigoModel from '../models/Abrigo'; // Substitua por sua model Mongoose
 export const createAbrigo = async (abrigoData: any) => {
     try {
         const abrigo = new AbrigoModel(abrigoData);
+        abrigo.ativo = true;
         await abrigo.save();
         return abrigo;
     } catch (error) {
@@ -12,7 +13,7 @@ export const createAbrigo = async (abrigoData: any) => {
 
 export const getAbrigos = async () => {
     try {
-        return await AbrigoModel.find();
+        return await AbrigoModel.find({ ativo: true });
     } catch (error) {
         throw new Error('Erro ao buscar abrigos');
     }
@@ -20,7 +21,7 @@ export const getAbrigos = async () => {
 
 export const getAbrigoById = async (id: string) => {
     try {
-        return await AbrigoModel.findById(id);
+        return await AbrigoModel.findOne({ _id: id, ativo: true });
     } catch (error) {
         throw new Error('Erro ao buscar abrigo');
     }
