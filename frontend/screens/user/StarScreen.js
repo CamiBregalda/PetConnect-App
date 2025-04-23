@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, Keyboard, ScrollView } from 'react-native';
-import SearchInput from '../botaodepesquisar';
+import SearchInput from '../../botaodepesquisar';
 
 
 function StarScreen() {
@@ -9,21 +9,15 @@ function StarScreen() {
   return (
     <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
-        <View style={styles.imgChat} edges={['top']}>
-          <Image
-            style={styles.imgChat}
-            source={require('../img/Chat.png')}
-          />
-        </View>
         <View style={styles.divPesquisa} >
           <Image
             style={styles.imgPesquisa}
-            source={require('../img/Filtro.png')}
+            source={require('../../img/Filtro.png')}
           />
           <SearchInput />
           <Image
             style={styles.imgPesquisa}
-            source={require('../img/Lupa.png')}
+            source={require('../../img/Lupa.png')}
           />
         </View>
         
@@ -32,11 +26,11 @@ function StarScreen() {
           <View style={styles.imagensContainer}>
             <Image
               style={styles.imgAnimais}
-              source={require('../img/Gato.png')}
+              source={require('../../img/Gato.png')}
             />
             <Image
               style={styles.imgAnimais}
-              source={require('../img/Cachorro.png')}
+              source={require('../../img/Cachorro.png')}
             />
           </View>
           <Text style={styles.viewMore}>View more...</Text>
@@ -46,11 +40,11 @@ function StarScreen() {
           <View style={styles.imagensContainer}>
             <Image
               style={styles.imgAnimais}
-              source={require('../img/PET.png')}
+              source={require('../../img/PET.png')}
             />
             <Image
               style={styles.imgAnimais}
-              source={require('../img/PET.png')}
+              source={require('../../img/PET.png')}
             />
           </View>
           <Text style={styles.viewMore}>View more...</Text>
@@ -79,6 +73,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   divPesquisa: {
+    marginTop: 60,
     marginBottom: 40,
     justifyContent: 'center',
     backgroundColor: 'white',
@@ -89,8 +84,8 @@ const styles = StyleSheet.create({
     maxHeight: 80,
   },
   imgPesquisa: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     marginHorizontal: 10,
   },
   taskContainer: {

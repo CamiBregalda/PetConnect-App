@@ -4,8 +4,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Image } from 'react-native';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-import StarScreen from "./screens/StarScreen";
+import StarScreen from "./screens/user/StarScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import Voluntariarse from "./screens/user/Voluntariarse";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -61,6 +62,7 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="User" component={Voluntariarse} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/CamiBregalda/PetConnect-App/issues"
   },
-  "homepage": "https://github.com/CamiBregalda/PetConnect-App#readme"
+  "homepage": "https://github.com/CamiBregalda/PetConnect-App#readme",
+  "dependencies": {
+    "expo": "^52.0.46",
+    "typescript": "^5.3.3",
+    "@types/react": "~18.3.12"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/react": "~18.3.12"
+  }
 }
