@@ -1,0 +1,22 @@
+{
+  "name": "petconnect-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CamiBregalda/PetConnect-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/CamiBregalda/PetConnect-App/issues"
+  },
+  "homepage": "https://github.com/CamiBregalda/PetConnect-App#readme"
+}
