@@ -11,7 +11,7 @@ function SeuComponente() {
       try {
         // 1. Defina a URL do seu endpoint de backend para buscar as informações
         //    Use a mesma URL que você usa no Postman para a requisição GET.
-        const apiUrl = 'http://localhost:8082/cadastro'; // <------------------- SUBSTITUA PELA SUA URL DO POSTMAN
+        const apiUrl = 'http://localhost:3000/users'; // <------------------- SUBSTITUA PELA SUA URL DO POSTMAN
 
         // Se a sua requisição GET no Postman inclui parâmetros na URL,
         // adicione-os aqui. Exemplo:
@@ -61,7 +61,7 @@ function SeuComponente() {
            Exemplo: */}
         {cadastroInfo.nome && <Text>Nome: {cadastroInfo.nome}</Text>}
         {cadastroInfo.idade && <Text>Idade: {cadastroInfo.idade}</Text>}
-        {cadastroInfo.contato && <Text>Contato: {cadastroInfo.contato}</Text>}
+        {cadastroInfo.telefone && <Text>Contato: {cadastroInfo.telefone}</Text>}
         {/* ... adicione outras informações que você precisa exibir */}
       </View>
     );
