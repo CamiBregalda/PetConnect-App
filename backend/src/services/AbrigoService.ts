@@ -7,7 +7,7 @@ export const createAbrigo = async (abrigoData: any) => {
         await abrigo.save();
         return abrigo;
     } catch (error) {
-        throw new Error('Erro ao criar abrigo');
+        throw new Error('Erro ao criar abrigo: ' + error.message);
     }
 };
 
@@ -15,7 +15,7 @@ export const getAbrigos = async () => {
     try {
         return await AbrigoModel.find({ ativo: true });
     } catch (error) {
-        throw new Error('Erro ao buscar abrigos');
+        throw new Error('Erro ao buscar abrigos: ' + error.message);
     }
 };
 
@@ -23,7 +23,7 @@ export const getAbrigoById = async (id: string) => {
     try {
         return await AbrigoModel.findOne({ _id: id, ativo: true });
     } catch (error) {
-        throw new Error('Erro ao buscar abrigo');
+        throw new Error('Erro ao buscar abrigo: ' + error.message);
     }
 };
 
@@ -42,7 +42,7 @@ export const updateAbrigo = async (id: string, updatedData: any) => {
 
         return await AbrigoModel.findByIdAndUpdate(id, updatedFields, { new: true });
     } catch (error) {
-        throw new Error('Erro ao atualizar abrigo');
+        throw new Error('Erro ao atualizar abrigo: ' + error.message);
     }
 };
 
@@ -56,6 +56,6 @@ export const deleteAbrigo = async (id: string) => {
         await abrigo.save();
         return abrigo;
     } catch (error) {
-        throw new Error('Erro ao deletar abrigo');
+        throw new Error('Erro ao deletar abrigo: ' + error.message);
     }
 };

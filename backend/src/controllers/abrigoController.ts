@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as AbrigoService from '../services/AbrigoService';
+import * as AbrigoService from '../services/abrigoService';
 
 export const createAbrigo = async (req: Request, res: Response) => {
     try {
