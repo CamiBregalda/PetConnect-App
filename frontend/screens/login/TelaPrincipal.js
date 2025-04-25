@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Image, Text, Keyboard, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
 import SearchInput from '../../botaodepesquisar';
+import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native';
 
-
-function StarScreen() {
-
+function TelaPrincipal() {
+  const navigation = useNavigation();
 
   return (
     <ScrollView style={styles.scrollView}>
@@ -20,14 +21,16 @@ function StarScreen() {
             source={require('../../img/Lupa.png')}
           />
         </View>
-        
+
         <View style={styles.divAnimais}>
           <Text style={styles.textoAnimais}>Animais próximo a você:</Text>
           <View style={styles.imagensContainer}>
-            <Image
-              style={styles.imgAnimais}
-              source={require('../../img/Gato.png')}
-            />
+            <TouchableOpacity onPress={() => navigation.navigate('Main', { screen: 'Home' })}>
+              <Image
+                style={styles.imgAnimais}
+                source={require('../../img/Gato.png')}
+              />
+            </TouchableOpacity>
             <Image
               style={styles.imgAnimais}
               source={require('../../img/Cachorro.png')}
@@ -37,6 +40,20 @@ function StarScreen() {
         </View>
         <View style={styles.divAnimais}>
           <Text style={styles.textoAnimais}>Abrigos próximo a você:</Text>
+          <View style={styles.imagensContainer}>
+            <Image
+              style={styles.imgAnimais}
+              source={require('../../img/PET.png')}
+            />
+            <Image
+              style={styles.imgAnimais}
+              source={require('../../img/PET.png')}
+            />
+          </View>
+          <Text style={styles.viewMore}>View more...</Text>
+        </View>
+        <View style={styles.divAnimais}>
+          <Text style={styles.textoAnimais}>Eventos próximo a você:</Text>
           <View style={styles.imagensContainer}>
             <Image
               style={styles.imgAnimais}
@@ -73,12 +90,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   divPesquisa: {
-    marginTop: 60,
-    marginBottom: 40,
+    marginTop: 40,
+    marginBottom: 20,
     justifyContent: 'center',
     backgroundColor: 'white',
     flexDirection: 'row',
-    width: 300,
+    width: '85%',
     padding: 20,
     borderRadius: 15,
     maxHeight: 80,
@@ -97,7 +114,7 @@ const styles = StyleSheet.create({
   },
   divAnimais: {
     backgroundColor: 'white',
-    width: 300,
+    width: '85%',
     padding: 20,
     borderRadius: 15,
     alignItems: 'center',
@@ -125,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StarScreen;
+export default TelaPrincipal;

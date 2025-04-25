@@ -6,6 +6,7 @@ import TaskList from '../../src/components/TaskList.js';
 function Voluntariarse() {  
 
   // State para armazenar a lista de tarefas
+  
   const [tasks, setTasks] = useState([]);
   const [titleInput, setTitleInput] = useState('');
   const [idadeInput, setIdadeInput] = useState('');
@@ -38,9 +39,10 @@ function Voluntariarse() {
   };
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <View style={styles.divCadastro}>
+    <ScrollView>
       
-        <View style={styles.taskContainer}>
+        
           <TaskInput
             titleValue={titleInput}
             onTitleChange={setTitleInput}
@@ -58,28 +60,37 @@ function Voluntariarse() {
             onEnderecoValue={setEnderecoInput}
             onAddTask={handleAddTask}
           />
-          <TaskList tasks={tasks} />
-        </View>
+           <TaskList tasks={tasks} />
+        
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: '#E7E3E3',
-  },
-  container: {
+  divCadastro: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    justifyContent: 'center', // Centraliza o conteúdo na tela de login
+    backgroundColor: 'white',
+    padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
   },
-  taskContainer: {
-    width: '90%',
-    backgroundColor: '#f0f0f0',
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 20,
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 40,
+  },
+  botao: {
+    backgroundColor: '#8A2BE2',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 80,
+    elevation: 3,
+    marginTop: 50,
+  },
+  textoBotao: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

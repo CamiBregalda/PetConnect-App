@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, View, Image, Text, Keyboard, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
 
+  
 
 function HomeScreen() {  
+
+
   const htmlContent = `
     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3594.9931725897354!2d-53.10019272460145!3d-25.704650077387758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f048f00dd26185%3A0x3965e767d865130a!2sUTFPR%20-%20Dois%20Vizinhos!5e0!3m2!1spt-BR!2sbr!4v1745415525946!5m2!1spt-BR!2sbr" 
     width="960" 
@@ -21,7 +24,7 @@ function HomeScreen() {
         <View>
           <Image
             style={styles.imgPerfil}
-            source={require('../img/teste.png')}
+            source={require('../../img/teste.png')}
           />
         </View>
 
@@ -48,7 +51,7 @@ function HomeScreen() {
             <Text>Um Abrigo Muito Legal</Text>
             <Image
               style={styles.imgADM}
-              source={require('../img/Cachorro.png')}
+              source={require('../../img/Cachorro.png')}
             />
             </View>
 
@@ -69,7 +72,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   imgPerfil: {
-    marginTop: 50,
     width: 250,
     height: 250,
     borderRadius: 125,

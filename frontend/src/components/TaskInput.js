@@ -23,7 +23,7 @@ const TaskInput = (props) => {
 
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>Candadatar-se como Voluntário!</Text>
+      <Text style={styles.label}>Candidatar-se como Voluntário!</Text>
       <TextInput
         style={styles.input}
         placeholder="Nome Completo"
@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    height: 45,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: '#f9f9f9',
+    width: 280,
+    height: 40,
+    margin: 10,
+    borderRadius: 30,
+    borderWidth: 0.2,
+    borderBottomWidth: 1,
+    padding: 10,
   },
 });
 

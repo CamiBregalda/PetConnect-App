@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import TextInputExample from '../text'; // Ajuste o path se necessário
+import TextInputExample from '../../text'; // Ajuste o path se necessário
 
 function LoginScreen() {
   const navigation = useNavigation();
@@ -10,7 +10,7 @@ function LoginScreen() {
     <View style={styles.divCadastro} edges={['top']}>
       <Image
         style={styles.logo}
-        source={require('../img/PET.png')} // Ajuste o path se necessário
+        source={require('../../img/PET.png')} // Ajuste o path se necessário
       />
       <TextInputExample />
       <Pressable
