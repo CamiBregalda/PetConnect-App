@@ -10,7 +10,7 @@ import Voluntariarse from "./screens/adm/Voluntariarse";
 import Candidatos from "./screens/adm/Candidatos";
 import VoluntariosAdm from "./screens/adm/VoluntariosAdm";
 import TelaPrincipal from "./screens/login/TelaPrincipal";
-import PerfilCandidatos from "./screens/adm/PerfilCandidato";
+import PerfilCandidato from "./screens/adm/PerfilCandidato";
 import IconVoluntariar from './img/candidatos.png';
 
 const Stack = createNativeStackNavigator();
@@ -126,7 +126,7 @@ export default function App() {
             },
             headerTintColor: 'white',
           }} />
-        <Stack.Screen name="Perfil" component={PerfilCandidatos} />
+        <Stack.Screen name="Perfil" component={PerfilCandidato} />
         
       </Stack.Navigator>
     </NavigationContainer>

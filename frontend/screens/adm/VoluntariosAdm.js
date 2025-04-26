@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
-function SeuComponente() {
+function Voluntarios() {
   const [cadastroInfo, setCadastroInfo] = useState(null); // Para armazenar as informações do backend
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ function SeuComponente() {
       try {
         // 1. Defina a URL do seu endpoint de backend para buscar as informações
         //    Use a mesma URL que você usa no Postman para a requisição GET.
-        const apiUrl = 'http://localhost:3000/users'; // <------------------- SUBSTITUA PELA SUA URL DO POSTMAN
+        const apiUrl = 'http://192.168.3.7:3000/users'; // <------------------- SUBSTITUA PELA SUA URL DO POSTMAN
 
         // Se a sua requisição GET no Postman inclui parâmetros na URL,
         // adicione-os aqui. Exemplo:
@@ -25,7 +25,6 @@ function SeuComponente() {
             // 'Authorization': 'Bearer SEU_TOKEN', // Exemplo: se precisar de autenticação
           },
         });
-        console.log(response)
         // 3. Verifique se a resposta foi bem-sucedida
         if (!response.ok) {
           const errorData = await response.json(); // Tenta parsear a resposta de erro como JSON
@@ -60,15 +59,19 @@ function SeuComponente() {
     // 7. Se as informações foram carregadas com sucesso, renderize-as
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Informações do Cadastro:</Text>
+        <Text style={styles.title}>Voluntarios do Abrigo:</Text>
         {/* Aqui você pode acessar as propriedades do objeto cadastroInfo
            e exibir as informações que você precisa.
            Adapte de acordo com a estrutura da resposta do seu backend.
            Exemplo: */}
-        {cadastroInfo.nome && <Text>Nome: {cadastroInfo.nome}</Text>}
-        {cadastroInfo.idade && <Text>Idade: {cadastroInfo.idade}</Text>}
-        {cadastroInfo.telefone && <Text>Contato: {cadastroInfo.telefone}</Text>}
-        {/* ... adicione outras informações que você precisa exibir */}
+        {Array.isArray(cadastroInfo) && cadastroInfo.map((user, idx) => (
+          <View key={idx} style={styles.box}>
+            <Text>Nome: {user.nome}</Text>
+            <Text>Idade: {user.idade}</Text>
+            <Text>Contato: {user.telefone}</Text>
+            {/* Adicione outros campos conforme necessário */}
+          </View>
+        ))}
       </View>
     );
   }
@@ -79,20 +82,39 @@ function SeuComponente() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 15,
     color: '#333',
+    textAlign: 'center',
+  },
+  box:{
+    marginBottom: 10,
+    backgroundColor: 'white',
+    padding: 15,
+    borderRadius: 15,
+  },
+  userItem: {
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
   errorText: {
     color: 'red',
     fontSize: 16,
+    textAlign: 'center',
   },
 });
 
-export default SeuComponente;
+export default Voluntarios;

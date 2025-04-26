@@ -1,97 +1,163 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Keyboard, ScrollView } from 'react-native';
-import TaskInput from '../../src/components/TaskInput.js';
-import TaskList from '../../src/components/TaskList.js';
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 
-function Voluntariarse() {  
+function VoluntarioFormScreen() {
+  const [nome, setNome] = useState('');
+  const [idade, setIdade] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [email, setEmail] = useState('');
+  const [endereco, setEndereco] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // State para armazenar a lista de tarefas
-  
-  const [tasks, setTasks] = useState([]);
-  const [titleInput, setTitleInput] = useState('');
-  const [idadeInput, setIdadeInput] = useState('');
-  const [ocupacaoInput, setOcupacaoInput] = useState('');
-  const [cpfInput, setCpfInput] = useState('');
-  const [emailInput, setEmailInput] = useState('');
-  const [telefoneInput, setTelefoneInput] = useState('');
-  const [enderecoInput, setEnderecoInput] = useState('');
+  const handleVoluntariar = async () => {
+    setLoading(true);
+    setError(null);
 
-  const handleAddTask = () => {
-    const newTask = {
-      id: Date.now().toString(),
-      title: titleInput,
-      idade: idadeInput,
-      ocupacao: ocupacaoInput,
-      cpf: cpfInput,
-      email: emailInput,
-      telefone: telefoneInput,
-      endereco: enderecoInput,
-    };
-    setTasks(prevTasks => [...prevTasks, newTask]);
-    setTitleInput('');
-    setIdadeInput('');
-    setOcupacaoInput('');
-    setCpfInput('');
-    setEmailInput('');
-    setTelefoneInput('');
-    setEnderecoInput('');
-    Keyboard.dismiss();
+    if (!nome || !idade || !telefone || !email || !endereco) {
+      setError('Por favor, preencha todos os campos.');
+      setLoading(false);
+      return;
+    }
+
+    // Aqui você faria a chamada para a sua API para enviar os dados do voluntário
+    const apiUrl = 'http://SEU_BACKEND_URL/voluntarios'; // Substitua pela URL correta
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome: nome,
+          idade: parseInt(idade, 10), 
+          telefone: telefone,
+          email: email,
+          endereco: endereco,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Erro ao se voluntariar: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+      }
+
+      const responseData = await response.json();
+      Alert.alert('Sucesso', 'Seu cadastro de voluntário foi enviado com sucesso!', [
+        { text: 'OK', onPress: () => {
+          setNome('');
+          setIdade('');
+          setTelefone('');
+          setEmail('');
+          setEndereco('');
+        } },
+      ]);
+    } catch (err) {
+      setError(`Erro ao se voluntariar: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={styles.divCadastro}>
-    <ScrollView>
-      
-        
-          <TaskInput
-            titleValue={titleInput}
-            onTitleChange={setTitleInput}
-            idadeValue={idadeInput}
-            onIdadeValue={setIdadeInput}
-            ocupacaoValue={ocupacaoInput}
-            onOcupacaoValue={setOcupacaoInput}
-            cpfValue={cpfInput}
-            onCpfValue={setCpfInput}
-            emailValue={emailInput}
-            onEmailValue={setEmailInput}
-            telefoneValue={telefoneInput}
-            onTelefoneValue={setTelefoneInput}
-            enderecoValue={enderecoInput}
-            onEnderecoValue={setEnderecoInput}
-            onAddTask={handleAddTask}
-          />
-           <TaskList tasks={tasks} />
-        
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Candidatar-se como Voluntário"</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nome Completo"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Idade"
+        value={idade}
+        onChangeText={setIdade}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Telefone"
+        value={telefone}
+        onChangeText={setTelefone}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Endereço"
+        value={endereco}
+        onChangeText={setEndereco}
+        multiline
+      />
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          pressed && { opacity: 0.8 }, // Feedback visual ao pressionar
+        ]}
+        onPress={handleVoluntariar}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={{ color: 'white', fontSize: 16 }}>Candidatar-se</Text>
+        )}
+      </Pressable>
+
     </ScrollView>
-    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  divCadastro: {
-    flex: 1,
+  container: {
+    flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center', // Centraliza o conteúdo na tela de login
-    backgroundColor: 'white',
-    padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
+    marginTop: 20,
   },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 40,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
   },
-  botao: {
+  input: {
+    width: 280,
+    height: 40,
+    margin: 10,
+    borderRadius: 30,
+    borderWidth: 0.2,
+    borderBottomWidth: 1,
+    padding: 10,
+  },
+  button: {
     backgroundColor: '#8A2BE2',
     borderRadius: 5,
     paddingVertical: 10,
-    paddingHorizontal: 80,
+    paddingHorizontal: 50,
     elevation: 3,
     marginTop: 50,
+    alignItems: 'center', 
+    justifyContent: 'center', 
   },
-  textoBotao: {
-    color: 'white',
+  errorText: {
+    color: 'red',
     fontSize: 16,
+    marginBottom: 15,
+    textAlign: 'center',
   },
 });
 
-export default Voluntariarse;
+export default VoluntarioFormScreen;
