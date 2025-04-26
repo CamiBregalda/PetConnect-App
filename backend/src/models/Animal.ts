@@ -36,6 +36,14 @@ const AnimalSchema = new Schema<AnimalAttributes>(
     {
         collection: "animais",
         timestamps: true,
+        toJSON: {
+            virtuals: true,
+            transform: (_, ret) => {
+                ret.id = ret._id;
+                delete ret._id;
+                delete ret.__v;
+            }
+        }
     }
 );
 

@@ -23,6 +23,14 @@ const VeterinarioSchema = new Schema<VeterinarioAttributes>(
   {
     collection: "veterinarios",
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_, ret) => {
+          ret.id = ret._id;
+          delete ret._id;
+          delete ret.__v;
+      }
+    }
   }
 );
 
