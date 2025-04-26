@@ -5,6 +5,7 @@ export interface AdmDeAbrigoAttributes {
     telefone: string;
     email: string;
     endereco: string;
+    descricao?: string;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -16,6 +17,7 @@ const AdmDeAbrigoSchema = new Schema<AdmDeAbrigoAttributes>(
         telefone: { type: String, required: true },
         email: { type: String, required: true },
         endereco: { type: String, required: true },
+        descricao: { type: String, required: false },
         ativo: { type: Boolean, required: true },
     },
     {

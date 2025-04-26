@@ -10,7 +10,7 @@ export const createAbrigo = async (req: Request, res: Response) => {
     }
 };
 
-export const getAbrigos = async (_req: Request, res: Response) => {
+export const getAbrigos = async (req: Request, res: Response) => {
     try {
         const abrigos = await AbrigoService.getAbrigos();
         res.status(200).json(abrigos);

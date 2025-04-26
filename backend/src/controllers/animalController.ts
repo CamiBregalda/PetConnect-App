@@ -10,7 +10,7 @@ export const createAnimal = async (req: Request, res: Response) => {
     }
 };
 
-export const getAnimais = async (_req: Request, res: Response) => {
+export const getAnimais = async (req: Request, res: Response) => {
     try {
         const animais = await AnimalService.getAnimais();
         res.status(200).json(animais);

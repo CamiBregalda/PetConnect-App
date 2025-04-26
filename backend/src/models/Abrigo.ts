@@ -7,11 +7,12 @@ export interface AbrigoAttributes {
     email: string;
     endereco: string;
     telefone: string;
+    descricao?: string;
     idAdmAbrigo: string;
-    avaliacao: string;
-    cuidadores: string[];
-    veterinarios: string[];
-    candidaturas: string[];
+    avaliacao?: string;
+    cuidadores?: string[];
+    veterinarios?: string[];
+    candidaturas?: string[];
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -24,11 +25,12 @@ const AbrigoSchema = new Schema<AbrigoAttributes>(
         email: { type: String, required: true },
         endereco: { type: String, required: true },
         telefone: { type: String, required: true },
+        descricao: { type: String, required: false },
         idAdmAbrigo: { type: String, required: true },
-        avaliacao: { type: String, required: true },
-        cuidadores: { type: [String], required: true },
-        veterinarios: { type: [String], required: true },
-        candidaturas: { type: [String], required: true },
+        avaliacao: { type: String, required: false },
+        cuidadores: { type: [String], required: false },
+        veterinarios: { type: [String], required: false },
+        candidaturas: { type: [String], required: false },
         ativo: { type: Boolean, required: true },
     },
     {

@@ -27,6 +27,18 @@ export const getAbrigoById = async (id: string) => {
     }
 };
 
+export const getAbrigoByAdmId = async (abrigoId: string) => {
+    try {
+        const abrigo = await AbrigoModel.findOne({ idAdmAbrigo: abrigoId, ativo: true });
+        if (!abrigo) {
+            throw new Error('Abrigo não encontrado');
+        }
+        return abrigo;
+    } catch (error) {
+        throw new Error('Erro ao buscar abrigo e administrador: ' + error.message);
+    }
+};
+
 export const updateAbrigo = async (id: string, updatedData: any) => {
     try {
         const updatedFields = Object.keys(updatedData).reduce((acc, key) => {
