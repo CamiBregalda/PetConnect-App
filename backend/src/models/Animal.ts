@@ -13,6 +13,8 @@ export interface AnimalAttributes {
     deficiencias: string[];
     informacoes: string;
     vacinas: string[];
+    idDono: string;
+    adotado: boolean;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -31,6 +33,8 @@ const AnimalSchema = new Schema<AnimalAttributes>(
         deficiencias: { type: [String], required: true },
         informacoes: { type: String, required: true },
         vacinas: { type: [String], required: true },
+        idDono: { type: String, required: true },
+        adotado: { type: Boolean, required: true },
         ativo: { type: Boolean, required: true },
     },
     {

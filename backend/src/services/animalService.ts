@@ -27,6 +27,15 @@ export const getAnimalById = async (id: string) => {
     }
 };
 
+export const getAnimaisByAbrigoId = async (abrigoId: string) => {
+    try {
+        const animais = await AnimalModel.find({ idDono: abrigoId, ativo: true });
+        return animais.map(animal => animal.toObject());
+    } catch (error: any) {
+        throw new Error("Erro ao buscar animais do abrigo: " + error.message);
+    }
+};
+
 export const updateAnimal = async (id: string, updatedData: any) => {
     try {
         const updatedFields = Object.keys(updatedData).reduce((acc, key) => {

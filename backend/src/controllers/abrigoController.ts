@@ -32,6 +32,19 @@ export const getAbrigoById = async (req: Request, res: Response) => {
     }
 };
 
+export const getAbrigoWithAnimais = async (req: Request, res: Response) => {
+    try {
+        const abrigo = await AbrigoService.getAbrigoWithAnimais(req.params.id);
+        if (abrigo) {
+            res.status(200).json(abrigo);
+        } else {
+            res.status(404).json({ message: 'Abrigo não encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 export const updateAbrigo = async (req: Request, res: Response) => {
     try {
         const abrigo = await AbrigoService.updateAbrigo(req.params.id, req.body);

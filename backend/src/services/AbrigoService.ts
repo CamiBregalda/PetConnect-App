@@ -1,4 +1,6 @@
 import AbrigoModel from '../models/Abrigo';
+import { getAnimaisByAbrigoId } from './AnimalService';
+import { AbrigoComAnimaisResponse } from "../models/responses/AbrigoComAnimaisResponse";
 
 export const createAbrigo = async (abrigoData: any) => {
     try {
@@ -36,6 +38,17 @@ export const getAbrigoByAdmId = async (abrigoId: string) => {
         return abrigo;
     } catch (error) {
         throw new Error('Erro ao buscar abrigo e administrador: ' + error.message);
+    }
+};
+
+export const getAbrigoWithAnimais = async (abrigoId: string) => {
+    try {
+        const abrigo = await getAbrigoById(abrigoId);
+        const animais = await getAnimaisByAbrigoId(abrigoId);
+
+        return AbrigoComAnimaisResponse.fromEntities(abrigo, animais);
+    } catch (error: any) {
+        throw new Error('Erro ao buscar abrigo e animais: ' + error.message);
     }
 };
 

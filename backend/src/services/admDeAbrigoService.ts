@@ -1,6 +1,6 @@
 import AdmDeAbrigoModel from "../models/AdmDeAbrigo";
 import * as AbrigoService from './abrigoService';
-import { AdmDeAbrigoWithAbrigoResponse } from "../models/responses/AdmDeAbrigoWithAbrigoResponse ";
+import { AdmDeAbrigoWithAbrigoResponse } from "../models/responses/AdmDeAbrigoComAbrigoResponse ";
 
 export const createAdmDeAbrigo = async (data: any) => {
     try {
