@@ -1,7 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { AbrigoProvider } from './AppContext';
 import LoginScreen from './screens/login/LoginScreen';
 import HomeAdm from './screens/adm/HomeAdm';
 import AnimaisAdm from "./screens/adm/AnimaisAdm";
@@ -12,6 +13,7 @@ import VoluntariosAdm from "./screens/adm/VoluntariosAdm";
 import TelaPrincipal from "./screens/login/TelaPrincipal";
 import PerfilCandidato from "./screens/adm/PerfilCandidato";
 import IconVoluntariar from './img/candidatos.png';
+import PerfilAnimal from "./screens/adm/PerfilAnimais";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -19,9 +21,19 @@ const Tab = createBottomTabNavigator();
 function MainTabs() {
   return (
     <Tab.Navigator
-    initialRouteName="Home"
-      screenOptions={({ route }) => ({
-        headerShown: false,
+      initialRouteName="Home"
+      screenOptions={({ route, navigation }) => ({
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: '#8A2BE2',
+        },
+        headerTintColor: 'white',
+        headerTitleAlign: 'center', // Opcional: centralizar o título
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={{ color: 'white', marginLeft: 15 }}>Voltar</Text>
+          </TouchableOpacity>
+        ),
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -43,23 +55,35 @@ function MainTabs() {
         },
         tabBarActiveTintColor: '#8A2BE2',
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: {
-          backgroundColor: 'white',
-          borderTopWidth: 1,
-          borderTopColor: '#E7E3E3',
-          height: 60,
-          paddingBottom: 5,
-          paddingTop: 5,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-        },
+        tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 60, paddingBottom: 5, paddingTop: 5 },
+        tabBarLabelStyle: { fontSize: 12 },
       })}
     >
-      
-      <Tab.Screen name="Animais" component={AnimaisAdm} />
-      <Tab.Screen name="Home" component={HomeAdm} />
-      <Tab.Screen name="Informações" component={InfoAdm} />
+
+      <Tab.Screen
+        name="Animais"
+        component={AnimaisAdm}
+        options={{
+          title: 'Animais',
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tab.Screen
+        name="Home"
+        component={HomeAdm}
+        options={{
+          title: 'Abrigo',
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tab.Screen
+        name="Informações"
+        component={InfoAdm}
+        options={{
+          title: 'Informações',
+          tabBarShowLabel: false,
+        }}
+      />
 
     </Tab.Navigator>
   );
@@ -67,6 +91,7 @@ function MainTabs() {
 
 export default function App() {
   return (
+    <AbrigoProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
       
@@ -76,12 +101,7 @@ export default function App() {
           name="Main"
           component={MainTabs}
           options={{
-            headerShown: true,
-            title: 'PetConnect',
-            headerStyle: {
-              backgroundColor: '#8A2BE2',
-            },
-            headerTintColor: 'white'
+            headerShown: false
           }} />
         <Stack.Screen
           name="VoluntariosAdm" component={VoluntariosAdm}
@@ -127,9 +147,10 @@ export default function App() {
             headerTintColor: 'white',
           }} />
         <Stack.Screen name="Perfil" component={PerfilCandidato} />
-        
+        <Stack.Screen name="PerfilAnimal" component={PerfilAnimal} />
       </Stack.Navigator>
     </NavigationContainer>
+    </AbrigoProvider>
   );
 }
 

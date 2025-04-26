@@ -1,145 +1,159 @@
-import React from 'react';
-import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
-import SearchInput from '../../botaodepesquisar';
+// HomeScreen.js
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity } from 'react-native';
 
-function TelaPrincipal() {
+function HomeScreen() {
+  const [animais, setAnimais] = useState([]);
+  const [abrigos, setAbrigos] = useState([]);
+  // const [eventos, setEventos] = useState([]); // Desativando o estado de eventos
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigation = useNavigation();
 
-  return (
-    <ScrollView style={styles.scrollView}>
-      <View style={styles.container}>
-        <View style={styles.divPesquisa} >
-          <Image
-            style={styles.imgPesquisa}
-            source={require('../../img/Filtro.png')}
-          />
-          <SearchInput />
-          <Image
-            style={styles.imgPesquisa}
-            source={require('../../img/Lupa.png')}
-          />
-        </View>
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [animaisResponse, abrigosResponse /*, eventosResponse*/] = await Promise.all([
+          fetch('http://192.168.3.7:3000/animais/'),
+          fetch('http://192.168.3.7:3000/abrigos/'),
+          // fetch('http://192.168.3.7:3000/eventos/'), // Desativando a busca de eventos
+        ]);
 
-        <View style={styles.divAnimais}>
-          <Text style={styles.textoAnimais}>Animais próximo a você:</Text>
-          <View style={styles.imagensContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Main', { screen: 'Home' })}>
-              <Image
-                style={styles.imgAnimais}
-                source={require('../../img/Gato.png')}
-              />
+        if (!animaisResponse.ok || !abrigosResponse.ok /*|| !eventosResponse.ok*/) {
+          const errorDetails = [];
+          if (!animaisResponse.ok) errorDetails.push(`Erro ao buscar animais: ${animaisResponse.status}`);
+          if (!abrigosResponse.ok) errorDetails.push(`Erro ao buscar abrigos: ${abrigosResponse.status}`);
+          // if (!eventosResponse.ok) errorDetails.push(`Erro ao buscar eventos: ${eventosResponse.status}`); // Desativando a mensagem de erro de eventos
+          throw new Error(errorDetails.join('\n'));
+        }
+
+        const animaisData = await animaisResponse.json();
+        const abrigosData = await abrigosResponse.json();
+        // const eventosData = await eventosResponse.json(); // Desativando o processamento de dados de eventos
+
+        setAnimais(animaisData);
+        setAbrigos(abrigosData);
+        // setEventos(eventosData); // Desativando a atualização do estado de eventos
+        setLoading(false);
+      } catch (err) {
+        console.error('Erro ao buscar dados:', err);
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const exibirDetalhesAnimal = (animal) => {
+    // Navegar para a tela de detalhes do animal, passando o ID
+    navigation.navigate('PerfilAnimal', { animalId: animal.id });
+    console.log('Navegando para Perfil do Animal com ID:', animal.id);
+  };
+
+  const exibirDetalhesAbrigo = (idDoAbrigo) => {
+    console.log('ID do abrigo ao navegar:', idDoAbrigo);
+    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo } });
+  };
+
+  // const exibirDetalhesEvento = (evento) => { // Desativando a função de detalhes do evento
+  //   // Navegar para a tela de detalhes do evento (a tela precisa ser criada)
+  //   console.log('Detalhes do evento:', evento);
+  // };
+
+  if (loading) {
+    return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
+  }
+
+  if (error) {
+    return <View style={styles.container}><Text style={styles.errorText}>Erro ao carregar dados: {error}</Text></View>;
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>O que você procura hoje?</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Animais para Adoção</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {animais.map((animal) => (
+            <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
+              <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
-            <Image
-              style={styles.imgAnimais}
-              source={require('../../img/Cachorro.png')}
-            />
-          </View>
-          <Text style={styles.viewMore}>View more...</Text>
-        </View>
-        <View style={styles.divAnimais}>
-          <Text style={styles.textoAnimais}>Abrigos próximo a você:</Text>
-          <View style={styles.imagensContainer}>
-            <Image
-              style={styles.imgAnimais}
-              source={require('../../img/PET.png')}
-            />
-            <Image
-              style={styles.imgAnimais}
-              source={require('../../img/PET.png')}
-            />
-          </View>
-          <Text style={styles.viewMore}>View more...</Text>
-        </View>
-        <View style={styles.divAnimais}>
-          <Text style={styles.textoAnimais}>Eventos próximo a você:</Text>
-          <View style={styles.imagensContainer}>
-            <Image
-              style={styles.imgAnimais}
-              source={require('../../img/PET.png')}
-            />
-            <Image
-              style={styles.imgAnimais}
-              source={require('../../img/PET.png')}
-            />
-          </View>
-          <Text style={styles.viewMore}>View more...</Text>
-        </View>
+          ))}
+        </ScrollView>
       </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Abrigos</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {abrigos.map((abrigo) => (
+          <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
+            <Text style={styles.listItemText}>{abrigo.nome}</Text>
+          </TouchableOpacity>
+        ))}
+        </ScrollView>
+      </View>
+
+      {/* Desativando a seção de eventos */}
+      {/* <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Eventos</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {eventos.map((evento) => (
+            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
+              <Text style={styles.listItemText}>{evento.nome}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View> */}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-    backgroundColor: '#E7E3E3',
-  },
   container: {
     flex: 1,
-    alignItems: 'center',
-    paddingTop: 20,
-  },
-  imgChat: {
-    width: 60,
-    height: 60,
-    paddingEnd: 20,
-    alignSelf: 'flex-end',
-    borderRadius: 0,
-    marginBottom: 20,
-  },
-  divPesquisa: {
-    marginTop: 40,
-    marginBottom: 20,
-    justifyContent: 'center',
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    width: '85%',
     padding: 20,
-    borderRadius: 15,
-    maxHeight: 80,
-  },
-  imgPesquisa: {
-    width: 30,
-    height: 30,
-    marginHorizontal: 10,
-  },
-  taskContainer: {
-    width: '90%',
     backgroundColor: '#f0f0f0',
-    padding: 20,
-    borderRadius: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
+    color: '#333',
+    textAlign: 'center',
+    marginTop: 50,
   },
-  divAnimais: {
-    backgroundColor: 'white',
-    width: '85%',
-    padding: 20,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 10,
+  section: {
+    marginBottom: 30,
   },
-  imagensContainer: {
-    flexDirection: 'row',
-    marginVertical: 15,
-  },
-  imgAnimais: {
-    width: 100,
-    height: 100,
-    marginHorizontal: 10,
-  },
-  textoAnimais: {
-    fontSize: 20,
-    alignSelf: 'flex-start',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
     marginBottom: 10,
+    color: '#555',
   },
-  viewMore: {
-    alignSelf: 'flex-end',
-    marginTop: 10,
-    color: '#8A2BE2',
+  listItem: {
+    backgroundColor: '#8A2BE2',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginRight: 15,
+  },
+  listItemText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
-export default TelaPrincipal;
+export default HomeScreen;

@@ -11,7 +11,7 @@ function ListaCandidatosScreen() {
   useEffect(() => {
     const buscarCadastro = async () => {
       try {
-        const apiUrl = 'http://192.168.3.7:3000/users';
+        const apiUrl = 'http://192.168.3.7:3000/users/';
 
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -53,14 +53,16 @@ function ListaCandidatosScreen() {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Candidatos para Abrigo:</Text>
-        {Array.isArray(cadastroInfo) && cadastroInfo.map((user, idx) => (
-          <TouchableOpacity key={idx} style={styles.box} onPress={() => exibirDetalhes(user.id)}>
-            <Text style={styles.text}>Nome: {user.nome}</Text>
-            <Text style={styles.text}>Idade: {user.idade}</Text>
-            <Text style={styles.text}>Contato: {user.telefone}</Text>
-            {/* Adicione outros campos que você quer exibir na lista */}
-          </TouchableOpacity>
-        ))}
+        {Array.isArray(cadastroInfo) && cadastroInfo.map((user, idx) => {
+          return (
+            <TouchableOpacity key={idx} style={styles.box} onPress={() => exibirDetalhes(user.id)}>
+              <Text style={styles.text}>Nome: {user.nome}</Text>
+              <Text style={styles.text}>Idade: {user.idade}</Text>
+              <Text style={styles.text}>Contato: {user.telefone}</Text>
+              {/* Adicione outros campos que você quer exibir na lista */}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     );
   }

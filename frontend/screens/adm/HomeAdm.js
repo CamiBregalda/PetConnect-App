@@ -1,89 +1,160 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
-import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
+import { AbrigoContext } from './../../AppContext'; // Verifique este caminho!
 
-  
-
-function HomeScreen() {  
-
-
+function HomeAdm({ route }) {
+  const { abrigoId } = route.params; // <-- Linha onde você pega o ID da rota
+  const [abrigoInfo, setAbrigoInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigation = useNavigation();
+  const { setCurrentAbrigoId } = useContext(AbrigoContext); 
   const htmlContent = `
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3594.9931725897354!2d-53.10019272460145!3d-25.704650077387758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f048f00dd26185%3A0x3965e767d865130a!2sUTFPR%20-%20Dois%20Vizinhos!5e0!3m2!1spt-BR!2sbr!4v1745415525946!5m2!1spt-BR!2sbr" 
-    width="960" 
-    height="600" 
-    style="border:0;" 
-    allowfullscreen="" loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-    </iframe>  
-    `;
- 
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3594.9931725897354!2d-53.10019272460145!3d-25.704650077387758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f048f00dd26185%3A0x3965e767d865130a!2sUTFPR%20-%20Dois%20Vizinhos!5e0!3m2!1spt-BR!2sbr!4v1745415525946!5m2!1spt-BR!2sbr" 
+  width="960" 
+  height="600" 
+  style="border:0;" 
+  allowfullscreen="" loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade">
+  </iframe>  
+  `;
 
-  return (
-    <ScrollView style={styles.scrollView}>
+  useEffect(() => {
+    const buscarInfoAbrigo = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (abrigoId) { // <-- Você usa abrigoId aqui
+          const apiUrl = `http://192.168.3.7:3000/abrigos/${abrigoId}`;
+          const response = await fetch(apiUrl);
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro ao buscar informações do abrigo: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+          }
+
+          const data = await response.json();
+          setAbrigoInfo(data);
+          setCurrentAbrigoId(data.id);
+          setLoading(false);
+          navigation.setOptions({ title: data.nome });
+        } else {
+          setLoading(false);
+          navigation.setOptions({ title: 'Abrigo' });
+        }
+      } catch (err) {
+        console.error('Erro ao buscar informações do abrigo:', err);
+        setError(err.message);
+        setLoading(false);
+        navigation.setOptions({ title: 'Erro no Abrigo' });
+      }
+    };
+
+    buscarInfoAbrigo();
+  }, [navigation, abrigoId, setCurrentAbrigoId]); // Adicione setCurrentAbrigoId como dependência
+
+
+  if (loading) {
+    return (
       <View style={styles.container}>
-        <View>
-          <Image
-            style={styles.imgPerfil}
-            source={require('../../img/teste.png')}
-          />
-        </View>
+        <ActivityIndicator size="large" color="#8A2BE2" />
+      </View>
+    );
+  }
 
-        <View style={styles.about}>
-          <Text>Sobre Nós:</Text>
-          <Text>Um Abrigo Muito Legal :D</Text>
-        </View>
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Erro ao carregar informações do abrigo: {error}</Text>
+      </View>
+    );
+  }
 
-        <View style={styles.mapa}>
-          <Text>Endereço:</Text>
-          <View style={styles.mapContainer}>
-            <WebView
-              style={styles.webView}
-              originWhitelist={['*']}
-              source={{ html: htmlContent }}
+  if (abrigoInfo) {
+    return (
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.container}>
+          <View>
+            <Image
+              style={styles.imgPerfil}
+              source={require('../../img/teste.png')}
             />
           </View>
-        </View>
+          <View style={styles.about}>
+            <Text style={styles.title}>Sobre o Abrigo: </Text>
+            <Text>Me chame no zap: (link do zap) </Text>
+            <Text> {abrigoInfo.descricao}</Text>
+          </View>
 
-        <View style={styles.aboutADM}>
+          <View style={styles.mapa}>
+            <Text style={styles.title}>Endereço:</Text>
+            <View style={styles.mapContainer}>
+              <WebView
+                style={styles.webView}
+                originWhitelist={['*']}
+                source={{ html: htmlContent }}
+              />
+            </View>
+          </View>
+          <View style={styles.aboutADM}>
 
-          <Text>Sobre o Administrador:</Text>
-          <View style={styles.sobre}>
-            <Text>Um Abrigo Muito Legal</Text>
-            <Image
-              style={styles.imgADM}
-              source={require('../../img/Cachorro.png')}
-            />
+            <Text style={styles.title}>Sobre o Adiministrador: </Text>
+            <View style={styles.sobre}>
+              <Text>{abrigoInfo.email}</Text>
+              <Image
+                style={styles.imgADM}
+                source={require('../../img/Cachorro.png')}
+              />
             </View>
 
+          </View>
+
+
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text>Selecione um abrigo para ver os detalhes.</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: '#E7E3E3',
+
   },
   container: {
     flex: 1,
+    padding: 20,
+    backgroundColor: '#f0f0f0',
     alignItems: 'center',
     paddingTop: 20,
+    justifyContent: 'center',
   },
   imgPerfil: {
     width: 250,
     height: 250,
     borderRadius: 125,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
     marginBottom: 20,
+
   },
   about: {
-    marginTop: 40,
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: 20,
     backgroundColor: 'white',
     width: 320,
-    height: 110,
-    padding: 20,
+    minHeight: 130,
+    padding: 10,
     borderRadius: 15,
   },
   mapa: {
@@ -92,10 +163,16 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 10, 
   },
+  mapContainer: {
+    width: '300',
+    height: '190', 
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
 
   aboutADM: {
-    marginTop: 40,
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: 20,
     width: 320,
     borderRadius: 15,
     padding: 10,
@@ -108,23 +185,28 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 15,
     maxHeight: 80,
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     alignItems: 'center'
   },
   imgADM: {
     width: 50,
     height: 50,
   },
-  mapContainer: {
-    width: '300',
-    height: '190', 
-    borderRadius: 10,
-    overflow: 'hidden',
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
   },
-  webView: {
-    flex: 1,
+  button: {
+    backgroundColor: '#8A2BE2',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
   },
-
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
 
-export default HomeScreen;
+export default HomeAdm;

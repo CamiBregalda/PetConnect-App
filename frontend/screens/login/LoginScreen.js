@@ -15,15 +15,9 @@ function LoginScreen() {
       <TextInputExample />
       <Pressable
         style={styles.botao}
-        onPress={() => navigation.navigate('Main')} // Navega para o TabNavigator
-      >
-        <Text style={styles.textoBotao}>Login</Text>
-      </Pressable>
-      <Pressable
-        style={styles.botao}
         onPress={() => navigation.navigate('User')} // Navega para o TabNavigator
       >
-        <Text style={styles.textoBotao}>Usuario</Text>
+        <Text style={styles.textoBotao}>Login</Text>
       </Pressable>
     </View>
   );
