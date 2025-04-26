@@ -1,5 +1,6 @@
 import AdmDeAbrigoModel from "../models/AdmDeAbrigo";
 import * as AbrigoService from './abrigoService';
+import { AdmDeAbrigoWithAbrigoResponse } from "../models/responses/AdmDeAbrigoWithAbrigoResponse ";
 
 export const createAdmDeAbrigo = async (data: any) => {
     try {
@@ -30,14 +31,14 @@ export const getAdmDeAbrigoById = async (id: string) => {
 
 export const getAdmDeAbrigoWithAbrigo = async (admId: string) => {
     try {
-        const adm = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true });
-        if (!adm) {
+        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true });
+        if (!admDeAbrigo) {
             throw new Error('Administrador de abrigo não encontrado');
         }
 
         const abrigo = await AbrigoService.getAbrigoByAdmId(admId);
 
-        return { adm, abrigo };
+        return AdmDeAbrigoWithAbrigoResponse.fromEntities(admDeAbrigo, abrigo);
     } catch (error: any) {
         throw new Error('Erro ao buscar administrador e abrigo: ' + error.message);
     }

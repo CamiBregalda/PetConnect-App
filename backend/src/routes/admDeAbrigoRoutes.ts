@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { createAdmDeAbrigo, getAdmDeAbrigos, getAdmDeAbrigoById, updateAdmDeAbrigo, deleteAdmDeAbrigo, getAdmDeAbrigoWithAbrigo } from '../controllers/admDeAbrigoController';
+import { 
+    createAdmDeAbrigo, 
+    getAdmDeAbrigos, 
+    getAdmDeAbrigoById, 
+    updateAdmDeAbrigo, 
+    deleteAdmDeAbrigo, 
+    getAdmDeAbrigoWithAbrigo 
+} from '../controllers/admDeAbrigoController';
 
 const router = Router();
 
