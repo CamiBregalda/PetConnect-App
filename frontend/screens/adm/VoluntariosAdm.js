@@ -1,82 +1,82 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { AbrigoContext } from './../../AppContext'; // Importe o Context
 
 function Voluntarios() {
-  const [cadastroInfo, setCadastroInfo] = useState(null); // Para armazenar as informações do backend
+  const { currentAbrigoId } = useContext(AbrigoContext); // Acesse o ID do abrigo do Context
+  const [voluntarios, setVoluntarios] = useState([]); // Renomeei para ser mais específico
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const buscarCadastro = async () => {
+    const buscarVoluntariosDoAbrigo = async () => {
+      if (!currentAbrigoId) {
+        setLoading(false);
+        setVoluntarios([]);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
       try {
-        // 1. Defina a URL do seu endpoint de backend para buscar as informações
-        //    Use a mesma URL que você usa no Postman para a requisição GET.
-        const apiUrl = 'http://192.168.3.7:3000/users'; // <------------------- SUBSTITUA PELA SUA URL DO POSTMAN
+        // 1. Construa a URL da API para buscar os voluntários do abrigo específico
+        //    Assumindo que sua API tem um endpoint como:
+        //    `http://192.168.3.7:3000/abrigos/{abrigoId}/voluntarios`
+        const apiUrl = `http://192.168.3.7:3000/abrigos/${currentAbrigoId}/voluntarios`; // <------------------- MODIFICADO
 
-        // Se a sua requisição GET no Postman inclui parâmetros na URL,
-        // adicione-os aqui. Exemplo:
-        // const apiUrl = 'http://localhost:8082/cadastro?id=123&detalhes=true';
-
-        // 2. Faça a requisição GET usando fetch (o método GET é o padrão)
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json', // Exemplo: se o backend espera JSON
-            // 'Authorization': 'Bearer SEU_TOKEN', // Exemplo: se precisar de autenticação
+            'Content-Type': 'application/json',
+            // 'Authorization': 'Bearer SEU_TOKEN',
           },
         });
-        // 3. Verifique se a resposta foi bem-sucedida
+
         if (!response.ok) {
-          const errorData = await response.json(); // Tenta parsear a resposta de erro como JSON
-          throw new Error(`Erro ao buscar informações: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+          const errorData = await response.json();
+          throw new Error(`Erro ao buscar voluntários: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
         }
 
-        // 4. Se a busca foi bem-sucedida, parseie a resposta JSON
         const data = await response.json();
-        setCadastroInfo(data); // Armazena as informações do backend
+        setVoluntarios(data); // Armazena a lista de voluntários do abrigo
         setLoading(false);
+        console.log('Voluntarios: Voluntários do abrigo carregados:', data); // LOG
       } catch (err) {
-        // 5. Trate erros na requisição ou no processamento
+        console.error('Voluntarios: Erro ao buscar voluntários:', err); // LOG
         setError(err.message);
         setLoading(false);
+        setVoluntarios([]);
       }
     };
 
-    // Chame a função de busca quando o componente for montado
-    buscarCadastro();
-  }, []);
+    buscarVoluntariosDoAbrigo();
+  }, [currentAbrigoId]); // Depende do ID do abrigo para refazer a busca
 
-  // 6. Renderize a interface com base no estado
   if (loading) {
     return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
   }
 
   if (error) {
-    return <View style={styles.container}><Text style={styles.errorText}>Erro ao buscar informações: {error}</Text></View>;
+    return <View style={styles.container}><Text style={styles.errorText}>Erro ao buscar voluntários: {error}</Text></View>;
   }
 
-  if (cadastroInfo) {
-    // 7. Se as informações foram carregadas com sucesso, renderize-as
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Voluntarios do Abrigo:</Text>
-        {/* Aqui você pode acessar as propriedades do objeto cadastroInfo
-           e exibir as informações que você precisa.
-           Adapte de acordo com a estrutura da resposta do seu backend.
-           Exemplo: */}
-        {Array.isArray(cadastroInfo) && cadastroInfo.map((user, idx) => (
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Voluntários do Abrigo:</Text>
+      {voluntarios.length > 0 ? (
+        voluntarios.map((voluntario, idx) => (
           <View key={idx} style={styles.box}>
-            <Text>Nome: {user.nome}</Text>
-            <Text>Idade: {user.idade}</Text>
-            <Text>Contato: {user.telefone}</Text>
+            <Text>Nome: {voluntario.nome}</Text>
+            <Text>Idade: {voluntario.idade}</Text>
+            <Text>Contato: {voluntario.telefone}</Text>
             {/* Adicione outros campos conforme necessário */}
           </View>
-        ))}
-      </View>
-    );
-  }
-
-  return null; // Estado inicial
+        ))
+      ) : (
+        <Text>Nenhum voluntário associado a este abrigo.</Text>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -96,19 +96,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 15,
-  },
-  userItem: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
   },
   errorText: {
     color: 'red',

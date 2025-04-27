@@ -37,3 +37,4 @@ yarn-error.*
 
 # properties
 **/.env
+backend/src/config/database.ts

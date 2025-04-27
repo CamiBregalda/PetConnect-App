@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export const connectDatabase = async () => {
     try {
-        await mongoose.connect("mongodb://localhost:27017/PetConnect-App", {
+        await mongoose.connect("mongodb+srv://guilago018:senhabd@cluster0.lfaqfms.mongodb.net/PetConnect", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

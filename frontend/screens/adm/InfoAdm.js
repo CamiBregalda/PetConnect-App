@@ -79,13 +79,13 @@ function InfoAdm() {
 
   return (
     <View style={styles.container}>
+      
       {abrigoInfo && (
         <View style={styles.infoContainer}>
           <Text style={styles.infoTitle}>Informações do Abrigo</Text>
           {abrigoInfo.endereco && <Text>Endereço: {abrigoInfo.endereco}</Text>}
           {abrigoInfo.telefone && <Text>Telefone: {abrigoInfo.telefone}</Text>}
           {abrigoInfo.email && <Text>Email: {abrigoInfo.email}</Text>}
-          {/* Adicione outras informações do abrigo que você quer exibir */}
         </View>
       )}
       <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm')}>
