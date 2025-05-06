@@ -60,3 +60,53 @@ export const deleteCuidador = async (id: string) => {
         throw new Error('Erro ao deletar administrador de abrigo: ' + error.message);
     }
 };
+
+export const uploudImage = async (id: string, image: Buffer) => {
+    try {
+        const cuidador = await CuidadorModel.findOne({ _id: id, ativo: true });
+
+        if (!cuidador) {
+            throw new Error ('Cuidador não encontrado');
+        }
+
+        cuidador.image = image;
+        await cuidador.save();
+        return cuidador;
+    } catch (error: any) {
+        throw new Error('Erro ao salvar imagem: ' + error.message);
+    }   
+};
+
+export const getImage = async (id: string) => {
+    try {
+        const cuidador = await CuidadorModel.findOne({ _id: id, ativo: true });
+
+        if (!cuidador) {
+            throw new Error ('Cuidador não encontrado');
+        }
+
+        if (!cuidador.image) {
+            throw new Error('Imagem não encontrada');
+        }
+
+        return cuidador.image;
+    } catch (error: any) {
+        throw new Error('Erro ao obter imagem: ' + error.message);
+    }
+};
+
+export const deleteImage = async (id: string) => {
+    try {
+        const cuidador = await CuidadorModel.findOne({ _id: id, ativo: true });
+
+        if (!cuidador) {
+            throw new Error('Cuidador não encontrado');
+        }
+
+        cuidador.image = undefined;
+
+        await cuidador.save();
+    } catch (error: any) {
+        throw new Error('Erro ao remover imagem: ' + error.message);
+    }
+};

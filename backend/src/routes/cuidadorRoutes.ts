@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createCuidador, getCuidador, getCuidadorById, updateCuidador, deleteCuidador } from '../controllers/cuidadorController';
+import { createCuidador, getCuidador, getCuidadorById, updateCuidador, deleteCuidador, uploadImage, getImage, deleteImage } from '../controllers/cuidadorController';
 
 const router = Router();
 

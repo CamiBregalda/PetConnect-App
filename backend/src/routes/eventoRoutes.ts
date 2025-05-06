@@ -17,4 +17,8 @@ router.put('/:id', updateEvento);
 router.delete('/:id', deleteEvento);
 router.get("/abrigo/:idAbrigo", getEventosByAbrigoId);
 
+router.post('/:id/imagem', uploadImage);
+router.get('/:id/imagem', getImage);
+router.delete('/:id/imagem', deleteImage);
+
 export default router;

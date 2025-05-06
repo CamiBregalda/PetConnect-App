@@ -20,8 +20,8 @@ router.get('/:id/animais', getAbrigoWithAnimais);
 router.put('/:id', updateAbrigo);
 router.delete('/:id', deleteAbrigo);
 
-router.post('/:id/image', uploadImage);
-router.get('/:id/image', getImage);
-router.delete('/:id/image', deleteImage);
+router.post('/:id/imagem', uploadImage);
+router.get('/:id/imagem', getImage);
+router.delete('/:id/imagem', deleteImage);
 
 export default router;

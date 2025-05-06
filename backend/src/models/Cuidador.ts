@@ -5,6 +5,7 @@ export interface CuidadorAttributes {
     email: string;
     telefone: string;
     abrigoId?: string;
+    image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -16,6 +17,7 @@ const CuidadorSchema = new Schema<CuidadorAttributes>(
         email: { type: String, required: true },
         telefone: { type: String, required: true },
         abrigoId: { type: String, required: true },
+        image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },
     {

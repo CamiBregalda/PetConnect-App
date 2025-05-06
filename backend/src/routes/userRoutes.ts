@@ -9,8 +9,8 @@ router.get('/:id', getUserById);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 
-router.post('/:id/image', uploadImage);
-router.get('/:id/image', getImage);
-router.delete('/:id/image', deleteImage);
+router.post('/:id/imagem', uploadImage);
+router.get('/:id/imagem', getImage);
+router.delete('/:id/imagem', deleteImage);
 
 export default router;

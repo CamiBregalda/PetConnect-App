@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
-import * as CuidadorService from '../services/CuidadorService';
+import * as CuidadorService from '../services/cuidadorService';
+import { validateImage } from '../utils/imageUtil';
+import multer from "multer";
+
+const upload = multer();
 
 export const createCuidador = async (req: Request, res: Response) => {
     try {
         const Cuidador = await CuidadorService.createCuidador(req.body);
         res.status(201).json(Cuidador);
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
@@ -14,7 +18,7 @@ export const getCuidador = async (req: Request, res: Response) => {
     try {
         const Cuidador = await CuidadorService.getCuidador();
         res.status(200).json(Cuidador);
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
@@ -27,7 +31,7 @@ export const getCuidadorById = async (req: Request, res: Response) => {
         } else {
             res.status(404).json({ message: 'Cuidador não encontrado' });
         }
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
@@ -41,7 +45,7 @@ export const updateCuidador = async (req: Request, res: Response) => {
         } else {
             res.status(404).json({ message: 'Cuidador não encontrado' });
         }
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
@@ -54,7 +58,54 @@ export const deleteCuidador = async (req: Request, res: Response) => {
         } else {
             res.status(404).json({ message: 'Cuidador não encontrado' });
         }
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
+};
+
+export const uploadImage = [
+    upload.single('image'),
+    async (req: Request, res: Response) => {
+        try {
+            const cuidadorId = req.params.id;
+            validateImage(req.file);
+            const imageBuffer = req.file?.buffer;
+
+            if (!imageBuffer) {
+                return res.status(400).json({ message: 'Imagem não enviada' });
+            }
+
+            const user = await CuidadorService.uploudImage(cuidadorId, imageBuffer);
+            return res.status(200).json(user);
+        } catch (error: any) {
+            return res.status(500).json({ message: error.message });
+        }
+    }
+];
+
+export const getImage = async (req: Request, res: Response) => {
+  try {
+      const cuidadorId = req.params.id;
+      const image = await CuidadorService.getImage(cuidadorId);
+
+      res.writeHead(200, {
+          'Content-Type': 'image/jpeg',
+          'Content-Length': image.length,
+      });
+      return res.end(image);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteImage = async (req: Request, res: Response) => {
+  const cuidadorId = req.params.id;
+
+  try {
+      await CuidadorService.deleteImage(cuidadorId);
+
+      return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
 };
