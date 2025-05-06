@@ -23,7 +23,7 @@ export const getAdmDeAbrigos = async () => {
 
 export const getAdmDeAbrigoById = async (id: string) => {
     try {
-        return await AdmDeAbrigoModel.findOne({ _id: id, ativo: true });
+        return await AdmDeAbrigoModel.findOne({ _id: id, ativo: true }).select('-image');
     } catch (error: any) {
         throw new Error('Erro ao buscar administrador de abrigo: ' + error.message);
     }
@@ -31,7 +31,8 @@ export const getAdmDeAbrigoById = async (id: string) => {
 
 export const getAdmDeAbrigoWithAbrigo = async (admId: string) => {
     try {
-        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true });
+        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true }).select('-image');
+
         if (!admDeAbrigo) {
             throw new Error('Administrador de abrigo não encontrado');
         }
@@ -65,7 +66,7 @@ export const updateAdmDeAbrigo = async (id: string, updatedData: any) => {
 
 export const deleteAdmDeAbrigo = async (id: string) => {
     try {
-        const admDeAbrigo = await AdmDeAbrigoModel.findById(id);
+        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: id, ativo: true });
         if (!admDeAbrigo) {
             throw new Error('Administrador de abrigo não encontrado');
         }
@@ -74,5 +75,55 @@ export const deleteAdmDeAbrigo = async (id: string) => {
         return admDeAbrigo;
     } catch (error: any) {
         throw new Error('Erro ao deletar administrador de abrigo: ' + error.message);
+    }
+};
+
+export const uploudImage = async (id: string, image: Buffer) => {
+    try {
+        const adm = await AdmDeAbrigoModel.findOne({ _id: id, ativo: true });
+
+        if (!adm) {
+            throw new Error ('Adm de abrigo não encontrado');
+        }
+
+        adm.image = image;
+        await adm.save();
+        return adm;
+    } catch (error: any) {
+        throw new Error('Erro ao salvar imagem: ' + error.message);
+    }   
+};
+
+export const getImage = async (id: string) => {
+    try {
+        const adm = await AdmDeAbrigoModel.findOne({ _id: id, ativo: true });
+
+        if (!adm) {
+            throw new Error ('Adm de abrigo não encontrado');
+        }
+
+        if (!adm.image) {
+            throw new Error('Imagem não encontrada');
+        }
+
+        return adm.image;
+    } catch (error: any) {
+        throw new Error('Erro ao obter imagem: ' + error.message);
+    }
+};
+
+export const deleteImage = async (id: string) => {
+    try {
+        const adm = await AdmDeAbrigoModel.findOne({ _id: id, ativo: true });
+
+        if (!adm) {
+            throw new Error('Adm de abrigo não encontrado');
+        }
+
+        adm.image = undefined;
+
+        await adm.save();
+    } catch (error: any) {
+        throw new Error('Erro ao remover imagem: ' + error.message);
     }
 };

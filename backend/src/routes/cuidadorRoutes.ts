@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { createCuidador, getCuidador, getCuidadorById, updateCuidador, deleteCuidador } from '../controllers/cuidadorController';
 
-
 const router = Router();
 
 router.post('', createCuidador);

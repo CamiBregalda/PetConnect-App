@@ -13,7 +13,7 @@ export const createAnimal = async (data: any) => {
 
 export const getAnimais = async () => {
     try {
-        return await AnimalModel.find({ ativo: true });
+        return await AnimalModel.find({ ativo: true }).select('-image');
     } catch (error: any) {
         throw new Error("Erro ao buscar animais: " + error.message);
     }
@@ -21,7 +21,7 @@ export const getAnimais = async () => {
 
 export const getAnimalById = async (id: string) => {
     try {
-        return await AnimalModel.findOne({ _id: id, ativo: true });
+        return await AnimalModel.findOne({ _id: id, ativo: true }).select('-image');
     } catch (error: any) {
         throw new Error("Erro ao buscar animal: " + error.message);
     }
@@ -57,7 +57,7 @@ export const updateAnimal = async (id: string, updatedData: any) => {
 
 export const deleteAnimal = async (id: string) => {
     try {
-        const animal = await AnimalModel.findById(id);
+        const animal = await AnimalModel.findOne({ _id: id, ativo: true });
         if (!animal) {
             throw new Error("Animal não encontrado");
         }
@@ -66,5 +66,55 @@ export const deleteAnimal = async (id: string) => {
         return animal;
     } catch (error: any) {
         throw new Error("Erro ao deletar animal: " + error.message);
+    }
+};
+
+export const uploudImage = async (id: string, image: Buffer) => {
+    try {
+        const animal = await AnimalModel.findOne({ _id: id, ativo: true });
+
+        if (!animal) {
+            throw new Error ('Animal não encontrado');
+        }
+
+        animal.image = image;
+        await animal.save();
+        return animal;
+    } catch (error: any) {
+        throw new Error('Erro ao salvar imagem: ' + error.message);
+    }   
+};
+
+export const getImage = async (id: string) => {
+    try {
+        const animal = await AnimalModel.findOne({ _id: id, ativo: true });
+
+        if (!animal) {
+            throw new Error ('Animal não encontrado');
+        }
+
+        if (!animal.image) {
+            throw new Error('Imagem não encontrada');
+        }
+
+        return animal.image;
+    } catch (error: any) {
+        throw new Error('Erro ao obter imagem: ' + error.message);
+    }
+};
+
+export const deleteImage = async (id: string) => {
+    try {
+        const animal = await AnimalModel.findOne({ _id: id, ativo: true });
+
+        if (!animal) {
+            throw new Error('Animal não encontrado');
+        }
+
+        animal.image = undefined;
+
+        await animal.save();
+    } catch (error: any) {
+        throw new Error('Erro ao remover imagem: ' + error.message);
     }
 };

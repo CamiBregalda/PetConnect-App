@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
 import * as userService from "../services/userService";
+import { validateImage } from '../utils/imageUtil';
+import multer from "multer";
+
+const upload = multer();
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -46,5 +50,52 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.json({ message: "Usuário desativado com sucesso", user });
   } catch (error) {
     res.status(500).json({ message: "Erro ao desativar usuário", error });
+  }
+};
+
+export const uploadImage = [
+  upload.single('image'),
+  async (req: Request, res: Response) => {
+      try {
+          const userId = req.params.id;
+          validateImage(req.file);
+          const imageBuffer = req.file?.buffer;
+
+          if (!imageBuffer) {
+              return res.status(400).json({ message: 'Imagem não enviada' });
+          }
+
+          const user = await userService.uploudImage(userId, imageBuffer);
+          return res.status(200).json(user);
+      } catch (error: any) {
+          return res.status(500).json({ message: error.message });
+      }
+  }
+];
+
+export const getImage = async (req: Request, res: Response) => {
+  try {
+      const userId = req.params.id;
+      const image = await userService.getImage(userId);
+
+      res.writeHead(200, {
+          'Content-Type': 'image/jpeg',
+          'Content-Length': image.length,
+      });
+      return res.end(image);
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteImage = async (req: Request, res: Response) => {
+  const userId = req.params.id;
+
+  try {
+      await userService.deleteImage(userId);
+
+      return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message });
   }
 };

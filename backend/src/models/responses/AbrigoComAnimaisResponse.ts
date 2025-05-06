@@ -1,4 +1,3 @@
-import { AbrigoAttributes } from "../Abrigo";
 import { AnimalAttributes } from "../Animal";
 
 export class AbrigoComAnimaisResponse {

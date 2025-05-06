@@ -12,6 +12,7 @@ export interface AbrigoAttributes {
     avaliacao?: string;
     cuidadores?: string[];
     candidaturas?: string[];
+    image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -29,6 +30,7 @@ const AbrigoSchema = new Schema<AbrigoAttributes>(
         avaliacao: { type: String, required: false },
         cuidadores: { type: [String], required: false },
         candidaturas: { type: [String], required: false },
+        image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },
     {

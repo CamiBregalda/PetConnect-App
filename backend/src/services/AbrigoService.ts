@@ -1,5 +1,5 @@
 import AbrigoModel from '../models/Abrigo';
-import { getAnimaisByAbrigoId } from './AnimalService';
+import { getAnimaisByAbrigoId } from './animalService';
 import { AbrigoComAnimaisResponse } from "../models/responses/AbrigoComAnimaisResponse";
 
 export const createAbrigo = async (abrigoData: any) => {
@@ -8,23 +8,23 @@ export const createAbrigo = async (abrigoData: any) => {
         abrigo.ativo = true;
         await abrigo.save();
         return abrigo;
-    } catch (error) {
+    } catch (error: any) {
         throw new Error('Erro ao criar abrigo: ' + error.message);
     }
 };
 
 export const getAbrigos = async () => {
     try {
-        return await AbrigoModel.find({ ativo: true });
-    } catch (error) {
+        return await AbrigoModel.find({ ativo: true }).select('-image');
+    } catch (error: any) {
         throw new Error('Erro ao buscar abrigos: ' + error.message);
     }
 };
 
 export const getAbrigoById = async (id: string) => {
     try {
-        return await AbrigoModel.findOne({ _id: id, ativo: true });
-    } catch (error) {
+        return await AbrigoModel.findOne({ _id: id, ativo: true }).select('-image');
+    } catch (error: any) {
         throw new Error('Erro ao buscar abrigo: ' + error.message);
     }
 };
@@ -36,7 +36,7 @@ export const getAbrigoByAdmId = async (abrigoId: string) => {
             throw new Error('Abrigo não encontrado');
         }
         return abrigo;
-    } catch (error) {
+    } catch (error: any) {
         throw new Error('Erro ao buscar abrigo e administrador: ' + error.message);
     }
 };
@@ -54,7 +54,7 @@ export const getAbrigoWithAnimais = async (abrigoId: string) => {
 
 export const updateAbrigo = async (id: string, updatedData: any) => {
     try {
-        const updatedFields = Object.keys(updatedData).reduce((acc, key) => {
+        const updatedFields = Object.keys(updatedData).reduce((acc: any, key) => {
             if (updatedData[key] != null) {
                 acc[key] = updatedData[key];
             }
@@ -66,21 +66,71 @@ export const updateAbrigo = async (id: string, updatedData: any) => {
         }
 
         return await AbrigoModel.findByIdAndUpdate(id, updatedFields, { new: true });
-    } catch (error) {
+    } catch (error: any) {
         throw new Error('Erro ao atualizar abrigo: ' + error.message);
     }
 };
 
 export const deleteAbrigo = async (id: string) => {
     try {
-        const abrigo = await AbrigoModel.findById(id);
+        const abrigo = await AbrigoModel.findOne({ _id: id, ativo: true });
         if (!abrigo) {
             throw new Error('Abrigo não encontrado');
         }
         abrigo.ativo = false;
         await abrigo.save();
         return abrigo;
-    } catch (error) {
+    } catch (error: any) {
         throw new Error('Erro ao deletar abrigo: ' + error.message);
+    }
+};
+
+export const uploudImage = async (id: string, image: Buffer) => {
+    try {
+        const abrigo = await AbrigoModel.findOne({ _id: id, ativo: true });
+
+        if (!abrigo) {
+            throw new Error ('Abrigo não encontrado');
+        }
+
+        abrigo.image = image;
+        await abrigo.save();
+        return abrigo;
+    } catch (error: any) {
+        throw new Error('Erro ao salvar imagem: ' + error.message);
+    }   
+};
+
+export const getImage = async (id: string) => {
+    try {
+        const abrigo = await AbrigoModel.findOne({ _id: id, ativo: true });
+
+        if (!abrigo) {
+            throw new Error ('Abrigo não encontrado');
+        }
+
+        if (!abrigo.image) {
+            throw new Error('Imagem não encontrada');
+        }
+
+        return abrigo.image;
+    } catch (error: any) {
+        throw new Error('Erro ao obter imagem: ' + error.message);
+    }
+};
+
+export const deleteImage = async (id: string) => {
+    try {
+        const abrigo = await AbrigoModel.findOne({ _id: id, ativo: true });
+
+        if (!abrigo) {
+            throw new Error('Abrigo não encontrado');
+        }
+
+        abrigo.image = undefined;
+
+        await abrigo.save();
+    } catch (error: any) {
+        throw new Error('Erro ao remover imagem: ' + error.message);
     }
 };

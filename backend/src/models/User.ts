@@ -6,6 +6,7 @@ export interface UserAttributes {
     idade: number;
     telefone?: string;
     endereco?: string;
+    image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -18,6 +19,7 @@ const UserSchema = new Schema<UserAttributes>(
         idade: { type: Number, required: true },
         telefone: { type: String, required: false },
         endereco: { type: String, required: false },
+        image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },
     {

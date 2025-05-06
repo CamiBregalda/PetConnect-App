@@ -49,7 +49,7 @@ export const updateCuidador = async (id: string, updatedData: any) => {
 
 export const deleteCuidador = async (id: string) => {
     try {
-        const Cuidador = await CuidadorModel.findById(id);
+        const Cuidador = await CuidadorModel.findOne({ _id: id, ativo: true });
         if (!Cuidador) {
             throw new Error('Administrador de abrigo não encontrado');
         }

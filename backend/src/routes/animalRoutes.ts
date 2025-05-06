@@ -4,7 +4,10 @@ import {
     getAnimais,
     getAnimalById,
     updateAnimal,
-    deleteAnimal
+    deleteAnimal,
+    uploadImage, 
+    getImage, 
+    deleteImage
 } from "../controllers/animalController";
 
 const router = Router();
@@ -12,7 +15,11 @@ const router = Router();
 router.post("/", createAnimal);
 router.get("/", getAnimais);
 router.get("/:id", getAnimalById);
-router.patch("/:id", updateAnimal);
+router.put("/:id", updateAnimal);
 router.delete("/:id", deleteAnimal);
+
+router.post('/:id/image', uploadImage);
+router.get('/:id/image', getImage);
+router.delete('/:id/image', deleteImage);
 
 export default router;
