@@ -9,4 +9,8 @@ router.get('/:id', getCuidadorById);
 router.put('/:id', updateCuidador);
 router.delete('/:id', deleteCuidador);
 
+router.post('/:id/imagem', uploadImage);
+router.get('/:id/imagem', getImage);
+router.delete('/:id/imagem', deleteImage);
+
 export default router;
