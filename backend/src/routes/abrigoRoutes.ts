@@ -4,6 +4,7 @@ import {
     getAbrigos,
     getAbrigoById,
     getAbrigoWithAnimais,
+    getAbrigoWithCuidadores,
     updateAbrigo,
     deleteAbrigo, 
     uploadImage, 
@@ -17,6 +18,7 @@ router.post('/', createAbrigo);
 router.get('/', getAbrigos);
 router.get('/:id', getAbrigoById);
 router.get('/:id/animais', getAbrigoWithAnimais);
+router.get('/:id/cuidadores', getAbrigoWithCuidadores);
 router.put('/:id', updateAbrigo);
 router.delete('/:id', deleteAbrigo);
 

@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image,  } from 'react-native';
 import { AbrigoContext } from './../../AppContext'; // Importe o Context
 
 function Voluntarios() {
   const { currentAbrigoId } = useContext(AbrigoContext); // Acesse o ID do abrigo do Context
-  const [voluntarios, setVoluntarios] = useState([]); // Renomeei para ser mais específico
+  const [Cuidadores, setCuidadores] = useState([]); // Renomeei para ser mais específico
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const buscarVoluntariosDoAbrigo = async () => {
+    const buscarCuidadoresDoAbrigo = async () => {
       if (!currentAbrigoId) {
         setLoading(false);
-        setVoluntarios([]);
+        setCuidadores([]);
         return;
       }
 
@@ -21,8 +21,8 @@ function Voluntarios() {
       try {
         // 1. Construa a URL da API para buscar os voluntários do abrigo específico
         //    Assumindo que sua API tem um endpoint como:
-        //    `http://192.168.3.7:3000/abrigos/{abrigoId}/voluntarios`
-        const apiUrl = `http://192.168.3.7:3000/abrigos/${currentAbrigoId}/voluntarios`; // <------------------- MODIFICADO
+        //    `http://192.168.3.7:3000/abrigos/{abrigoId}/Cuidadores`
+        const apiUrl = `http://192.168.3.7:3000/abrigos/${currentAbrigoId}/Cuidadores`; // <------------------- MODIFICADO
 
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -38,18 +38,18 @@ function Voluntarios() {
         }
 
         const data = await response.json();
-        setVoluntarios(data); // Armazena a lista de voluntários do abrigo
+        setCuidadores(data.cuidadores); // Armazena a lista de voluntários do abrigo
         setLoading(false);
-        console.log('Voluntarios: Voluntários do abrigo carregados:', data); // LOG
+        console.log('Cuidadores: Voluntários do abrigo carregados:', data); // LOG
       } catch (err) {
-        console.error('Voluntarios: Erro ao buscar voluntários:', err); // LOG
+        console.error('Cuidadores: Erro ao buscar voluntários:', err); // LOG
         setError(err.message);
         setLoading(false);
-        setVoluntarios([]);
+        setCuidadores([]);
       }
     };
 
-    buscarVoluntariosDoAbrigo();
+    buscarCuidadoresDoAbrigo();
   }, [currentAbrigoId]); // Depende do ID do abrigo para refazer a busca
 
   if (loading) {
@@ -63,12 +63,18 @@ function Voluntarios() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Voluntários do Abrigo:</Text>
-      {voluntarios.length > 0 ? (
-        voluntarios.map((voluntario, idx) => (
+      {Cuidadores.length > 0 ? (
+        Cuidadores.map((cuidador, idx) => (
           <View key={idx} style={styles.box}>
-            <Text>Nome: {voluntario.nome}</Text>
-            <Text>Idade: {voluntario.idade}</Text>
-            <Text>Contato: {voluntario.telefone}</Text>
+            <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
+              <Image 
+                  source={{ uri: `http://192.168.3.7:3000/abrigo/${cuidador.id}/cuidadores` }} 
+                  style={styles.listImage} />
+              <Text style={styles.listItemText}>{cuidador.nome}</Text>
+            </TouchableOpacity>
+            <Text>Nome: {cuidador.nome}</Text>
+            <Text>Idade: {cuidador.idade}</Text>
+            <Text>Contato: {cuidador.telefone}</Text>
             {/* Adicione outros campos conforme necessário */}
           </View>
         ))
@@ -96,6 +102,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 15,
+  },
+  listItem: {
+    backgroundColor: '#8A2BE2',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginRight: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 150,
+    height: 150,
+  },
+  listItemText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 5,
+    textAlign: 'center',
   },
   errorText: {
     color: 'red',

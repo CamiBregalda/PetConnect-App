@@ -11,7 +11,6 @@ function InfoAdm() {
   const [error, setError] = useState(null);
 
   const buscarInfoAbrigo = useCallback(async (abrigoId) => {
-    console.log('InfoAdm: Iniciando busca de informações para o ID:', abrigoId); // LOG
     if (!abrigoId) {
       setLoading(false);
       setAbrigoInfo(null); // Limpa as informações se não houver ID
@@ -43,7 +42,6 @@ function InfoAdm() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('InfoAdm: Tela focada. ID do abrigo no contexto:', currentAbrigoId); // LOG
       if (currentAbrigoId) {
         buscarInfoAbrigo(currentAbrigoId);
       } else {

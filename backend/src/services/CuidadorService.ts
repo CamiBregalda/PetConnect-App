@@ -27,6 +27,15 @@ export const getCuidadorById = async (id: string) => {
     }
 };
 
+export const getCuidadoresByAbrigoId = async (abrigoId: string) => {
+    try {
+        const Cuidadores = await CuidadorModel.find({ abrigoId, ativo: true });
+        return Cuidadores.map(Cuidador => Cuidador.toObject());
+    } catch (error: any) {
+        throw new Error("Erro ao buscar Cuidadores do abrigo: " + error.message);
+    }
+};
+
 
 export const updateCuidador = async (id: string, updatedData: any) => {
     try {

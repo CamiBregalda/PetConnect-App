@@ -1,6 +1,6 @@
 // HomeScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 function HomeScreen() {
@@ -51,11 +51,10 @@ function HomeScreen() {
   const exibirDetalhesAnimal = (animal) => {
     // Navegar para a tela de detalhes do animal, passando o ID
     navigation.navigate('PerfilAnimal', { animalId: animal.id });
-    console.log('Navegando para Perfil do Animal com ID:', animal.id);
+
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {
-    console.log('ID do abrigo ao navegar:', idDoAbrigo);
     navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo } });
   };
 
@@ -81,7 +80,10 @@ function HomeScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {animais.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
-              <Text style={styles.listItemText}>{animal.nome}</Text>
+              <Image 
+                source={{ uri: `http://192.168.3.7:3000/animais/${animal.id}/imagem` }} 
+                 style={styles.listImage} />
+                 <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -90,11 +92,14 @@ function HomeScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Abrigos</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {abrigos.map((abrigo) => (
-          <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
-            <Text style={styles.listItemText}>{abrigo.nome}</Text>
-          </TouchableOpacity>
-        ))}
+          {abrigos.map((abrigo) => (
+            <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
+              <Image 
+                source={{ uri: `http://192.168.3.7:3000/abrigos/${abrigo.id}/imagem` }} 
+                style={styles.listImage} />
+                <Text style={styles.listItemText}>{abrigo.nome}</Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
 
@@ -138,21 +143,34 @@ const styles = StyleSheet.create({
   },
   listItem: {
     backgroundColor: '#8A2BE2',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     borderRadius: 10,
     marginRight: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 150,
+    height: 150,
   },
   listItemText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 5,
+    textAlign: 'center',
   },
   errorText: {
     color: 'red',
     fontSize: 16,
     textAlign: 'center',
     marginTop: 20,
+  },
+  listImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 0,
+    resizeMode: 'cover',
   },
 });
 
