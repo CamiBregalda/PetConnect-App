@@ -1,11 +1,12 @@
 import { Schema, model } from "mongoose";
+import { Endereco, EnderecoSchema } from "./Endereco";
 
 export interface AbrigoAttributes {
     id?: string;
     cnpj: string;
     nome: string;
     email: string;
-    endereco: string;
+    endereco: Endereco;
     telefone: string;
     descricao?: string;
     idAdmAbrigo: string;
@@ -23,7 +24,7 @@ const AbrigoSchema = new Schema<AbrigoAttributes>(
         cnpj: { type: String, required: true },
         nome: { type: String, required: true },
         email: { type: String, required: true },
-        endereco: { type: String, required: true },
+        endereco: { type: EnderecoSchema, required: true },
         telefone: { type: String, required: true },
         descricao: { type: String, required: false },
         idAdmAbrigo: { type: String, required: true },

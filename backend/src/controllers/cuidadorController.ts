@@ -14,6 +14,15 @@ export const createCuidador = async (req: Request, res: Response) => {
     }
 };
 
+export const createCuidadorByUserId = async (req: Request, res: Response) => {
+    try {
+        const Cuidador = await CuidadorService.createCuidadorByUserId(req.params.userId, req.query.abrigoId as string);
+        res.status(201).json(Cuidador);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 export const getCuidador = async (req: Request, res: Response) => {
     try {
         const Cuidador = await CuidadorService.getCuidador();
@@ -84,28 +93,28 @@ export const uploadImage = [
 ];
 
 export const getImage = async (req: Request, res: Response) => {
-  try {
-      const cuidadorId = req.params.id;
-      const image = await CuidadorService.getImage(cuidadorId);
+    try {
+        const cuidadorId = req.params.id;
+        const image = await CuidadorService.getImage(cuidadorId);
 
-      res.writeHead(200, {
-          'Content-Type': 'image/jpeg',
-          'Content-Length': image.length,
-      });
-      return res.end(image);
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
-  }
+        res.writeHead(200, {
+            'Content-Type': 'image/jpeg',
+            'Content-Length': image.length,
+        });
+        return res.end(image);
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
 };
 
 export const deleteImage = async (req: Request, res: Response) => {
-  const cuidadorId = req.params.id;
+    const cuidadorId = req.params.id;
 
-  try {
-      await CuidadorService.deleteImage(cuidadorId);
+    try {
+        await CuidadorService.deleteImage(cuidadorId);
 
-      return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
-  } catch (error: any) {
-    return res.status(500).json({ message: error.message });
-  }
+        return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
 };

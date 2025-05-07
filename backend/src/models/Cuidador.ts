@@ -1,9 +1,10 @@
 import { Schema, model } from "mongoose";
+import { UserAttributes } from "./User";
 
 export interface CuidadorAttributes {
     nome: string;
     email: string;
-    telefone: string;
+    telefone?: string;
     abrigoId?: string;
     image?: Buffer;
     ativo: boolean;
@@ -36,3 +37,16 @@ const CuidadorSchema = new Schema<CuidadorAttributes>(
 
 const CuidadorModel = model<CuidadorAttributes>("Cuidador", CuidadorSchema);
 export default CuidadorModel;
+
+export class CuidadorFactory {
+    static createFromUser(user: UserAttributes, abrigoId: string) {
+        return new CuidadorModel({
+            nome: user.nome,
+            email: user.email,
+            telefone: user.telefone,
+            image: user.image,
+            abrigoId,
+            ativo: true,
+        });
+    }
+}

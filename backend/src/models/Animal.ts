@@ -4,7 +4,7 @@ export interface AnimalAttributes {
     id?: string;
     nome: string;
     sexo: string;
-    dataNascimento: Date;
+    dataNascimento?: Date;
     especie: string;
     raca: string;
     porte: string;
@@ -25,7 +25,7 @@ const AnimalSchema = new Schema<AnimalAttributes>(
     {
         nome: { type: String, required: true },
         sexo: { type: String, required: true },
-        dataNascimento: { type: Date, required: true },
+        dataNascimento: { type: Date, required: false },
         especie: { type: String, required: true },
         raca: { type: String, required: true },
         porte: { type: String, required: true },
@@ -48,6 +48,16 @@ const AnimalSchema = new Schema<AnimalAttributes>(
                 ret.id = ret._id;
                 delete ret._id;
                 delete ret.__v;
+
+                if (ret.dataNascimento instanceof Date && !isNaN(ret.dataNascimento.getTime())) {
+                    const date = new Date(ret.dataNascimento);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    ret.dataNascimento = `${day}/${month}/${year}`;
+                } else {
+                    ret.dataNascimento = "Data desconhecida";
+                }
             }
         }
     }

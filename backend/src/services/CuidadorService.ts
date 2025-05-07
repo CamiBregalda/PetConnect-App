@@ -1,9 +1,26 @@
-import CuidadorModel from "../models/Cuidador";
-
+import CuidadorModel, { CuidadorFactory } from "../models/Cuidador";
+import { getUserById } from './userService';
 
 export const createCuidador = async (data: any) => {
     try {
         const Cuidador = new CuidadorModel(data);
+        Cuidador.ativo = true;
+        await Cuidador.save();
+        return Cuidador;
+    } catch (error: any) {
+        throw new Error('Erro ao criar administrador de abrigo: ' + error.message);
+    }
+};
+
+export const createCuidadorByUserId = async (userId: string, abrigoId: string) => {
+    try {
+        const user = await getUserById(userId);
+
+        if (!user) {
+            throw new Error("Usuário não encontrado");
+        }
+
+        const Cuidador = CuidadorFactory.createFromUser(user, abrigoId);
         Cuidador.ativo = true;
         await Cuidador.save();
         return Cuidador;
