@@ -9,6 +9,7 @@ export interface AbandonoAttributes {
     animalResgatado: boolean;
     idAbrigoResgatou: string;
     images: Buffer[];
+    ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
