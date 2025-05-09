@@ -19,7 +19,7 @@ export const getAbandonos = async (req: Request, res: Response) => {
     }
 };
 
-export const getAbandonosById = async (req: Request, res: Response) => {
+export const getAbandonoById = async (req: Request, res: Response) => {
     try {
         const evento = await AbandonoService.getAbandonoById(req.params.id);
         if (!evento) {
