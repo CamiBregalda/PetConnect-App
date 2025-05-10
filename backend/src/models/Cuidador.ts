@@ -1,12 +1,10 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { UserAttributes } from "./User";
 
 export interface CuidadorAttributes {
-    nome: string;
     email: string;
-    telefone?: string;
+    userId: Types.ObjectId;
     abrigoId?: string;
-    image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -14,11 +12,9 @@ export interface CuidadorAttributes {
 
 const CuidadorSchema = new Schema<CuidadorAttributes>(
     {
-        nome: { type: String, required: true },
         email: { type: String, required: true },
-        telefone: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         abrigoId: { type: String, required: true },
-        image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },
     {
@@ -39,12 +35,10 @@ const CuidadorModel = model<CuidadorAttributes>("Cuidador", CuidadorSchema);
 export default CuidadorModel;
 
 export class CuidadorFactory {
-    static createFromUser(user: UserAttributes, abrigoId: string) {
+    static createFromUser(user: UserAttributes, userId: string, abrigoId: string) {
         return new CuidadorModel({
-            nome: user.nome,
             email: user.email,
-            telefone: user.telefone,
-            image: user.image,
+            userId,
             abrigoId,
             ativo: true,
         });

@@ -1,5 +1,8 @@
+import { Types } from "mongoose";
 import CuidadorModel, { CuidadorFactory } from "../models/Cuidador";
-import { getUserById } from './userService';
+import { CuidadorResponse } from "../models/responses/CuidadorResponse";
+import { UserAttributes } from "../models/User";
+import * as UserService from './userService';
 
 export const createCuidador = async (data: any) => {
     try {
@@ -14,13 +17,13 @@ export const createCuidador = async (data: any) => {
 
 export const createCuidadorByUserId = async (userId: string, abrigoId: string) => {
     try {
-        const user = await getUserById(userId);
+        const user = await UserService.getUserById(userId);
 
         if (!user) {
             throw new Error("Usuário não encontrado");
         }
 
-        const Cuidador = CuidadorFactory.createFromUser(user, abrigoId);
+        const Cuidador = CuidadorFactory.createFromUser(user, userId, abrigoId);
         Cuidador.ativo = true;
         await Cuidador.save();
         return Cuidador;
@@ -31,16 +34,38 @@ export const createCuidadorByUserId = async (userId: string, abrigoId: string) =
 
 export const getCuidador = async () => {
     try {
-        return await CuidadorModel.find({ ativo: true });    } catch (error: any) {
-        throw new Error('Erro ao buscar administradores de abrigo: ' + error.message);
+        return await CuidadorModel.find({ ativo: true });    
+    } catch (error: any) {
+        throw new Error('Erro ao buscar cuidadores de abrigo: ' + error.message);
     }
 };
 
 export const getCuidadorById = async (id: string) => {
     try {
-        return await CuidadorModel.findOne({ _id: id, ativo: true });
+        const cuidador = await CuidadorModel.findOne({ _id: id, ativo: true }).populate('userId');
+        
+        if (!cuidador || !cuidador.userId) {
+            throw new Error('Cuidador de abrigo não encontrado');
+        }
+        
+        return CuidadorResponse.fromEntities(cuidador);
     } catch (error: any) {
-        throw new Error('Erro ao buscar administrador de abrigo: ' + error.message);
+        throw new Error('Erro ao buscar cuidador de abrigo: ' + error.message);
+    }
+};
+
+export const getCuidadorByUserId = async (user: string) => {
+    try {
+        const objectUserId = new Types.ObjectId(user);
+        const cuidador = await CuidadorModel.findOne({ userId: objectUserId, ativo: true }).populate('userId');
+        
+        if (!cuidador || !cuidador.userId) {
+            throw new Error('Cuidador de abrigo não encontrado');
+        }
+
+        return CuidadorResponse.fromEntities(cuidador);
+    } catch (error: any) {
+        throw new Error('Erro ao buscar cuidador de abrigo: ' + error.message);
     }
 };
 
@@ -77,7 +102,7 @@ export const deleteCuidador = async (id: string) => {
     try {
         const Cuidador = await CuidadorModel.findOne({ _id: id, ativo: true });
         if (!Cuidador) {
-            throw new Error('Administrador de abrigo não encontrado');
+            throw new Error('Cuidador de abrigo não encontrado');
         }
         Cuidador.ativo = false;
         await Cuidador.save();
@@ -95,9 +120,7 @@ export const uploudImage = async (id: string, image: Buffer) => {
             throw new Error ('Cuidador não encontrado');
         }
 
-        cuidador.image = image;
-        await cuidador.save();
-        return cuidador;
+        return UserService.uploudImage(cuidador.userId.toString(), image);
     } catch (error: any) {
         throw new Error('Erro ao salvar imagem: ' + error.message);
     }   
@@ -111,11 +134,7 @@ export const getImage = async (id: string) => {
             throw new Error ('Cuidador não encontrado');
         }
 
-        if (!cuidador.image) {
-            throw new Error('Imagem não encontrada');
-        }
-
-        return cuidador.image;
+        return await UserService.getImage(cuidador.userId.toString());
     } catch (error: any) {
         throw new Error('Erro ao obter imagem: ' + error.message);
     }
@@ -129,9 +148,7 @@ export const deleteImage = async (id: string) => {
             throw new Error('Cuidador não encontrado');
         }
 
-        cuidador.image = undefined;
-
-        await cuidador.save();
+        await await UserService.deleteImage(cuidador.userId.toString());
     } catch (error: any) {
         throw new Error('Erro ao remover imagem: ' + error.message);
     }

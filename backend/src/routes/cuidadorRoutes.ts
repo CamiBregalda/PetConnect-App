@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createCuidador, createCuidadorByUserId, getCuidador, getCuidadorById, updateCuidador, deleteCuidador, uploadImage, getImage, deleteImage } from '../controllers/cuidadorController';
+import { createCuidador, createCuidadorByUserId, getCuidador, getCuidadorById, getCuidadorByUserId, updateCuidador, deleteCuidador, uploadImage, getImage, deleteImage } from '../controllers/cuidadorController';
 
 const router = Router();
 
@@ -7,6 +7,7 @@ router.post('', createCuidador);
 router.post('/user/:userId', createCuidadorByUserId);
 router.get('', getCuidador);
 router.get('/:id', getCuidadorById);
+router.get('/user/:userId', getCuidadorByUserId);
 router.put('/:id', updateCuidador);
 router.delete('/:id', deleteCuidador);
 

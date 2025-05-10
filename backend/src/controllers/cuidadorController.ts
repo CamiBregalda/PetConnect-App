@@ -34,17 +34,21 @@ export const getCuidador = async (req: Request, res: Response) => {
 
 export const getCuidadorById = async (req: Request, res: Response) => {
     try {
-        const Cuidador = await CuidadorService.getCuidadorById(req.params.id);
-        if (Cuidador) {
-            res.status(200).json(Cuidador);
-        } else {
-            res.status(404).json({ message: 'Cuidador não encontrado' });
-        }
+        const cuidador = await CuidadorService.getCuidadorById(req.params.id);
+        res.status(200).json(cuidador);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
 
+export const getCuidadorByUserId = async (req: Request, res: Response) => {
+    try {
+        const cuidador = await CuidadorService.getCuidadorByUserId(req.params.userId);
+        res.status(200).json(cuidador);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 export const updateCuidador = async (req: Request, res: Response) => {
     try {
