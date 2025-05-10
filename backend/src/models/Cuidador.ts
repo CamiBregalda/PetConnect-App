@@ -4,7 +4,7 @@ import { UserAttributes } from "./User";
 export interface CuidadorAttributes {
     email: string;
     userId: Types.ObjectId;
-    abrigoId?: string;
+    abrigoId?: Types.ObjectId;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -14,7 +14,7 @@ const CuidadorSchema = new Schema<CuidadorAttributes>(
     {
         email: { type: String, required: true },
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        abrigoId: { type: String, required: true },
+        abrigoId: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
         ativo: { type: Boolean, required: true },
     },
     {

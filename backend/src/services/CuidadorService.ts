@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 import CuidadorModel, { CuidadorFactory } from "../models/Cuidador";
 import { CuidadorResponse } from "../models/responses/CuidadorResponse";
-import { UserAttributes } from "../models/User";
 import * as UserService from './userService';
 
 export const createCuidador = async (data: any) => {
@@ -34,7 +33,9 @@ export const createCuidadorByUserId = async (userId: string, abrigoId: string) =
 
 export const getCuidador = async () => {
     try {
-        return await CuidadorModel.find({ ativo: true });    
+        const listCuidadores = await CuidadorModel.find({ ativo: true }).populate('userId');
+
+        return listCuidadores.map((cuidador) => CuidadorResponse.fromEntities(cuidador));
     } catch (error: any) {
         throw new Error('Erro ao buscar cuidadores de abrigo: ' + error.message);
     }
@@ -58,7 +59,7 @@ export const getCuidadorByUserId = async (user: string) => {
     try {
         const objectUserId = new Types.ObjectId(user);
         const cuidador = await CuidadorModel.findOne({ userId: objectUserId, ativo: true }).populate('userId');
-        
+
         if (!cuidador || !cuidador.userId) {
             throw new Error('Cuidador de abrigo não encontrado');
         }
@@ -71,8 +72,10 @@ export const getCuidadorByUserId = async (user: string) => {
 
 export const getCuidadoresByAbrigoId = async (abrigoId: string) => {
     try {
-        const Cuidadores = await CuidadorModel.find({ abrigoId, ativo: true });
-        return Cuidadores.map(Cuidador => Cuidador.toObject());
+        const objectAbrigoId = new Types.ObjectId(abrigoId);
+        const listCuidadores = await CuidadorModel.find({ abrigoId: objectAbrigoId, ativo: true }).populate('userId');
+
+        return listCuidadores.map((cuidador) => CuidadorResponse.fromEntities(cuidador));
     } catch (error: any) {
         throw new Error("Erro ao buscar Cuidadores do abrigo: " + error.message);
     }
@@ -92,9 +95,17 @@ export const updateCuidador = async (id: string, updatedData: any) => {
             throw new Error('Nenhum campo válido para atualização');
         }
 
-        return await CuidadorModel.findByIdAndUpdate(id, updatedFields, { new: true });
+        const cuidador = await CuidadorModel.findByIdAndUpdate(id, updatedFields, { new: true });
+        
+        if (!cuidador) {
+            throw new Error('Cuidador não encontrado');
+        }
+        
+        UserService.updateUser(cuidador.userId.toString(), updatedFields);
+        
+        return CuidadorResponse.fromEntities(cuidador);
     } catch (error: any) {
-        throw new Error('Erro ao atualizar administrador de abrigo: ' + error.message);
+        throw new Error('Erro ao atualizar cuidador: ' + error.message);
     }
 };
 

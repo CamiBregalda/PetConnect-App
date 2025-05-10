@@ -1,12 +1,8 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 export interface AdmDeAbrigoAttributes {
-    nome: string;
-    telefone: string;
-    email: string;
-    endereco: string;
+    userId: Types.ObjectId;
     descricao?: string;
-    image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -14,12 +10,8 @@ export interface AdmDeAbrigoAttributes {
 
 const AdmDeAbrigoSchema = new Schema<AdmDeAbrigoAttributes>(
     {
-        nome: { type: String, required: true },
-        telefone: { type: String, required: true },
-        email: { type: String, required: true },
-        endereco: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         descricao: { type: String, required: false },
-        image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },
     {

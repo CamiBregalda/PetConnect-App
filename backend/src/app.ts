@@ -7,6 +7,7 @@ import AdmDeAbrigoRoutes from './routes/admDeAbrigoRoutes';
 import cuidadorRoutes from './routes/cuidadorRoutes';
 import eventoRoutes from './routes/eventoRoutes';
 import abandonoRoutes from './routes/abandonoRoutes';
+import candidaturaRoutes from './routes/candidaturaRoutes';
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.use('/animais', animaisRoutes);
 app.use('/cuidadores', cuidadorRoutes);
 app.use('/eventos', eventoRoutes);
 app.use('/abandonos', abandonoRoutes);
+app.use('/candidaturas', candidaturaRoutes);
 
 export default app;

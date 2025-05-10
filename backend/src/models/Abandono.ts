@@ -1,5 +1,6 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { Endereco, EnderecoSchema } from "./Endereco";
+import { Imagem, ImagemSchema } from "./Imagem";
 
 export interface AbandonoAttributes {
     id?: string;
@@ -7,8 +8,8 @@ export interface AbandonoAttributes {
     local: Endereco;
     descricao: string;
     animalResgatado: boolean;
-    idAbrigoResgatou: string;
-    images: Buffer[];
+    idAbrigoResgatou?: Types.ObjectId;
+    images: Imagem[];
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -20,8 +21,9 @@ const AbandonoSchema = new Schema<AbandonoAttributes>(
         local: { type: EnderecoSchema, required: true },
         descricao: { type: String, required: true },
         animalResgatado: { type: Boolean, required: true },
-        idAbrigoResgatou: { type: String, required: true },
-        images: [{ type: Buffer, required: false }],
+        idAbrigoResgatou: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: false },
+        images: [{ type: [ImagemSchema], default: [], required: false }],
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "abandono",

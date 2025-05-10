@@ -1,8 +1,8 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 export interface CandidaturaAttributes {
-    idCandidatura?: string;
-    idAbrigo: string;
+    abrigoId: Types.ObjectId;
+    userId: Types.ObjectId;
     cargo: string;
     curriculo: string;
     aprovacao: boolean;
@@ -13,8 +13,8 @@ export interface CandidaturaAttributes {
 
 const CandidaturaSchema = new Schema<CandidaturaAttributes>(
     {
-        idCandidatura: { type: String },
-        idAbrigo: { type: String, required: true },
+        abrigoId: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         cargo: { type: String, required: true },
         curriculo: { type: String, required: true },
         aprovacao: { type: Boolean, required: true },

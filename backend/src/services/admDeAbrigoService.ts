@@ -1,6 +1,8 @@
 import AdmDeAbrigoModel from "../models/AdmDeAbrigo";
 import * as AbrigoService from './abrigoService';
+import * as UserService from './userService';
 import { AdmDeAbrigoWithAbrigoResponse } from "../models/responses/AdmDeAbrigoComAbrigoResponse ";
+import { AdmDeAbrigoResponse } from "../models/responses/AdmDeAbrigoResponse";
 
 export const createAdmDeAbrigo = async (data: any) => {
     try {
@@ -15,7 +17,9 @@ export const createAdmDeAbrigo = async (data: any) => {
 
 export const getAdmDeAbrigos = async () => {
     try {
-        return await AdmDeAbrigoModel.find({ ativo: true });
+        const listAdm = await AdmDeAbrigoModel.find({ ativo: true }).populate('userId');
+
+        return listAdm.map((adm) => AdmDeAbrigoResponse.fromEntities(adm));
     } catch (error: any) {
         throw new Error('Erro ao buscar administradores de abrigo: ' + error.message);
     }
@@ -23,7 +27,13 @@ export const getAdmDeAbrigos = async () => {
 
 export const getAdmDeAbrigoById = async (id: string) => {
     try {
-        return await AdmDeAbrigoModel.findOne({ _id: id, ativo: true }).select('-image');
+        const admAbrigo = await AdmDeAbrigoModel.findOne({ _id: id, ativo: true }).populate('userId');
+
+        if (!admAbrigo || !admAbrigo.userId) {
+            throw new Error('Administrador de abrigo não encontrado');
+        }
+
+        return AdmDeAbrigoResponse.fromEntities(admAbrigo);
     } catch (error: any) {
         throw new Error('Erro ao buscar administrador de abrigo: ' + error.message);
     }
@@ -31,7 +41,7 @@ export const getAdmDeAbrigoById = async (id: string) => {
 
 export const getAdmDeAbrigoWithAbrigo = async (admId: string) => {
     try {
-        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true }).select('-image');
+        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true }).populate('userId');
 
         if (!admDeAbrigo) {
             throw new Error('Administrador de abrigo não encontrado');
@@ -58,7 +68,15 @@ export const updateAdmDeAbrigo = async (id: string, updatedData: any) => {
             throw new Error('Nenhum campo válido para atualização');
         }
 
-        return await AdmDeAbrigoModel.findByIdAndUpdate(id, updatedFields, { new: true });
+        const adm = await AdmDeAbrigoModel.findByIdAndUpdate(id, updatedFields, { new: true });
+
+        if (!adm) {
+            throw new Error('Administrador de abrigo não encontrado');
+        }
+
+        UserService.updateUser(adm.userId.toString(), updatedFields);
+
+        return AdmDeAbrigoResponse.fromEntities(adm);
     } catch (error: any) {
         throw new Error('Erro ao atualizar administrador de abrigo: ' + error.message);
     }
@@ -86,9 +104,7 @@ export const uploudImage = async (id: string, image: Buffer) => {
             throw new Error ('Adm de abrigo não encontrado');
         }
 
-        adm.image = image;
-        await adm.save();
-        return adm;
+        return UserService.uploudImage(adm.userId.toString(), image);
     } catch (error: any) {
         throw new Error('Erro ao salvar imagem: ' + error.message);
     }   
@@ -102,11 +118,7 @@ export const getImage = async (id: string) => {
             throw new Error ('Adm de abrigo não encontrado');
         }
 
-        if (!adm.image) {
-            throw new Error('Imagem não encontrada');
-        }
-
-        return adm.image;
+        return UserService.getImage(adm.userId.toString());
     } catch (error: any) {
         throw new Error('Erro ao obter imagem: ' + error.message);
     }
@@ -120,9 +132,7 @@ export const deleteImage = async (id: string) => {
             throw new Error('Adm de abrigo não encontrado');
         }
 
-        adm.image = undefined;
-
-        await adm.save();
+        return UserService.deleteImage(adm.userId.toString());
     } catch (error: any) {
         throw new Error('Erro ao remover imagem: ' + error.message);
     }

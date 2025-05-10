@@ -1,6 +1,6 @@
 import AbandonoModel from "../models/Abandono";
 import { AbandonoAttributes } from "../models/Abandono";
-
+import { Imagem } from "../models/Imagem";
 
 export const createAbandono = async (data: AbandonoAttributes) => {
     try {
@@ -15,7 +15,7 @@ export const createAbandono = async (data: AbandonoAttributes) => {
 
 export const getAbandono = async () => {
     try {
-        return await AbandonoModel.find({ ativo: true });
+        return await AbandonoModel.find({ ativo: true }).select('-images');
     } catch (error: any) {
         throw new Error("Erro ao buscar abandono: " + error.message);
     }
@@ -23,7 +23,7 @@ export const getAbandono = async () => {
 
 export const getAbandonoById = async (id: string) => {
     try {
-        return await AbandonoModel.findOne({ _id: id, ativo: true });
+        return await AbandonoModel.findOne({ _id: id, ativo: true }).select('-images');
     } catch (error: any) {
         throw new Error("Erro ao buscar abandono: " + error.message);
     }
@@ -62,16 +62,63 @@ export const deleteAbandono = async (id: string) => {
     }
 };
 
-export const getAbandonosByAbandonoId = async (idAbandono: string) => {
+export const addImage = async (id: string, imagem: Imagem) => {
     try {
-        const abandonos = await AbandonoModel.find({ idAbandono: idAbandono, ativo: true });
+        const abandono = await AbandonoModel.findOne({ _id: id, ativo: true });
 
-        if (!abandonos || abandonos.length === 0) {
-            throw new Error("Nenhum abandono encontrado para este abandono");
+        if (!abandono) {
+            throw new Error ('Registro de abandono não encontrado');
         }
 
-        return abandonos;
+        abandono.images.push(imagem)
+        await abandono.save();
+        return abandono;
     } catch (error: any) {
-        throw new Error("Erro ao buscar abandonos pelo ID do abandono: " + error.message);
+        throw new Error('Erro ao salvar imagem: ' + error.message);
+    }   
+};
+
+export const getImage = async (id: string, fileName: string) => {
+    try {
+        const abandono = await AbandonoModel.findOne({ _id: id, ativo: true });
+
+        if (!abandono) {
+            throw new Error ('Registro de abandono não encontrado');
+        }
+
+        if (!abandono.images) {
+            throw new Error('Imagem não encontrada');
+        }
+
+        //const imagem = abandono.images[0];
+        const imagem = abandono.images.find(img => img.name === fileName);
+        if (!imagem) {
+            throw new Error(fileName);
+        }
+
+        return imagem.image;
+    } catch (error: any) {
+        throw new Error('Erro ao obter imagem: ' + error.message);
+    }
+};
+
+export const deleteImage = async (id: string, fileName: string) => {
+    try {
+        const abandono = await AbandonoModel.findOne({ _id: id, ativo: true });
+
+        if (!abandono) {
+            throw new Error ('Registro de abandono não encontrado');
+        }
+
+        if (!abandono.images) {
+            throw new Error('Imagem não encontrada');
+        }
+
+        abandono.images = abandono.images.filter(image => image.name !== fileName);
+
+        await abandono.save();
+        return abandono;
+    } catch (error: any) {
+        throw new Error('Erro ao remover imagem: ' + error.message);
     }
 };

@@ -1,32 +1,33 @@
 import { CuidadorAttributes } from "../Cuidador";
+import { CuidadorResponse } from "./CuidadorResponse";
 
 
 export class AbrigoComCuidadoresResponse {
-    id: string;
-    nome: string;
-    email: string;
-    telefone: string;
+    id?: string;
+    nome?: string;
+    email?: string;
+    telefone?: string;
     abrigoId?: string;
-    ativo: boolean;
+    ativo?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
-    cuidadores: CuidadorAttributes[];
+    cuidadores?: CuidadorResponse[];
 
     constructor(props: {
-        id: string;
-        nome: string;
-        email: string;
-        telefone: string;
+        id?: string;
+        nome?: string;
+        email?: string;
+        telefone?: string;
         abrigoId?: string;
-        ativo: boolean;
+        ativo?: boolean;
         createdAt?: Date;
         updatedAt?: Date;
-        cuidadores: CuidadorAttributes[];
+        cuidadores?: CuidadorResponse[];
     }) {
         Object.assign(this, props);
     }
 
-    static fromEntities(abrigo: any, cuidadores: CuidadorAttributes[]) {
+    static fromEntities(abrigo: any, cuidadores: CuidadorResponse[]) {
         return new AbrigoComCuidadoresResponse({
             id: abrigo.id,
             nome: abrigo.nome,

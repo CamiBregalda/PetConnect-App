@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import * as AbandonoService from "../services/abandonoService";
+import { validateImage } from '../utils/imageUtil';
+import { Imagem } from "../models/Imagem";
+import multer from "multer";
+
+const upload = multer();
 
 export const createAbandono = async (req: Request, res: Response) => {
     try {
@@ -46,5 +51,61 @@ export const deleteAbandono = async (req: Request, res: Response) => {
         res.status(200).json({ message: "Abandono deletado com sucesso" });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+export const addImage = [
+    upload.single('image'),
+    async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.id;
+            validateImage(req.file);
+            const imageBuffer = req.file?.buffer;
+            const imageName = req.file?.originalname;
+
+            if (!imageBuffer || !imageName) {
+                return res.status(400).json({ message: 'Imagem não enviada' });
+            }
+
+            const imagem: Imagem = {
+                name: imageName,
+                image: imageBuffer
+            };
+
+            const user = await AbandonoService.addImage(userId, imagem);
+            return res.status(200).json(user);
+        } catch (error: any) {
+            return res.status(500).json({ message: error.message });
+        }
+    }
+];
+
+export const getImage = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.id;
+        const imagem = req.params.image;
+
+        const image = await AbandonoService.getImage(userId, imagem);
+
+        res.writeHead(200, {
+            'Content-Type': 'image/jpeg',
+            'Content-Length': image.length,
+        });
+        return res.end(image);
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteImage = async (req: Request, res: Response) => {
+    const userId = req.params.id;
+    const imagem = req.params.image;
+
+    try {
+        await AbandonoService.deleteImage(userId, imagem);
+
+        return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
     }
 };

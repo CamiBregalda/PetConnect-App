@@ -1,38 +1,38 @@
     import { AnimalAttributes } from "../Animal";
 
     export class AbrigoComAnimaisResponse {
-        id: string;
-        cnpj: string;
-        nome: string;
-        email: string;
-        endereco: string;
-        telefone: string;
+        id?: string;
+        cnpj?: string;
+        nome?: string;
+        email?: string;
+        endereco?: string;
+        telefone?: string;
         descricao?: string;
-        idAdmAbrigo: string;
+        idAdmAbrigo?: string;
         avaliacao?: string;
         cuidadores?: string[];
         candidaturas?: string[];
-        ativo: boolean;
-        createdAt: Date;
-        updatedAt: Date;
-        animais: AnimalAttributes[];
+        ativo?: boolean;
+        createdAt?: Date;
+        updatedAt?: Date;
+        animais?: AnimalAttributes[];
 
         constructor(props: {
-            id: string;
-            cnpj: string;
-            nome: string;
-            email: string;
-            endereco: string;
-            telefone: string;
+            id?: string;
+            cnpj?: string;
+            nome?: string;
+            email?: string;
+            endereco?: string;
+            telefone?: string;
             descricao?: string;
-            idAdmAbrigo: string;
+            idAdmAbrigo?: string;
             avaliacao?: string;
             cuidadores?: string[];
             candidaturas?: string[];
-            ativo: boolean;
-            createdAt: Date;
-            updatedAt: Date;
-            animais: AnimalAttributes[];
+            ativo?: boolean;
+            createdAt?: Date;
+            updatedAt?: Date;
+            animais?: AnimalAttributes[];
         }) {
             Object.assign(this, props);
         }

@@ -1,6 +1,5 @@
     import { Request, Response } from 'express';
     import * as AbrigoService from '../services/abrigoService';
-    import * as CuidadorService from '../services/cuidadorService';
     import { validateImage } from '../utils/imageUtil';
     import multer from "multer";
 

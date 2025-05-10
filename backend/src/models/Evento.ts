@@ -1,13 +1,12 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { Endereco, EnderecoSchema } from "./Endereco";
 
 export interface EventoAttributes {
-    id?: string;
     titulo: string;
     descricao: string;
     endereco: Endereco;
     data: Date;
-    idAbrigo?: string;
+    idAbrigo?: Types.ObjectId;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -19,7 +18,7 @@ const EventoSchema = new Schema<EventoAttributes>(
         descricao: { type: String, required: true },
         endereco: { type: EnderecoSchema, required: true },
         data: { type: Date, required: true },
-        idAbrigo: { type: String, required: false },
+        idAbrigo: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
         ativo: { type: Boolean, required: true },
     },
     {

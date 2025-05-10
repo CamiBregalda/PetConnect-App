@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 import { Endereco, EnderecoSchema } from "./Endereco";
 
 export interface AbrigoAttributes {
@@ -9,10 +9,10 @@ export interface AbrigoAttributes {
     endereco: Endereco;
     telefone: string;
     descricao?: string;
-    idAdmAbrigo: string;
+    idAdmAbrigo?: Types.ObjectId
     avaliacao?: string;
-    cuidadores?: string[];
-    candidaturas?: string[];
+    cuidadores?: Types.ObjectId[];
+    candidaturas?: Types.ObjectId[];
     image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
@@ -27,12 +27,12 @@ const AbrigoSchema = new Schema<AbrigoAttributes>(
         endereco: { type: EnderecoSchema, required: true },
         telefone: { type: String, required: true },
         descricao: { type: String, required: false },
-        idAdmAbrigo: { type: String, required: true },
+        idAdmAbrigo: { type: Schema.Types.ObjectId, ref: 'AdmDeAbrigo', required: true },
         avaliacao: { type: String, required: false },
-        cuidadores: { type: [String], required: false },
-        candidaturas: { type: [String], required: false },
+        cuidadores: { type: [Schema.Types.ObjectId], ref: 'Cuidador', required: false },
+        candidaturas: { type: [Schema.Types.ObjectId], ref: 'Candidatura', required: false },
         image: { type: Buffer, required: false },
-        ativo: { type: Boolean, required: true },
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "abrigos",

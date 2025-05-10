@@ -1,5 +1,3 @@
-import { UserAttributes } from "../User";
-
 export class CuidadorResponse {
     id?: string;
     nome?: string;
