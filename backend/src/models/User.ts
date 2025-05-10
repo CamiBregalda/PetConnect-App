@@ -1,11 +1,12 @@
 import { Schema, model } from "mongoose";
+import { Endereco, EnderecoSchema } from "./Endereco";
 
 export interface UserAttributes {
     nome: string;
     email: string;
     idade: number;
     telefone?: string;
-    endereco?: string;
+    endereco?: Endereco;
     image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
@@ -18,7 +19,7 @@ const UserSchema = new Schema<UserAttributes>(
         email: { type: String, required: true },
         idade: { type: Number, required: true },
         telefone: { type: String, required: false },
-        endereco: { type: String, required: false },
+        endereco: { type: EnderecoSchema, required: false },
         image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },
