@@ -52,6 +52,10 @@ function Voluntarios() {
     buscarCuidadoresDoAbrigo();
   }, [currentAbrigoId]); // Depende do ID do abrigo para refazer a busca
 
+  const exibirPerfil = (cuidador) => {
+    navigation.navigate('perfil da pessoa', { userID: cuidador.id });
+  };
+
   if (loading) {
     return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
   }
@@ -66,14 +70,12 @@ function Voluntarios() {
       {Cuidadores.length > 0 ? (
         Cuidadores.map((cuidador, idx) => (
           <View key={idx} style={styles.box}>
-            <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
+            <TouchableOpacity key={cuidador.id} style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
               <Image 
                   source={{ uri: `http://192.168.3.7:3000/abrigo/${cuidador.id}/cuidadores` }} 
                   style={styles.listImage} />
-              <Text style={styles.listItemText}>{cuidador.nome}</Text>
             </TouchableOpacity>
             <Text>Nome: {cuidador.nome}</Text>
-            <Text>Idade: {cuidador.idade}</Text>
             <Text>Contato: {cuidador.telefone}</Text>
             {/* Adicione outros campos conforme necessário */}
           </View>

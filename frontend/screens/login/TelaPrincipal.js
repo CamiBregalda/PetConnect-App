@@ -1,12 +1,12 @@
 // HomeScreen.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 function HomeScreen() {
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
-  // const [eventos, setEventos] = useState([]); // Desativando o estado de eventos
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
@@ -16,27 +16,23 @@ function HomeScreen() {
       setLoading(true);
       setError(null);
       try {
-        const [animaisResponse, abrigosResponse /*, eventosResponse*/] = await Promise.all([
+        const [animaisResponse, abrigosResponse] = await Promise.all([
           fetch('http://192.168.3.7:3000/animais/'),
           fetch('http://192.168.3.7:3000/abrigos/'),
-          // fetch('http://192.168.3.7:3000/eventos/'), // Desativando a busca de eventos
         ]);
 
-        if (!animaisResponse.ok || !abrigosResponse.ok /*|| !eventosResponse.ok*/) {
+        if (!animaisResponse.ok || !abrigosResponse.ok) {
           const errorDetails = [];
           if (!animaisResponse.ok) errorDetails.push(`Erro ao buscar animais: ${animaisResponse.status}`);
           if (!abrigosResponse.ok) errorDetails.push(`Erro ao buscar abrigos: ${abrigosResponse.status}`);
-          // if (!eventosResponse.ok) errorDetails.push(`Erro ao buscar eventos: ${eventosResponse.status}`); // Desativando a mensagem de erro de eventos
           throw new Error(errorDetails.join('\n'));
         }
 
         const animaisData = await animaisResponse.json();
         const abrigosData = await abrigosResponse.json();
-        // const eventosData = await eventosResponse.json(); // Desativando o processamento de dados de eventos
 
         setAnimais(animaisData);
         setAbrigos(abrigosData);
-        // setEventos(eventosData); // Desativando a atualização do estado de eventos
         setLoading(false);
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
@@ -49,19 +45,24 @@ function HomeScreen() {
   }, []);
 
   const exibirDetalhesAnimal = (animal) => {
-    // Navegar para a tela de detalhes do animal, passando o ID
     navigation.navigate('PerfilAnimal', { animalId: animal.id });
-
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {
     navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo } });
   };
 
-  // const exibirDetalhesEvento = (evento) => { // Desativando a função de detalhes do evento
-  //   // Navegar para a tela de detalhes do evento (a tela precisa ser criada)
-  //   console.log('Detalhes do evento:', evento);
-  // };
+  const handleSearch = (text) => {
+    setSearchTerm(text);
+  };
+
+  const animaisFiltrados = animais.filter(animal =>
+    animal.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const abrigosFiltrados = abrigos.filter(abrigo =>
+    abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
@@ -75,45 +76,44 @@ function HomeScreen() {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>O que você procura hoje?</Text>
 
+      <View style={styles.searchBarContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar por nome..."
+          value={searchTerm}
+          onChangeText={handleSearch}
+        />
+      </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Animais para Adoção</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {animais.map((animal) => (
+          {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
-              <Image 
-                source={{ uri: `http://192.168.3.7:3000/animais/${animal.id}/imagem` }} 
-                 style={styles.listImage} />
-                 <Text style={styles.listItemText}>{animal.nome}</Text>
+              <Image
+                source={{ uri: `http://192.168.3.7:3000/animais/${animal.id}/imagem` }}
+                style={styles.listImage} />
+              <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
           ))}
+          {animaisFiltrados.length === 0 && <Text>Nenhum animal encontrado com esse nome.</Text>}
         </ScrollView>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Abrigos</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {abrigos.map((abrigo) => (
+          {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
-              <Image 
-                source={{ uri: `http://192.168.3.7:3000/abrigos/${abrigo.id}/imagem` }} 
+              <Image
+                source={{ uri: `http://192.168.3.7:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
-                <Text style={styles.listItemText}>{abrigo.nome}</Text>
+              <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>
           ))}
+          {abrigosFiltrados.length === 0 && <Text>Nenhum abrigo encontrado com esse nome.</Text>}
         </ScrollView>
       </View>
-
-      {/* Desativando a seção de eventos */}
-      {/* <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Eventos</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {eventos.map((evento) => (
-            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
-              <Text style={styles.listItemText}>{evento.nome}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View> */}
     </ScrollView>
   );
 }
@@ -131,6 +131,18 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginTop: 50,
+  },
+  searchBarContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingLeft: 10,
+    backgroundColor: 'white',
   },
   section: {
     marginBottom: 30,

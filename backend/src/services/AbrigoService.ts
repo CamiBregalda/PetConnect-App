@@ -1,6 +1,6 @@
 import AbrigoModel from '../models/Abrigo';
 import { getAnimaisByAbrigoId } from './animalService';
-import { getCuidadoresByAbrigoId } from './CuidadorService';
+import { getCuidadoresByAbrigoId } from './cuidadorService';
 import { AbrigoComAnimaisResponse } from "../models/responses/AbrigoComAnimaisResponse";
 import { AbrigoComCuidadoresResponse } from "../models/responses/AbrigoComCuidadoresResponse";
 

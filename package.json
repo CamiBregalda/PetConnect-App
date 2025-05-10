@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/CamiBregalda/PetConnect-App#readme",
   "dependencies": {
-    "expo": "^52.0.46",
+    "expo": "^53.0.46",
     "typescript": "^5.3.3",
     "@types/react": "~18.3.12"
   },
