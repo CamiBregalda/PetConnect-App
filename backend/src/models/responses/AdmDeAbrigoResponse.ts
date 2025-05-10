@@ -23,14 +23,14 @@ export class AdmDeAbrigoResponse {
 
     static fromEntities(adm: any) {
         return new AdmDeAbrigoResponse({
-            id: adm.id,
-            nome: adm.userId.nome,
-            email: adm.userId.email,
-            idade: adm.userId.idade,
-            telefone: adm.userId.telefone,
-            endereco: adm.userId.endereco,
-            descricao: adm.descricao,
-            userId: adm.userId.id,
+            id: adm.id ?? null,
+            nome: adm.userId.nome ?? null,
+            email: adm.userId.email ?? null,
+            idade: adm.userId.idade ?? null,
+            telefone: adm.userId.telefone ?? null,
+            endereco: adm.userId.endereco ?? null,
+            descricao: adm.descricao ?? null,
+            userId: adm.userId.id ?? null,
         });
     }
 }

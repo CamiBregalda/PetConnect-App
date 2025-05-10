@@ -5,6 +5,13 @@ import * as UserService from './userService';
 
 export const createCuidador = async (data: any) => {
     try {
+        UserService.updateUser(data.userId, data);
+
+        const existingUser = await CuidadorModel.findOne({ userId: data.userId, ativo: true });
+        if (existingUser) {
+            throw new Error('Cuidador já existente para este usuário');
+        }
+
         const Cuidador = new CuidadorModel(data);
         Cuidador.ativo = true;
         await Cuidador.save();

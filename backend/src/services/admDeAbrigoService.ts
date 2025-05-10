@@ -6,6 +6,13 @@ import { AdmDeAbrigoResponse } from "../models/responses/AdmDeAbrigoResponse";
 
 export const createAdmDeAbrigo = async (data: any) => {
     try {
+        UserService.updateUser(data.userId, data);
+
+        const existingUser = await AdmDeAbrigoModel.findOne({ userId: data.userId, ativo: true });
+        if (existingUser) {
+            throw new Error('Administrador de Abrigo já existente para este usuário');
+        }
+
         const admDeAbrigo = new AdmDeAbrigoModel(data);
         admDeAbrigo.ativo = true;
         await admDeAbrigo.save();
