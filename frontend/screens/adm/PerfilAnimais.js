@@ -78,58 +78,76 @@ function PerfilAnimal({ route }) {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={styles.title}>Detalhes do Animal</Text>
-        <View style={styles.infoContainer}>
-           <View style={styles.imageView}>
-          <Image
-            source={{ uri: `http://192.168.3.7:3000/animais/${AnimalDetalhes.id}/imagem` }}
-            style={styles.imgAdm}
-          />
+          <View style={styles.imageView}>
+            <Image
+              source={{ uri: `http://192.168.3.7:3000/animais/${AnimalDetalhes.id}/imagem` }}
+              style={styles.imgAdm}
+            />
           </View>
-          <Text style={styles.label}>Nome:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.nome}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Nome:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.nome}</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Sexo:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.sexo}</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Data de Nascimento:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.dataNascimento}</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Especie:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.especie}</Text>
+          </View>
 
-          <Text style={styles.label}>Sexo:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.sexo}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Especie:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.raca}</Text>
+          </View>
 
-          <Text style={styles.label}>Data de Nascimento:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.dataNascimento}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Porte:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.porte}</Text>
+          </View>
 
-          <Text style={styles.label}>Especie:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.especie}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Castrado(a):</Text>
+            <Text style={styles.value}>{AnimalDetalhes.castrado ? 'Sim' : 'Não'}</Text>
+          </View>
 
-          <Text style={styles.label}>Porte:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.porte}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Doencas:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.doencas}</Text>
+          </View>
 
-          <Text style={styles.label}>Castrado(a):</Text>
-          <Text style={styles.value}>{AnimalDetalhes.castrado}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Deficiências:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.deficiencias}</Text>
+          </View>
 
-          <Text style={styles.label}>Doencas:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.doencas}</Text>
-
-          <Text style={styles.label}>Deficiências:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.deficiencias}</Text>
-
-          <Text style={styles.label}>Sobre:</Text>
-          <Text style={styles.value}>{AnimalDetalhes.informacoes}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Sobre:</Text>
+            <Text style={styles.value}>{AnimalDetalhes.informacoes}</Text>
+          </View>
         </View>
-      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  
+
   container: {
     flex: 1,
+    display: 'flex',
     padding: 20,
     backgroundColor: '#f0f0f0',
-    
   },
-  imageView:{
+  imageView: {
     alignItems: 'center',
   },
   imgAdm: {
+    marginTop: 20,
     width: 250,
     height: 250,
     borderRadius: 15,
@@ -158,20 +176,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   infoContainer: {
+    display: 'flex',
     backgroundColor: 'white',
     borderRadius: 15,
-    padding: 20,
+    margin: 5,
+    padding: 15,
     elevation: 2,
+    flexDirection: 'row',
+    borderColor: '#8A2BE2',
+    borderWidth: 1,
   },
   label: {
     fontSize: 16,
     color: '#666',
-    marginTop: 10,
   },
   value: {
     fontSize: 16,
     color: '#333',
-    marginBottom: 10,
+
   },
 });
 

@@ -14,6 +14,7 @@ import TelaPrincipal from "./screens/login/TelaPrincipal";
 import PerfilCandidato from "./screens/adm/PerfilCandidato";
 import IconVoluntariar from './img/candidatos.png';
 import PerfilAnimal from "./screens/adm/PerfilAnimais";
+import PerfilCuidador from "./screens/adm/PerfilCuidador";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -55,7 +56,7 @@ function MainTabs() {
         },
         tabBarActiveTintColor: '#8A2BE2',
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 60, paddingBottom: 5, paddingTop: 5 },
+        tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 100, paddingBottom: 5, paddingTop: 5 },
         tabBarLabelStyle: { fontSize: 12 },
       })}
     >
@@ -146,7 +147,8 @@ export default function App() {
             },
             headerTintColor: 'white',
           }} />
-        <Stack.Screen name="Perfil" component={PerfilCandidato} />
+        <Stack.Screen name="PerfilCandidato" component={PerfilCandidato} />
+        <Stack.Screen name="PerfilCuidador" component={PerfilCuidador} />
         <Stack.Screen name="PerfilAnimal" component={PerfilAnimal} />
       </Stack.Navigator>
     </NavigationContainer>

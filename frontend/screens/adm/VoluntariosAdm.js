@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image,  } from 'react-native';
 import { AbrigoContext } from './../../AppContext'; // Importe o Context
+import { useNavigation } from '@react-navigation/native';
 
 function Voluntarios() {
   const { currentAbrigoId } = useContext(AbrigoContext); // Acesse o ID do abrigo do Context
   const [Cuidadores, setCuidadores] = useState([]); // Renomeei para ser mais específico
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const buscarCuidadoresDoAbrigo = async () => {
@@ -53,7 +55,7 @@ function Voluntarios() {
   }, [currentAbrigoId]); // Depende do ID do abrigo para refazer a busca
 
   const exibirPerfil = (cuidador) => {
-    navigation.navigate('perfil da pessoa', { userID: cuidador.id });
+    navigation.navigate('PerfilCuidador', { userId: cuidador.id });
   };
 
   if (loading) {
@@ -72,7 +74,7 @@ function Voluntarios() {
           <View key={idx} style={styles.box}>
             <TouchableOpacity key={cuidador.id} style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
               <Image 
-                  source={{ uri: `http://192.168.3.7:3000/abrigo/${cuidador.id}/cuidadores` }} 
+                  source={{ uri: `http://192.168.3.7:3000/cuidadores/${cuidador.id}/imagem` }} 
                   style={styles.listImage} />
             </TouchableOpacity>
             <Text>Nome: {cuidador.nome}</Text>
@@ -104,6 +106,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 15,
     borderRadius: 15,
+  },
+  listImage: {
+    width: 130,
+    height: 100,
+    borderRadius: 10,
+    marginBottom: 0,
+    resizeMode: 'cover',
   },
   listItem: {
     backgroundColor: '#8A2BE2',

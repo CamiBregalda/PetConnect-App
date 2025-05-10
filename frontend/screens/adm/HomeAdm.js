@@ -60,7 +60,7 @@ function HomeAdm({ route }) {
 
     const buscarInfoAdmin = async (idAdmAbrigo) => {
       try {
-        const adminApiUrl = `http://192.168.3.7:3000/admAbrigo/${idAdmAbrigo}`; // Ajuste a URL da sua API de administradores
+        const adminApiUrl = `http://192.168.3.7:3000/admAbrigo/${idAdmAbrigo}`; 
         const adminResponse = await fetch(adminApiUrl);
 
         if (!adminResponse.ok) {

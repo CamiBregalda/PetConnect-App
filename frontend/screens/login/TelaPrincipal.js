@@ -146,15 +146,17 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 30,
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 15,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#555',
+    color: 'black',
   },
   listItem: {
-    backgroundColor: '#8A2BE2',
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
@@ -165,11 +167,11 @@ const styles = StyleSheet.create({
     height: 150,
   },
   listItemText: {
-    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
     marginTop: 5,
     textAlign: 'center',
+    color: "#8A2BE2",
   },
   errorText: {
     color: 'red',
@@ -178,9 +180,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   listImage: {
-    width: 100,
+    width: 130,
     height: 100,
-    borderRadius: 50,
+    borderRadius: 10,
     marginBottom: 0,
     resizeMode: 'cover',
   },
