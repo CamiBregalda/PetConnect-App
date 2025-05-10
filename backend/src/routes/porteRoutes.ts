@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { getAllPortes } from '../controllers/especieController';
+import { getPortes } from '../controllers/porteController';
 
 const router = Router();
 
-router.get('', getAllPortes);
+router.get('', getPortes);
 
 export default router;

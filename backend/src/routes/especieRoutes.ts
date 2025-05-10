@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { getAllEspecies } from '../controllers/especieController';
+import { getEspecies } from '../controllers/especieController';
 
 const router = Router();
 
-router.get('', getAllEspecies);
+router.get('', getEspecies);
 
 export default router;

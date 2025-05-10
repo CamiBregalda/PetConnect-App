@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { getPortes } from '../services/porteService';
+import * as PorteService from '../services/porteService';
 
-export const getAllPortes = (req: Request, res: Response) => {
+export const getPortes = (req: Request, res: Response) => {
     try {
-        const portes = getPortes();
+        const portes = PorteService.getPortes();
         return res.status(200).json(portes);
     } catch (error: any) {
         return res.status(500).json({ message: 'Erro ao buscar portes', error: error.message });
