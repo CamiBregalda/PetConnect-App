@@ -3,6 +3,7 @@ export class CuidadorResponse {
     nome?: string;
     email?: string;
     idade?: number;
+    ocupacao?: string;
     telefone?: string;
     endereco?: string;
     abrigoId?: string;
@@ -13,6 +14,7 @@ export class CuidadorResponse {
         nome?: string;
         email?: string;
         idade?: number;
+        ocupacao?: string;
         telefone?: string;
         endereco?: string;
         abrigoId?: string;
@@ -27,6 +29,7 @@ export class CuidadorResponse {
             nome: cuidador.userId.nome,
             email: cuidador.userId.email,
             idade: cuidador.userId.idade,
+            ocupacao: cuidador.userId.ocupacao,
             telefone: cuidador.userId.telefone,
             endereco: cuidador.userId.endereco,
             abrigoId: cuidador.abrigoId,

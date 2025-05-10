@@ -8,6 +8,9 @@ import cuidadorRoutes from './routes/cuidadorRoutes';
 import eventoRoutes from './routes/eventoRoutes';
 import abandonoRoutes from './routes/abandonoRoutes';
 import candidaturaRoutes from './routes/candidaturaRoutes';
+import especieRoutes from './routes/especieRoutes';
+import racaRoutes from './routes/racaRoutes';
+import porteRoutes from './routes/porteRoutes';
 
 const app = express();
 
@@ -22,5 +25,8 @@ app.use('/cuidadores', cuidadorRoutes);
 app.use('/eventos', eventoRoutes);
 app.use('/abandonos', abandonoRoutes);
 app.use('/candidaturas', candidaturaRoutes);
+app.use('/especies', especieRoutes);
+app.use('/racas', racaRoutes);
+app.use('/portes', porteRoutes);
 
 export default app;

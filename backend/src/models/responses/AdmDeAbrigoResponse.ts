@@ -3,6 +3,7 @@ export class AdmDeAbrigoResponse {
     nome?: string;
     email?: string;
     idade?: number;
+    ocupacao?: string;
     telefone?: string;
     endereco?: string;
     descricao?: string;
@@ -13,6 +14,7 @@ export class AdmDeAbrigoResponse {
         nome?: string;
         email?: string;
         idade?: number;
+        ocupacao?: string;
         telefone?: string;
         endereco?: string;
         descricao?: string;
@@ -23,14 +25,15 @@ export class AdmDeAbrigoResponse {
 
     static fromEntities(adm: any) {
         return new AdmDeAbrigoResponse({
-            id: adm.id ?? null,
-            nome: adm.userId.nome ?? null,
-            email: adm.userId.email ?? null,
-            idade: adm.userId.idade ?? null,
-            telefone: adm.userId.telefone ?? null,
-            endereco: adm.userId.endereco ?? null,
-            descricao: adm.descricao ?? null,
-            userId: adm.userId.id ?? null,
+            id: adm.id,
+            nome: adm.userId.nome,
+            email: adm.userId.email,
+            telefone: adm.userId.telefone,
+            endereco: adm.userId.endereco,
+            idade: adm.userId.idade,
+            ocupacao: adm.userId.ocupacao,
+            descricao: adm.descricao,
+            userId: adm.userId.id,
         });
     }
 }

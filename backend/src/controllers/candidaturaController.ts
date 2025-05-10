@@ -22,9 +22,15 @@ export const getCandidaturas = async (req: Request, res: Response) => {
 export const getCandidaturaById = async (req: Request, res: Response) => {
     try {
         const candidatura = await CandidaturaService.getCandidaturaById(req.params.id);
-        if (!candidatura) {
-            return res.status(404).json({ message: "Candidatura não encontrada" });
-        }
+        res.status(200).json(candidatura);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getCandidaturasByAbrigoId = async (req: Request, res: Response) => {
+    try {
+        const candidatura = await CandidaturaService.getCandidaturasByAbrigoId(req.params.id);
         res.status(200).json(candidatura);
     } catch (error: any) {
         res.status(500).json({ message: error.message });

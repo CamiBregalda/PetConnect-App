@@ -4,9 +4,11 @@ import { Endereco, EnderecoSchema } from "./Endereco";
 export interface UserAttributes {
     nome: string;
     email: string;
-    idade: number;
-    telefone?: string;
-    endereco?: Endereco;
+    cpf: string;
+    telefone: string;
+    endereco: Endereco;
+    idade?: number;
+    ocupacao?: string;
     image?: Buffer;
     ativo: boolean;
     createdAt?: Date;
@@ -17,9 +19,11 @@ const UserSchema = new Schema<UserAttributes>(
     {
         nome: { type: String, required: true },
         email: { type: String, required: true },
-        idade: { type: Number, required: true },
-        telefone: { type: String, required: false },
-        endereco: { type: EnderecoSchema, required: false },
+        cpf: { type: String, required: true },
+        telefone: { type: String, required: true },
+        endereco: { type: EnderecoSchema, required: true },
+        idade: { type: Number, required: false },
+        ocupacao: { type: String, required: false },
         image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: true },
     },

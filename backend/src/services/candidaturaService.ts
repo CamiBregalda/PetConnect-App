@@ -1,9 +1,14 @@
+import { Types } from "mongoose";
 import CandidaturaModel from "../models/Candidatura";
 import { CandidaturaAttributes } from "../models/Candidatura";
 import * as CuidadorService from './cuidadorService';
+import * as UserService from './userService';
+import { CandidaturaResponse } from "../models/responses/CandidaturaResponse";
 
-export const createCandidatura = async (data: CandidaturaAttributes) => {
+export const createCandidatura = async (data: any) => {
     try {
+        UserService.updateUser(data.userId.toString(), data);
+
         const candidatura = new CandidaturaModel(data);
         candidatura.ativo = true;
         await candidatura.save();
@@ -15,7 +20,8 @@ export const createCandidatura = async (data: CandidaturaAttributes) => {
 
 export const getCandidaturas = async () => {
     try {
-        return await CandidaturaModel.find({ ativo: true });
+        const listCandidaturas = await CandidaturaModel.find({ ativo: true }).populate('userId');
+        return listCandidaturas.map((candidatura) => CandidaturaResponse.fromEntities(candidatura));
     } catch (error: any) {
         throw new Error("Erro ao buscar candidaturas: " + error.message);
     }
@@ -23,7 +29,22 @@ export const getCandidaturas = async () => {
 
 export const getCandidaturaById = async (id: string) => {
     try {
-        return await CandidaturaModel.findOne({ _id: id, ativo: true });
+        const candidatura = await CandidaturaModel.findOne({ _id: id, ativo: true }).populate('userId');
+        if (!candidatura || !candidatura.userId) {
+            throw new Error("Candidatura não encontrada");
+        }
+        return CandidaturaResponse.fromEntities(candidatura);
+    } catch (error: any) {
+        throw new Error("Erro ao buscar candidatura: " + error.message);
+    }
+};
+
+export const getCandidaturasByAbrigoId = async (id: string) => {
+    try {
+        const objectAbrigoId = new Types.ObjectId(id);
+        const listCandidaturas = await CandidaturaModel.find({ abrigoId: objectAbrigoId, ativo: true }).populate('userId');
+
+        return listCandidaturas.map((candidatura) => CandidaturaResponse.fromEntities(candidatura));
     } catch (error: any) {
         throw new Error("Erro ao buscar candidatura: " + error.message);
     }

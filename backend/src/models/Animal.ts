@@ -1,11 +1,12 @@
 import { Schema, model } from "mongoose";
+import { EspecieEnum } from './enums/EspecieEnum';
 
 export interface AnimalAttributes {
     id?: string;
     nome: string;
     sexo: string;
     dataNascimento?: Date;
-    especie: string;
+    especie: EspecieEnum;
     raca: string;
     porte: string;
     castrado: boolean;
@@ -26,7 +27,7 @@ const AnimalSchema = new Schema<AnimalAttributes>(
         nome: { type: String, required: true },
         sexo: { type: String, required: true },
         dataNascimento: { type: Date, required: false },
-        especie: { type: String, required: true },
+        especie: { type: String, enum: Object.values(EspecieEnum), required: true },
         raca: { type: String, required: true },
         porte: { type: String, required: true },
         castrado: { type: Boolean, required: true },
