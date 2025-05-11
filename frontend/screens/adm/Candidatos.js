@@ -1,44 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 function ListaCandidatosScreen() {
-  const [cadastroInfo, setCadastroInfo] = useState(null);
+  const [candidatos, setCandidatos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const buscarCadastro = async () => {
-      try {
-        const apiUrl = 'http://192.168.3.7:3000/users/';
+  const buscarCandidatos = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apiUrl = 'http://192.168.3.7:3000/candidaturas';
 
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Erro ao buscar informações: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
-        }
-
-        const data = await response.json();
-        setCadastroInfo(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Erro ao buscar candidatos: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-    };
 
-    buscarCadastro();
+      const data = await response.json();
+      setCandidatos(data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
   }, []);
 
-  const exibirDetalhes = (userId) => {
-    navigation.navigate('Perfil', { userId: userId });
+  useFocusEffect(
+    useCallback(() => {
+      buscarCandidatos();
+    }, [buscarCandidatos])
+  );
+
+  const exibirDetalhes = (userId, candidaturaId) => {
+    console.log(`ID da candidatura: ${candidaturaId}`);
+    navigation.navigate('PerfilCandidato', { userId: userId, candidaturaId: candidaturaId });
   };
 
   if (loading) {
@@ -49,17 +54,17 @@ function ListaCandidatosScreen() {
     return <View style={styles.container}><Text style={styles.errorText}>Erro ao buscar informações: {error}</Text></View>;
   }
 
-  if (cadastroInfo) {
+  if (candidatos) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Candidatos para Abrigo:</Text>
-        {Array.isArray(cadastroInfo) && cadastroInfo.map((user, idx) => {
+        <Text style={styles.title}>Candidatos para o Abrigo:</Text>
+        {Array.isArray(candidatos) && candidatos.map((candidato, idx) => {
           return (
-            <TouchableOpacity key={idx} style={styles.box} onPress={() => exibirDetalhes(user.id)}>
-              <Text style={styles.text}>Nome: {user.nome}</Text>
-              <Text style={styles.text}>Idade: {user.idade}</Text>
-              <Text style={styles.text}>Contato: {user.telefone}</Text>
-              {/* Adicione outros campos que você quer exibir na lista */}
+            <TouchableOpacity key={idx} style={styles.box} onPress={() => exibirDetalhes(candidato.userId, candidato.id)}>
+              <Text style={styles.text}>Nome: {candidato.nome}</Text>
+              <Text style={styles.text}>Idade: {candidato.idade}</Text>
+              <Text style={styles.text}>Contato: {candidato.telefone}</Text>
+              <Text style={styles.text}>Email: {candidato.email}</Text>
             </TouchableOpacity>
           );
         })}

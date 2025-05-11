@@ -61,6 +61,11 @@ function InfoAdm() {
     );
   }
 
+const seVoluntariar = (abrigoId) => { // Modifique a função para receber abrigoId
+    console.log(`Abrigo ID ao navegar para Voluntariarse: ${abrigoId}`); // Adicione este log
+    navigation.navigate('Voluntariarse', { abrigoId: abrigoId }); // Passa abrigoId como parâmetro
+  };
+
   if (error) {
     return (
       <View style={styles.container}>
@@ -68,7 +73,7 @@ function InfoAdm() {
         <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm')}>
           <Text style={styles.textoBotao}>Voluntarios</Text>
         </Pressable>
-        <Pressable style={styles.botao} onPress={() => navigation.navigate('Voluntariarse')}>
+        <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
           <Text style={styles.textoBotao}>Voluntariar-se</Text>
         </Pressable>
       </View>
@@ -88,9 +93,9 @@ function InfoAdm() {
       <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm')}>
         <Text style={styles.textoBotao}>Voluntarios</Text>
       </Pressable>
-      <Pressable style={styles.botao} onPress={() => navigation.navigate('Voluntariarse')}>
-        <Text style={styles.textoBotao}>Voluntariar-se</Text>
-      </Pressable>
+      <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
+          <Text style={styles.textoBotao}>Voluntariar-se</Text>
+        </Pressable>
     </View>
   );
 }

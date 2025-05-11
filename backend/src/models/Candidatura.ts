@@ -6,7 +6,7 @@ export interface CandidaturaAttributes {
     cargo: string;
     curriculo: string;
     aprovacao: boolean;
-    ativo: boolean;
+    ativo?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -18,7 +18,7 @@ const CandidaturaSchema = new Schema<CandidaturaAttributes>(
         cargo: { type: String, required: true },
         curriculo: { type: String, required: true },
         aprovacao: { type: Boolean, required: true },
-        ativo: { type: Boolean, required: true },
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "candidaturas",

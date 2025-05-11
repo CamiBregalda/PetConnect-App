@@ -1,60 +1,78 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 function VoluntarioFormScreen() {
   const [nome, setNome] = useState('');
   const [idade, setIdade] = useState('');
   const [telefone, setTelefone] = useState('');
   const [email, setEmail] = useState('');
-  const [endereco, setEndereco] = useState('');
+  const [cep, setCep] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const route = useRoute();
+  const { abrigoId } = route.params || {};
+
+  const userId = '681ea614e52f3511668cda67'; // Substitua pela forma real de obter o ID
 
   const handleVoluntariar = async () => {
     setLoading(true);
     setError(null);
 
-    if (!nome || !idade || !telefone || !email || !endereco) {
-      setError('Por favor, preencha todos os campos.');
+    if (!nome || !idade || !telefone || !email) {
+      setError('Por favor, preencha todos os campos e certifique-se do ID do abrigo e do usuário.');
       setLoading(false);
       return;
     }
 
-    // Aqui você faria a chamada para a sua API para enviar os dados do voluntário
-    const apiUrl = 'http://SEU_BACKEND_URL/voluntarios'; // Substitua pela URL correta
-
     try {
-      const response = await fetch(apiUrl, {
+      const volunteerUrl = `http://192.168.3.7:3000/candidaturas`; // Rota para adicionar candidatura
+      const volunteerResponse = await fetch(volunteerUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          abrigoId: abrigoId,
+          userId: userId,
           nome: nome,
-          idade: parseInt(idade, 10), 
+          idade: parseInt(idade, 10),
           telefone: telefone,
           email: email,
-          endereco: endereco,
+          cargo: 'Voluntario',
+          curriculo: 'N/A',
+          aprovacao: false,
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Erro ao se voluntariar: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+      const volunteerResponseText = await volunteerResponse.text();
+      console.log('Resposta da candidatura:', volunteerResponseText);
+
+      if (!volunteerResponse.ok) {
+        // Agora, se a resposta não for ok, tentamos obter o JSON para logar o erro do servidor, se disponível.
+        try {
+          const errorData = await volunteerResponse.json();
+          throw new Error(`Erro ao candidatar-se ao abrigo: ${volunteerResponse.status} - ${errorData.message || 'Erro desconhecido'}`);
+        } catch (jsonError) {
+          // Se não for um JSON válido, lançamos o texto da resposta
+          throw new Error(`Erro ao candidatar-se ao abrigo: ${volunteerResponse.status} - ${volunteerResponseText || 'Erro desconhecido'}`);
+        }
       }
 
-      const responseData = await response.json();
-      Alert.alert('Sucesso', 'Seu cadastro de voluntário foi enviado com sucesso!', [
-        { text: 'OK', onPress: () => {
-          setNome('');
-          setIdade('');
-          setTelefone('');
-          setEmail('');
-          setEndereco('');
-        } },
+      // Se chegamos aqui, a resposta foi ok, então parseamos o JSON.
+      const responseData = await volunteerResponse.json();
+      Alert.alert('Sucesso', 'Sua candidatura foi enviada com sucesso!', [
+        {
+          text: 'OK', onPress: () => {
+            setNome('');
+            setIdade('');
+            setTelefone('');
+            setEmail('');
+          }
+        },
       ]);
     } catch (err) {
-      setError(`Erro ao se voluntariar: ${err.message}`);
+      setError(`Erro ao realizar a operação: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -62,7 +80,7 @@ function VoluntarioFormScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Candidatar-se como Voluntário"</Text>
+      <Text style={styles.title}>Candidatar-se como Voluntário</Text>
 
       <TextInput
         style={styles.input}
@@ -91,20 +109,12 @@ function VoluntarioFormScreen() {
         onChangeText={setEmail}
         keyboardType="email-address"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Endereço"
-        value={endereco}
-        onChangeText={setEndereco}
-        multiline
-      />
-
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <Pressable
         style={({ pressed }) => [
           styles.button,
-          pressed && { opacity: 0.8 }, // Feedback visual ao pressionar
+          pressed && { opacity: 0.8 },
         ]}
         onPress={handleVoluntariar}
         disabled={loading}
@@ -149,8 +159,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 50,
     elevation: 3,
     marginTop: 50,
-    alignItems: 'center', 
-    justifyContent: 'center', 
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorText: {
     color: 'red',
@@ -161,3 +171,4 @@ const styles = StyleSheet.create({
 });
 
 export default VoluntarioFormScreen;
+

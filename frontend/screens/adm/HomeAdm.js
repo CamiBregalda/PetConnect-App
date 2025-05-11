@@ -127,11 +127,11 @@ function HomeAdm({ route }) {
             <Text style={styles.title}>Sobre o Adiministrador: </Text>
             <View style={styles.sobre}>
               <View style={styles.infoAdm}>
-                <Text style={styles.nomeAdm}>{adminInfo?.nome}</Text>
+                <Text style={styles.nomeAdm}>{adminInfo.nome}</Text>
                 <Text>{adminInfo?.descricao}</Text>
               </View>
               <Image
-                source={{ uri: `http://192.168.3.7:3000/admAbrigo/${adminInfo?.id}/imagem` }}
+                source={{ uri: `http://192.168.3.7:3000/admAbrigo/${adminInfo.id}/imagem` }}
                 style={styles.imgADM}
               />
             </View>
