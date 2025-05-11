@@ -55,21 +55,26 @@ function ListaCandidatosScreen() {
   }
 
   if (candidatos) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Candidatos para o Abrigo:</Text>
-        {Array.isArray(candidatos) && candidatos.map((candidato, idx) => {
-          return (
+    if (Array.isArray(candidatos) && candidatos.length > 0) {
+      return (
+        <View style={styles.container}>
+          {candidatos.map((candidato, idx) => (
             <TouchableOpacity key={idx} style={styles.box} onPress={() => exibirDetalhes(candidato.userId, candidato.id)}>
               <Text style={styles.text}>Nome: {candidato.nome}</Text>
               <Text style={styles.text}>Idade: {candidato.idade}</Text>
               <Text style={styles.text}>Contato: {candidato.telefone}</Text>
               <Text style={styles.text}>Email: {candidato.email}</Text>
             </TouchableOpacity>
-          );
-        })}
-      </View>
-    );
+          ))}
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.container}>
+          <Text style={styles.emptyText}>Não há inscrições no momento.</Text>
+        </View>
+      );
+    }
   }
 
   return null;
@@ -100,6 +105,11 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
     textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#555',
   },
 });
 

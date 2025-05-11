@@ -148,7 +148,6 @@ function PerfilCandidato({ route, onAprovado }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Detalhes do Candidato</Text>
       <View style={styles.infoContainer}>
         <Image
           source={{ uri: `http://192.168.3.7:3000/users/${userId}/imagem` }}
@@ -168,7 +167,7 @@ function PerfilCandidato({ route, onAprovado }) {
             <Text style={styles.value}>{candidatoDetalhes.email}</Text>
 
             <Text style={styles.label}>Endereço:</Text>
-            <Text style={styles.value}>{candidatoDetalhes.endereco}</Text>
+            <Text style={styles.value}>{candidatoDetalhes.endereco.rua}</Text>
             {/* Display other user data */}
           </>
         )}

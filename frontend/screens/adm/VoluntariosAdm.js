@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image,  } from 'react-native';
-import { AbrigoContext } from './../../AppContext'; // Importe o Context
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { AbrigoContext } from './../../AppContext';
 import { useNavigation } from '@react-navigation/native';
 
 function Voluntarios() {
-  const { currentAbrigoId } = useContext(AbrigoContext); // Acesse o ID do abrigo do Context
-  const [Cuidadores, setCuidadores] = useState([]); // Renomeei para ser mais específico
+  const { currentAbrigoId } = useContext(AbrigoContext);
+  const [Cuidadores, setCuidadores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
@@ -21,16 +21,12 @@ function Voluntarios() {
       setLoading(true);
       setError(null);
       try {
-        // 1. Construa a URL da API para buscar os voluntários do abrigo específico
-        //    Assumindo que sua API tem um endpoint como:
-        //    `http://192.168.3.7:3000/abrigos/{abrigoId}/Cuidadores`
-        const apiUrl = `http://192.168.3.7:3000/abrigos/${currentAbrigoId}/Cuidadores`; // <------------------- MODIFICADO
+        const apiUrl = `http://192.168.3.7:3000/abrigos/${currentAbrigoId}/Cuidadores`;
 
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            // 'Authorization': 'Bearer SEU_TOKEN',
           },
         });
 
@@ -40,11 +36,11 @@ function Voluntarios() {
         }
 
         const data = await response.json();
-        setCuidadores(data.cuidadores); // Armazena a lista de voluntários do abrigo
+        setCuidadores(data.cuidadores);
         setLoading(false);
-        console.log('Cuidadores: Voluntários do abrigo carregados:', data); // LOG
+        console.log('Cuidadores: Voluntários do abrigo carregados:', data);
       } catch (err) {
-        console.error('Cuidadores: Erro ao buscar voluntários:', err); // LOG
+        console.error('Cuidadores: Erro ao buscar voluntários:', err);
         setError(err.message);
         setLoading(false);
         setCuidadores([]);
@@ -52,7 +48,7 @@ function Voluntarios() {
     };
 
     buscarCuidadoresDoAbrigo();
-  }, [currentAbrigoId]); // Depende do ID do abrigo para refazer a busca
+  }, [currentAbrigoId]);
 
   const exibirPerfil = (cuidador) => {
     navigation.navigate('PerfilCuidador', { userId: cuidador.id });
@@ -67,70 +63,80 @@ function Voluntarios() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Voluntários do Abrigo:</Text>
-      {Cuidadores.length > 0 ? (
-        Cuidadores.map((cuidador, idx) => (
-          <View key={idx} style={styles.box}>
-            <TouchableOpacity key={cuidador.id} style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
-              <Image 
-                source={{ uri: `http://192.168.3.7:3000/cuidadores/${cuidador.id}/imagem` }} 
-                style={styles.listImage} />
-            </TouchableOpacity>
-            <Text>Nome: {cuidador.nome}</Text>
-            <Text>Contato: {cuidador.telefone}</Text>
-            {/* Adicione outros campos conforme necessário */}
+    <ScrollView style={styles.scrollView}>
+      <View style={styles.whiteContainer}>
+        {Cuidadores.length > 0 ? (
+          <View style={styles.listContainer}>
+            {Cuidadores.map((cuidador, idx) => (
+              <View key={idx} style={styles.itemContainer}>
+                <TouchableOpacity key={cuidador.id} style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
+                  <Image
+                    source={{ uri: `http://192.168.3.7:3000/cuidadores/${cuidador.id}/imagem` }}
+                    style={styles.listImage} />
+                </TouchableOpacity>
+                <Text style={styles.listItemText}>{cuidador.nome}</Text>
+              </View>
+            ))}
           </View>
-        ))
-      ) : (
-        <Text>Nenhum voluntário associado a este abrigo.</Text>
-      )}
-    </View>
+        ) : (
+          <Text>Nenhum voluntário associado a este abrigo.</Text>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#E0E0E0', // Fundo cinza claro para a tela
+    padding: 20, // Adicione um pouco de padding ao redor do container branco
+    
+  },
   container: {
     flex: 1,
-    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
-    textAlign: 'center',
-  },
-  box:{
-    marginBottom: 10,
+  whiteContainer: {
     backgroundColor: 'white',
-    padding: 15,
     borderRadius: 15,
+    padding: 20,
+    width: '100%', // Ocupa toda a largura disponível
+    alignItems: 'center',
+  },
+  listContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start', 
+  },
+  itemContainer: {
+    padding: 10,
+    marginBottom: 15,
+    marginTop: 15,
+    width: '50%',
+    alignItems: 'center',
   },
   listImage: {
-    width: 130,
+    width: 100,
     height: 100,
     borderRadius: 10,
-    marginBottom: 0,
+    marginBottom: 15,
     resizeMode: 'cover',
   },
   listItem: {
-    backgroundColor: '#8A2BE2',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
     borderRadius: 10,
-    marginRight: 15,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 150,
-    height: 150,
+    width: 80,
+    height: 80,
   },
   listItemText: {
-    color: 'white',
-    fontSize: 16,
+    color: 'black',
+    fontSize: 14,
     fontWeight: 'bold',
-    marginTop: 5,
     textAlign: 'center',
+    marginTop: 5,
   },
   errorText: {
     color: 'red',

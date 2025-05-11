@@ -45,7 +45,8 @@ function HomeScreen() {
   }, []);
 
   const exibirDetalhesAnimal = (animal) => {
-    navigation.navigate('PerfilAnimal', { animalId: animal.id });
+    console.log(`ID do Dono (Abrigo): ${animal.idDono}`);
+    navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal });
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {

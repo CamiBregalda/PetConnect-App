@@ -108,7 +108,7 @@ function HomeAdm({ route }) {
           </View>
           <View style={styles.about}>
             <Text style={styles.title}>Sobre o Abrigo: </Text>
-            <Text> {abrigoInfo.descricao}</Text>
+            <Text style={styles.descricao}>{abrigoInfo.descricao}</Text>
           </View>
 
           <View style={styles.mapa}>
@@ -127,13 +127,14 @@ function HomeAdm({ route }) {
             <Text style={styles.title}>Sobre o Adiministrador: </Text>
             <View style={styles.sobre}>
               <View style={styles.infoAdm}>
-                <Text style={styles.nomeAdm}>{adminInfo.nome}</Text>
-                <Text>{adminInfo?.descricao}</Text>
-              </View>
-              <Image
+                <Image
                 source={{ uri: `http://192.168.3.7:3000/admAbrigo/${adminInfo.id}/imagem` }}
                 style={styles.imgADM}
               />
+                <Text style={styles.nomeAdm}>{adminInfo.nome}</Text>
+                <Text style={styles.descricao}>{adminInfo?.descricao}</Text>
+              </View>
+              
             </View>
           </View>
           )}
@@ -162,9 +163,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'purple',
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  descricao:{
+    fontSize: 17,
   },
   about: {
     marginTop: 20,
@@ -174,6 +178,7 @@ const styles = StyleSheet.create({
     minHeight: 130,
     padding: 10,
     borderRadius: 15,
+    
   },
   mapa: {
     justifyContent: 'center',
@@ -199,8 +204,8 @@ const styles = StyleSheet.create({
     width: 310,
     padding: 20,
     borderRadius: 15,
-    flexDirection: 'row',
-    alignItems: 'center', // Para alinhar verticalmente o texto e a imagem
+
+
     justifyContent: 'space-between', // Opcional: espaça nome/descrição e imagem
   },
   infoAdm: {
@@ -209,14 +214,18 @@ const styles = StyleSheet.create({
   },
   nomeAdm: {
     fontWeight: 'bold',
+    fontSize: 22,
   },
   imgADM: {
-    width: 50,
-    height: 50,
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    marginBottom: 20,
+
   },
   errorText: {
     color: 'red',
-    fontSize: 16,
+    fontSize: 22,
     textAlign: 'center',
   },
   button: {

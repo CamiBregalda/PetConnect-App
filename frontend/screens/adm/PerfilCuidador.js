@@ -1,84 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 
-function PerfilCandidato({ route }) {
-  const { userId, candidaturaId } = route.params; // Get candidaturaId
-  const [candidatoDetalhes, setCandidatoDetalhes] = useState(null);
+function PerfilCuidador({ route }) {
+  const { userId } = route.params; // Alterado para userId
+  const [CuidadorDetalhes, setCuidadorDetalhes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasTriedLoading, setHasTriedLoading] = useState(false);
 
   useEffect(() => {
-    const buscarDetalhesCandidato = async () => {
+     const buscarDetalhesCuidador = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://192.168.3.7:3000/users/${userId}`);
+        console.log(userId); // Alterado para userId
+        const response = await fetch(`http://192.168.3.7:3000/cuidadores/${userId}`); // Rota alterada
+        if (!response.ok) {
+          let errorMessage = `Erro ao buscar cuidador: ${response.status}`;
+          try {
+            const errorData = await response.json();
+            if (errorData && errorData.message) {
+              errorMessage += ` - ${errorData.message}`;
+            }
+          } catch (jsonError) {
+            console.error("Erro ao analisar resposta JSON de erro:", jsonError);
+          }
+          throw new Error(errorMessage);
+        }
         const data = await response.json();
-        setCandidatoDetalhes(data);
+        if (!data || !data.id) { // Mantive data.id, verifique se a API retorna o ID
+          throw new Error('Dados do Cuidador inválidos');
+        }
+        setCuidadorDetalhes(data);
       } catch (err) {
         console.error('Erro:', err);
         setError(err.message);
       } finally {
         setLoading(false);
+        setHasTriedLoading(true);
       }
     };
 
-    buscarDetalhesCandidato();
-  }, [userId]);
-
-  const aprovarCandidato = async () => {
-    try {
-      const response = await fetch(`http://192.168.3.7:3000/candidaturas/${candidaturaId}`, { // Use candidaturaId
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ aprovacao: true }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Erro ao aprovar candidato: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
-      }
-
-      Alert.alert('Sucesso', 'Candidato aprovado com sucesso!', [
-        { text: 'OK', onPress: () => { /* Atualizar a tela ou navegar de volta */ } },
-      ]);
-      // Atualizar a interface para refletir a aprovação
-    } catch (err) {
-      setError(`Erro ao aprovar candidato: ${err.message}`);
-      Alert.alert('Erro', `Não foi possível aprovar o candidato: ${err.message}`);
-    }
-  };
-
-  const rejeitarCandidato = async () => {
-    try {
-      const response = await fetch(`http://192.168.3.7:3000/candidaturas/${candidaturaId}`, { // Use candidaturaId
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Erro ao rejeitar candidato: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
-      }
-
-      Alert.alert('Sucesso', 'Candidatura removida com sucesso!', [
-        { text: 'OK', onPress: () => { /* Atualizar a tela ou navegar de volta */ } },
-      ]);
-      // Atualizar a interface para refletir a rejeição
-    } catch (err) {
-      setError(`Erro ao rejeitar candidato: ${err.message}`);
-      Alert.alert('Erro', `Não foi possível remover a candidatura: ${err.message}`);
-    }
-  };
+    buscarDetalhesCuidador();
+  }, [userId]); 
 
 
   if (loading && !hasTriedLoading) {
-    return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#8A2BE2" />
+      </View>
+    );
   }
 
   if (error) {
@@ -92,14 +64,26 @@ function PerfilCandidato({ route }) {
             setLoading(true);
             setHasTriedLoading(false);
 
-            const buscarDetalhesCandidato = async () => {
+            const buscarDetalhesCuidador  = async () => {
               try {
-                const response = await fetch(`http://192.168.3.7:3000/users/${userId}`);
-                const data = await response.json();
-                if (!data || !data.id) {
-                  throw new Error('Dados do candidato inválidos');
+               const response = await fetch(`http://192.168.3.7:3000/cuidadores/${userId}`); // Rota alterada
+                if (!response.ok) {
+                  let errorMessage = `Erro ao buscar cuidador: ${response.status}`;
+                  try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.message) {
+                      errorMessage += ` - ${errorData.message}`;
+                    }
+                  } catch (jsonError) {
+                    console.error("Erro ao analisar resposta JSON de erro:", jsonError);
+                  }
+                  throw new Error(errorMessage);
                 }
-                setCandidatoDetalhes(data);
+                const data = await response.json();
+                if (!data || !data.id) {  // Mantive data.id, verifique se a API retorna o ID
+                  throw new Error('Dados do Cuidador inválidos');
+                }
+                setCuidadorDetalhes(data);
                 setLoading(false);
                 setHasTriedLoading(true);
               } catch (err) {
@@ -108,7 +92,7 @@ function PerfilCandidato({ route }) {
                 setHasTriedLoading(true);
               }
             };
-            buscarDetalhesCandidato();
+            buscarDetalhesCuidador();
           }}
         >
           <Text style={styles.retryButtonText}>Tentar novamente</Text>
@@ -117,54 +101,62 @@ function PerfilCandidato({ route }) {
     );
   }
 
-  if (!candidatoDetalhes && hasTriedLoading) {
+  if (!CuidadorDetalhes  && hasTriedLoading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.errorText}>Nenhum candidato encontrado</Text>
+        <Text style={styles.errorText}>Nenhum Cuidador encontrado</Text>
+      </View>
+    );
+  }
+
+  if (!CuidadorDetalhes) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Nenhum Cuidador encontrado</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Detalhes do Candidato</Text>
-      <View style={styles.infoContainer}>
-        <Image
-          source={{ uri: `http://192.168.3.7:3000/users/${userId}/imagem` }}
-          style={styles.listImage} />
+     <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Detalhes do Cuidador</Text>
+        <View style={styles.infoContainer}>
+          <View style={styles.imageView}>
+            <Image
+              source={{ uri: `http://192.168.3.7:3000/cuidadores/${CuidadorDetalhes.id}/imagem` }} // Mantive CuidadorDetalhes.id, verifique
+              style={styles.imgAdm}
+            />
+          </View>
+          <Text style={styles.label}>Nome:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.nome}</Text>
 
-        <Text style={styles.label}>Nome:</Text>
-        <Text style={styles.value}>{candidatoDetalhes.nome}</Text>
+          <Text style={styles.label}>Idade:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.idade}</Text>
 
-        <Text style={styles.label}>Idade:</Text>
-        <Text style={styles.value}>{candidatoDetalhes.idade}</Text>
+          <Text style={styles.label}>Data de Nascimento:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.dataNascimento}</Text>
 
-        <Text style={styles.label}>Contato:</Text>
-        <Text style={styles.value}>{candidatoDetalhes.telefone}</Text>
+          <Text style={styles.label}>Especie:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.especie}</Text>
 
-        {candidatoDetalhes.email && (
-          <>
-            <Text style={styles.label}>Email:</Text>
-            <Text style={styles.value}>{candidatoDetalhes.email}</Text>
-          </>
-        )}
+          <Text style={styles.label}>Porte:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.porte}</Text>
 
-        {candidatoDetalhes.endereco && (
-          <>
-            <Text style={styles.label}>Endereço:</Text>
-            <Text style={styles.value}>{candidatoDetalhes.endereco}</Text>
-          </>
-        )}
+          <Text style={styles.label}>Castrado(a):</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.castrado}</Text>
+
+          <Text style={styles.label}>Doencas:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.doencas}</Text>
+
+          <Text style={styles.label}>Deficiências:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.deficiencias}</Text>
+
+          <Text style={styles.label}>Sobre:</Text>
+          <Text style={styles.value}>{CuidadorDetalhes.informacoes}</Text>
+        </View>
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.aprovarButton} onPress={aprovarCandidato}>
-          <Text style={styles.buttonText}>Aprovar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.rejeitarButton} onPress={rejeitarCandidato}>
-          <Text style={styles.buttonText}>Rejeitar</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -175,6 +167,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     marginTop: 40,
 
+  },
+  imageView: {
+    alignItems: 'center',
+  },
+  imgAdm: {
+    width: 250,
+    height: 250,
+    borderRadius: 15,
   },
   title: {
     fontSize: 24,
@@ -188,18 +188,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+   retryButton: {
+    backgroundColor: '#8A2BE2',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
   infoContainer: {
     backgroundColor: 'white',
     borderRadius: 15,
     padding: 20,
     elevation: 2,
-  },
-  listImage: {
-    width: 130,
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 0,
-    resizeMode: 'cover',
   },
   label: {
     fontSize: 16,
@@ -211,42 +214,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  aprovarButton: {
-    backgroundColor: 'green',
-    padding: 10,
-    borderRadius: 5,
-    marginRight: 10,
-    flex: 1,
-    alignItems: 'center',
-  },
-  rejeitarButton: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  retryButton: {
-    backgroundColor: '#8A2BE2',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  retryButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  }
+ 
 });
-
-export default PerfilCandidato;
+export default PerfilCuidador;
 

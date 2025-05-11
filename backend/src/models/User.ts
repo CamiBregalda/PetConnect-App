@@ -6,7 +6,7 @@ export interface UserAttributes {
     email: string;
     cpf: string;
     telefone: string;
-    endereco?: Endereco;
+    endereco: Endereco;
     idade?: number;
     ocupacao?: string;
     image?: Buffer;
@@ -21,7 +21,7 @@ const UserSchema = new Schema<UserAttributes>(
         email: { type: String, required: true },
         cpf: { type: String, required: true },
         telefone: { type: String, required: true },
-        endereco: { type: EnderecoSchema, required: false },
+        endereco: { type: EnderecoSchema, required: true },
         idade: { type: Number, required: false },
         ocupacao: { type: String, required: false },
         image: { type: Buffer, required: false },
