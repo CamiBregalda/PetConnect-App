@@ -3,7 +3,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { AbrigoProvider } from './AppContext';
+import TelaInicial from './screens/login/TelaInicial';
 import LoginScreen from './screens/login/LoginScreen';
+import CadastroUser from './screens/cadastros/CadastroUser';
+import CadastroAbrigo from './screens/cadastros/CadastroAbrigo';
 import HomeAdm from './screens/adm/HomeAdm';
 import AnimaisAdm from "./screens/adm/AnimaisAdm";
 import InfoAdm from "./screens/adm/InfoAdm";
@@ -96,7 +99,10 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
       
+        <Stack.Screen name="TelaInicial" component={TelaInicial} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="CadastroUser" component={CadastroUser} />
+        <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
         <Stack.Screen name="User" component={TelaPrincipal} />
         <Stack.Screen
           name="Main"
