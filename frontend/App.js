@@ -7,6 +7,7 @@ import TelaInicial from './screens/login/TelaInicial';
 import LoginScreen from './screens/login/LoginScreen';
 import CadastroUser from './screens/cadastros/CadastroUser';
 import CadastroAbrigo from './screens/cadastros/CadastroAbrigo';
+import CadastroAnimal from './screens/cadastros/CadastroAnimal';
 import HomeAdm from './screens/adm/HomeAdm';
 import AnimaisAdm from "./screens/adm/AnimaisAdm";
 import InfoAdm from "./screens/adm/InfoAdm";
@@ -103,6 +104,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="CadastroUser" component={CadastroUser} />
         <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
+        <Stack.Screen name="CadastroAnimal" component={CadastroAnimal} />
         <Stack.Screen name="User" component={TelaPrincipal} />
         <Stack.Screen
           name="Main"

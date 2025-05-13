@@ -38,7 +38,7 @@ function CadastroAbrigoScreen() {
 
         <Pressable
             style={styles.botao}
-            onPress={() => navigation.navigate('Login')} // Navega para o TabNavigator
+            onPress={() => navigation.navigate('CadastroAnimal')} // Navega para o TabNavigator
         >
             <Text style={styles.textoBotao}>Cadastrar</Text>
         </Pressable>
