@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigation } from "@react-navigation/native";
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import TextCadastroAbrigoInput from '../../components/TextCadastroAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -22,6 +22,7 @@ function CadastroAbrigoScreen() {
     };
 
     return (
+        <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
         <Text style={styles.title}>Cadastrar Abrigo</Text>
         <TextCadastroAbrigoInput />
@@ -43,6 +44,7 @@ function CadastroAbrigoScreen() {
             <Text style={styles.textoBotao}>Cadastrar</Text>
         </Pressable>
         </View>
+        </ScrollView>
     );
 }
 
@@ -52,7 +54,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center', // Centraliza o conteúdo na tela de login
         backgroundColor: 'white',
-        padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
+        padding: 50, // Adicionado um padding para o conteúdo não ficar nas bordas
     },
     title: {
         fontSize: 18,

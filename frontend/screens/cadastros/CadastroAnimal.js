@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigation } from "@react-navigation/native";
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
 import TextCadastroAnimalInput from '../../components/TextCadastroAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -22,6 +22,7 @@ function CadastroAnimalScreen() {
     };
 
     return (
+        <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
         <Text style={styles.title}>Cadastrar Abrigo</Text>
         <TextCadastroAnimalInput />
@@ -43,16 +44,19 @@ function CadastroAnimalScreen() {
             <Text style={styles.textoBotao}>Cadastrar 2</Text>
         </Pressable>
         </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+
     divCadastro: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center', // Centraliza o conteúdo na tela de login
         backgroundColor: 'white',
-        padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
+        padding: 50, // Adicionado um padding para o conteúdo não ficar nas bordas
+        
     },
     title: {
         fontSize: 18,
