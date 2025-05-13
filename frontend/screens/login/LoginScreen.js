@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import TextInputExample from '../../text'; // Ajuste o path se necessário
+import TextLoginInput from '../../components/text'; // Ajuste o path se necessário
 
 function LoginScreen() {
   const navigation = useNavigation();
@@ -12,7 +12,7 @@ function LoginScreen() {
         style={styles.logo}
         source={require('../../img/PET.png')} // Ajuste o path se necessário
       />
-      <TextInputExample />
+      <TextLoginInput />
       <Pressable
         style={styles.botao}
         onPress={() => navigation.navigate('User')} // Navega para o TabNavigator
@@ -32,8 +32,8 @@ const styles = StyleSheet.create({
     padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     marginBottom: 40,
   },
   botao: {

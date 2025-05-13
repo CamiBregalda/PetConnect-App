@@ -4,6 +4,12 @@ export const RacasPorEspecieRecord: Record<string, string[]> = {
         'Poodle',
         'Golden Retriever',
         'Bulldog',
+        'Vira-lata',
+        'Chihuahua',
+        'Pastor Alemão',
+        'Shih Tzu',
+        'Rottweiler',
+        'Beagle',
         'Vira-lata'
     ],
     Gato: [
@@ -11,6 +17,12 @@ export const RacasPorEspecieRecord: Record<string, string[]> = {
         'Siamês',
         'Maine Coon',
         'Sphynx',
+        'Vira-lata',
+        'Angorá',
+        'Bengal',
+        'Ragdoll',
+        'British Shorthair',
+        'Himalaio',
         'Vira-lata'
     ],
     Coelho: [
