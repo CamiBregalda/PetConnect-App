@@ -24,7 +24,7 @@ function CadastroAnimalScreen() {
     return (
         <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
-        <Text style={styles.title}>Cadastrar Abrigo</Text>
+        <Text style={styles.title}>Cadastrar Animal</Text>
         <TextCadastroAnimalInput />
 
         <Pressable onPress={pickImage}>
