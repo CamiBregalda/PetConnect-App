@@ -41,7 +41,7 @@ function CadastroAnimalScreen() {
             style={styles.botao}
             onPress={() => navigation.navigate('User')} // Navega para o TabNavigator
         >
-            <Text style={styles.textoBotao}>Cadastrar 2</Text>
+            <Text style={styles.textoBotao}>Cadastrar</Text>
         </Pressable>
         </View>
         </ScrollView>
@@ -49,13 +49,12 @@ function CadastroAnimalScreen() {
 }
 
 const styles = StyleSheet.create({
-
     divCadastro: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center', // Centraliza o conteúdo na tela de login
+        justifyContent: 'center',
         backgroundColor: 'white',
-        padding: 50, // Adicionado um padding para o conteúdo não ficar nas bordas
+        padding: 50,
         
     },
     title: {

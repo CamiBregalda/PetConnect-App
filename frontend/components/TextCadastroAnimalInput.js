@@ -29,15 +29,18 @@ const TextCadastroAnimalInput = () => {
                 keyboardType="Nome"
             />
 
-            <Picker
-                selectedValue={sexo}
-                onValueChange={(itemValue) => onChangeSexo(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Sexo" value="" />
-                <Picker.Item label="Feminino" value="Feminino" />
-                <Picker.Item label="Masculino" value="Masculino" />
-            </Picker>
+            <View style={styles.inputSelect}>
+                <Picker
+                    selectedValue={sexo}
+                    onValueChange={(itemValue) => onChangeSexo(itemValue)}
+                    style={styles.picker}
+
+                >
+                    <Picker.Item label="Sexo" value="" />
+                    <Picker.Item label="Feminino" value="Feminino" />
+                    <Picker.Item label="Masculino" value="Masculino" />
+                </Picker>
+            </View>
 
             <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInput}>
                 <Text style={styles.input}>
@@ -56,45 +59,53 @@ const TextCadastroAnimalInput = () => {
                 />
             )}
 
-            <Picker
-                selectedValue={especie}
-                onValueChange={(itemValue) => onChangeEspecie(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Espécie" value="" />
-                <Picker.Item label="Espécie 1" value="Feminino" />
-                <Picker.Item label="Espécie 2" value="Masculino" />
-            </Picker>
+            <View style={styles.input}>
+                <Picker
+                    selectedValue={especie}
+                    onValueChange={(itemValue) => onChangeEspecie(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Espécie" value="" />
+                    <Picker.Item label="Espécie 1" value="Feminino" />
+                    <Picker.Item label="Espécie 2" value="Masculino" />
+                </Picker>
+            </View>
 
-            <Picker
-                selectedValue={raca}
-                onValueChange={(itemValue) => onChangeRaca(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Raça" value="" />
-                <Picker.Item label="Espécie 1" value="Feminino" />
-                <Picker.Item label="Espécie 2" value="Masculino" />
-            </Picker>
+            <View style={styles.input}>
+                <Picker
+                    selectedValue={raca}
+                    onValueChange={(itemValue) => onChangeRaca(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Raça" value="" />
+                    <Picker.Item label="Espécie 1" value="Feminino" />
+                    <Picker.Item label="Espécie 2" value="Masculino" />
+                </Picker>
+            </View>
 
-            <Picker
-                selectedValue={porte}
-                onValueChange={(itemValue) => onChangePorte(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Porte" value="" />
-                <Picker.Item label="Porte 1" value="Feminino" />
-                <Picker.Item label="Porte 2" value="Masculino" />
-            </Picker>
+            <View style={styles.input}>
+                <Picker
+                    selectedValue={porte}
+                    onValueChange={(itemValue) => onChangePorte(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Porte" value="" />
+                    <Picker.Item label="Porte 1" value="Feminino" />
+                    <Picker.Item label="Porte 2" value="Masculino" />
+                </Picker>
+            </View>
 
-            <Picker
-                selectedValue={castrado}
-                onValueChange={(itemValue) => onChangeCastrado(itemValue)}
-                style={styles.picker}
-            >
-                <Picker.Item label="Castrado(a)" value="" />
-                <Picker.Item label="Castrado(a) 1" value="Sim" />
-                <Picker.Item label="Castrado(a) 2" value="Não" />
-            </Picker>
+            <View style={styles.input}>
+                <Picker
+                    selectedValue={castrado}
+                    onValueChange={(itemValue) => onChangeCastrado(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Castrado(a)" value="" />
+                    <Picker.Item label="Castrado(a) 1" value="Sim" />
+                    <Picker.Item label="Castrado(a) 2" value="Não" />
+                </Picker>
+            </View>
 
             <GenericListInput
                 items={doencas}
@@ -111,7 +122,7 @@ const TextCadastroAnimalInput = () => {
                 setItems={onChangeVacinas}
                 placeholder="Vacinas"
             />
-            
+
             <TextInput
                 style={[styles.input, styles.largeInput]}
                 onChangeText={onChangeInformacoesAdicionais}
@@ -133,28 +144,25 @@ const styles = StyleSheet.create({
     input: {
         width: 280,
         height: 40,
-        marginVertical: 6,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#aaa',
-        paddingHorizontal: 10,
-        backgroundColor: '#fff',
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
+        padding: 10,
+    },
+    descricaoInput: {
+        height: 150,
+        textAlignVertical: 'top',
     },
     textArea: {
         height: 100,
         textAlignVertical: 'top',
     },
-    image: {
-        width: 120,
-        height: 120,
-        borderRadius: 8,
-        marginVertical: 10,
-    },
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
     },
-        largeInput: {
+    largeInput: {
         height: 150,
         textAlignVertical: 'top',
     },
@@ -163,6 +171,22 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 4,
     },
+    picker: {
+        color: '#808080',
+        marginLeft: -10,
+        marginTop: Platform.OS === 'android' ? -15 : -11,
+    },
+    inputSelect: {
+        width: 280,
+        height: 40,
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
+        padding: 10,
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
+        fontSize: Platform.OS === 'ios' ? 17 : 14,
+    }
 });
 
 export default TextCadastroAnimalInput;

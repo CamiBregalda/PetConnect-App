@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         padding: 10,
     },
-        descricaoInput: {
+    descricaoInput: {
         height: 150,
         textAlignVertical: 'top',
     },

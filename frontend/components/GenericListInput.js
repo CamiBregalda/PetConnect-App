@@ -48,11 +48,13 @@ export const GenericListInput = ({ items, setItems, placeholder }) => {
 
 const styles = StyleSheet.create({
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
+        width: 280,
+        height: 40,
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
         padding: 10,
-        borderRadius: 8,
-        marginVertical: 5,
     },
     button: {
         marginLeft: 10,

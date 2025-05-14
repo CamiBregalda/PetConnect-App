@@ -52,9 +52,9 @@ const styles = StyleSheet.create({
     divCadastro: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center', // Centraliza o conteúdo na tela de login
+        justifyContent: 'center',
         backgroundColor: 'white',
-        padding: 50, // Adicionado um padding para o conteúdo não ficar nas bordas
+        padding: 50, 
     },
     title: {
         fontSize: 18,
