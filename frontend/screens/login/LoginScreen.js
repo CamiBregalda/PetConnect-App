@@ -65,11 +65,14 @@ function LoginScreen() {
         style={styles.logo}
         source={require('../../img/PET.png')}
       />
-      <TextLoginInput />
-      <Pressable
-        style={styles.botao}
-        onPress={() => navigation.navigate('User')} // Navega para o TabNavigator
-      >
+      <TextLoginInput
+        username={username}
+        onChangeUsername={onChangeUsername}
+        password={password}
+        onChangePassword={onChangePassword}
+        errors={errors}
+      />
+      <Pressable style={styles.botao} onPress={handleLogin}>
         <Text style={styles.textoBotao}>Login</Text>
       </Pressable>
     </View>
