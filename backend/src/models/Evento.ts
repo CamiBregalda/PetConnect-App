@@ -19,7 +19,7 @@ const EventoSchema = new Schema<EventoAttributes>(
         endereco: { type: EnderecoSchema, required: true },
         data: { type: Date, required: true },
         idAbrigo: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
-        ativo: { type: Boolean, required: true },
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "eventos",
