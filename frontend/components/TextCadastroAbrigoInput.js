@@ -1,5 +1,6 @@
 import React, { useEffect, useState }  from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
+import TextEnderecoInput from './TextEnderecoInput';
 /*import * as Location from 'expo-location';
 
 // Dentro do seu componente CadastroAbrigoScreen:
@@ -26,54 +27,55 @@ useEffect(() => {
 }, []);*/
 
 
-const TextCadastroUserInput = () => {
-    const [name, onChangeName] = React.useState('');
-    const [cnpj, onChangeCnpj] = React.useState('');
-    const [email, onChangeEmail] = React.useState('');
-    const [telefone, onChangeTelefone] = React.useState('');
-    const [endereco, onChangeEndereco] = React.useState('');
-    const [descricao, onChangeDescricao] = React.useState('');
+const TextCadastroUserInput = ({nome, onChangeNome, cnpj, onChangeCnpj, email, onChangeEmail, telefone, onChangeTelefone, endereco, onChangeEndereco, descricao, onChangeDescricao, errors}) => {
+    const getInputStyle = (fieldError) => [
+        styles.input,
+        fieldError && styles.inputError,
+    ];
 
+    const getDescricaoInputStyle = (fieldError) => [
+        styles.descricaoInput,
+        fieldError && styles.inputError,
+    ];
+    
     return (
         <>
         <View>
             <TextInput
-                style={styles.input}
-                onChangeText={onChangeName}
-                value={name}
-                placeholder="Name"
-                keyboardType="Name"
+                style={getInputStyle(errors.nome)}
+                onChangeText={onChangeNome}
+                value={nome}
+                placeholder="Nome"
+                keyboardType="default"
             />
             <TextInput
-                style={styles.input}
+                style={getInputStyle(errors.cnpj)}
                 onChangeText={onChangeCnpj}
                 value={cnpj}
                 placeholder="CNPJ"
                 keyboardType="Cnpj"
             />
             <TextInput
-                style={styles.input}
+                style={getInputStyle(errors.email)}
                 onChangeText={onChangeEmail}
                 value={email}
-                placeholder="email"
+                placeholder="Email"
                 keyboardType="Email"
             />
             <TextInput
-                style={styles.input}
+                style={getInputStyle(errors.telefone)}
                 onChangeText={onChangeTelefone}
                 value={telefone}
                 placeholder="Telefone"
                 keyboardType="Telefone"
             />
-            <TextInput
-                style={styles.input}
-                onChangeText={onChangeEndereco}
-                value={endereco}
-                placeholder="Endereco"
-                keyboardType="Endereco"
+            <TextEnderecoInput 
+                endereco={endereco} 
+                onChangeEndereco={onChangeEndereco} 
+                errors={errors.endereco}
             />
             <TextInput
-                style={[styles.input, styles.descricaoInput]}
+                style={getDescricaoInputStyle(errors.descricao)}
                 onChangeText={onChangeDescricao}
                 value={descricao}
                 placeholder="Descrição"
@@ -95,7 +97,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         padding: 10,
     },
+    inputError: {
+        borderColor: 'red',
+        borderWidth: 1,
+        shadowColor: 'red',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 3,
+    },
     descricaoInput: {
+        width: 280,
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
+        paddingTop: 10,
+        padding: 10,
         height: 150,
         textAlignVertical: 'top',
     },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRoute } from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
 import TextCadastroAnimalInput from '../../components/TextCadastroAnimalInput';
@@ -6,7 +6,32 @@ import * as ImagePicker from 'expo-image-picker';
 
 function CadastroAnimalScreen() {
     const navigation = useNavigation();
+    const route = useRoute();
+    const idDono = route.params.idDono;
+
+    const [nome, onChangeNome] = React.useState('');
+    const [sexo, onChangeSexo] = React.useState('');
+    const [dataNascimento, onChangeDataNascimento] = React.useState(new Date());
+    const [especie, onChangeEspecie] = React.useState('');
+    const [raca, onChangeRaca] = React.useState('');
+    const [porte, onChangePorte] = React.useState('');
+    const [castrado, onChangeCastrado] = React.useState(null);
+    const [doencas, onChangeDoencas] = React.useState(['']);
+    const [deficiencias, onChangeDeficiencias] = React.useState(['']);
+    const [vacinas, onChangeVacinas] = React.useState(['']);
+    const [informacoes, onChangeInformacoes] = React.useState('');
     const [imageUri, setImageUri] = useState(null);
+
+    const [errors, setErrors] = React.useState({
+        nome: false,
+        sexo: false,
+        especie: false,
+        raca: false,
+        porte: false,
+        castrado: false,
+        informacoes: false,
+        image: false,
+    });
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -21,11 +46,98 @@ function CadastroAnimalScreen() {
         }
     };
 
+    const handleCadastro = async () => {
+        const newErrors = {
+            nome: !nome.trim(),
+            sexo: !sexo.trim(),
+            especie: !especie.trim(),
+            raca: !raca.trim(),
+            porte: !porte.trim(),
+            castrado: castrado === null,
+            informacoes: !informacoes.trim(),
+            image: !imageUri,
+        };
+
+        const hasError = Object.values(newErrors).some(e =>
+            typeof e === 'object'
+                ? Object.values(e).some(v => v)
+                : e
+        );
+        setErrors(newErrors);
+
+        if (hasError) {
+            Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        const clearList = (list) => {
+            return list.length === 1 && list[0].trim() === '' ? [] : list;
+        };
+
+        try {           
+            const response = await fetch(`http://192.168.3.5:3000/animais`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: nome.trim(),
+                    sexo: sexo.trim(),
+                    dataNascimento: dataNascimento.toISOString(),
+                    especie: especie.trim(),
+                    raca: raca.trim(),
+                    porte: porte.trim(),
+                    castrado: castrado,
+                    doencas: clearList(doencas),
+                    deficiencias: clearList(deficiencias),
+                    vacinas: clearList(vacinas),
+                    informacoes: informacoes.trim(),
+                    idDono: "682a3ccb7bdb8c892057266a",
+                    adotado: false,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Cadastro inválido');
+            }
+
+            const data = await response.json();
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Erro ao fazer cadastro:', error);
+            Alert.alert('Erro', 'Cadastro inválido');
+        }
+    };
+
     return (
         <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
         <Text style={styles.title}>Cadastrar Animal</Text>
-        <TextCadastroAnimalInput />
+        <TextCadastroAnimalInput 
+            nome={nome}
+            onChangeNome={onChangeNome}
+            sexo={sexo}
+            onChangeSexo={onChangeSexo}
+            dataNascimento={dataNascimento}
+            onChangeDataNascimento={onChangeDataNascimento}
+            especie={especie}
+            onChangeEspecie={onChangeEspecie}
+            raca={raca}
+            onChangeRaca={onChangeRaca}
+            porte={porte}
+            onChangePorte={onChangePorte}
+            castrado={castrado}
+            onChangeCastrado={onChangeCastrado}
+            doencas={doencas}
+            onChangeDoencas={onChangeDoencas}
+            deficiencias={deficiencias}
+            onChangeDeficiencias={onChangeDeficiencias}
+            vacinas={vacinas}
+            onChangeVacinas={onChangeVacinas}
+            informacoesAdicionais={informacoes}
+            onChangeInformacoesAdicionais={onChangeInformacoes}
+            errors={errors}
+        />
 
         <Pressable onPress={pickImage}>
             {imageUri ? (
@@ -37,9 +149,13 @@ function CadastroAnimalScreen() {
             )}
         </Pressable>
 
+        {errors.image && (
+            <Text style={styles.errorText}>Imagem obrigatória</Text>
+        )}
+
         <Pressable
             style={styles.botao}
-            onPress={() => navigation.navigate('User')} // Navega para o TabNavigator
+            onPress={handleCadastro}
         >
             <Text style={styles.textoBotao}>Cadastrar</Text>
         </Pressable>
@@ -55,7 +171,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: 'white',
         padding: 50,
-        
     },
     title: {
         fontSize: 18,
@@ -95,6 +210,11 @@ const styles = StyleSheet.create({
     textoBotao: {
         color: 'white',
         fontSize: 16,
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 8,
+        fontSize: 14,
     },
 });
 

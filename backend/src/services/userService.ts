@@ -1,7 +1,30 @@
 import UserModel from "../models/User";
+import { LoginRequest } from "../models/requests/LoginRequest";
+import bcrypt from 'bcrypt';
+
+export const loginUser = async (login: LoginRequest) => {
+
+    const usuario = await UserModel.findOne({ email: login.email, senha: login.senha, ativo: true }).select('-image');
+
+    if (!usuario) {
+        throw new Error('Usuário não encontrado');
+    }
+
+    /*const senhaCorreta = await bcrypt.compare(login.senha, usuario.senha);
+    if (!senhaCorreta) {
+        throw new Error('Senha inválida');
+    }*/
+
+    return usuario;
+};
 
 export const createUser = async (data: any) => {
     try {
+        const existingUser = await UserModel.findOne({ email: data.email, ativo: true });
+        if (existingUser) {
+            throw new Error('Email já cadastrado!');
+        }
+
         const user = new UserModel(data);
         user.ativo = true;
         await user.save();

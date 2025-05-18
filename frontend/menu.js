@@ -18,7 +18,7 @@ const BottomMenu = () => {
                 <Image
                         style={styles.logo}
                         source={require('./img/Estrela.png')}
-                      />
+                />
             </Pressable>
 
             <Pressable
@@ -31,7 +31,7 @@ const BottomMenu = () => {
                 <Image
                         style={styles.logo}
                         source={require('./img/Home.png')}
-                      />
+                />
             </Pressable>
 
             <Pressable
