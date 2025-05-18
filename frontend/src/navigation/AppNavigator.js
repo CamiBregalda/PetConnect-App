@@ -21,6 +21,9 @@ import IconVoluntariar from '../../img/candidatos.png';
 import PerfilAnimal from "../../screens/perfils/PerfilAnimais";
 import PerfilCuidador from "../../screens/perfils/PerfilCuidador";
 import InfoScreen from "../../screens/user/InfoScreen";
+import AnimaisUser from "../../screens/user/AnimaisUser";
+import RegistroScreen from "../../screens/user/RegistroScreen";
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -147,7 +150,11 @@ export default function AppNavigator() {
         <Stack.Screen name="CadastroUser" component={CadastroUser} />
         <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
         <Stack.Screen name="CadastroAnimal" component={CadastroAnimal} />
-        <Stack.Screen name="User" component={TelaPrincipal} />
+        <Stack.Screen name="TelaPrincipal" component={TelaPrincipal} />
+        <Stack.Screen name="RegistroScreen" component={RegistroScreen} />
+        <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
+        <Stack.Screen name="InfoScreen" component={InfoScreen} />
+
 
         <Stack.Screen
           name="Main"
