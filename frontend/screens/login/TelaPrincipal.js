@@ -1,5 +1,5 @@
 // HomeScreen.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -10,6 +10,38 @@ function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
+
+useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: true, 
+      title: '',
+      headerTitleAlign: 'center',
+      headerStyle: {
+        backgroundColor: '#8A2BE2', // Cor de fundo do cabeçalho
+      },
+      headerTintColor: 'white', // Cor do título e botão de voltar
+      headerTitleAlign: 'center',
+
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Image
+            source={require('../../img/logout.png')} // Caminho para sua imagem
+            style={styles.headerLogoutIcon}
+          />
+        </TouchableOpacity>
+      ),
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('UsuarioInfo')}>
+          <Image
+            source={require('../../img/Profile_Active.png')} // Caminho para sua imagem
+            style={styles.headerProfileIcon}
+          />
+        </TouchableOpacity>
+      ),
+      // Se você quiser um botão de voltar personalizado ou nenhum, pode adicionar headerLeft aqui
+      // Exemplo: headerLeft: () => null, // para remover o botão de voltar padrão
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,16 +154,25 @@ function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f0f0f0',
   },
+  headerLogoutIcon: {  
+    width: 28,
+    height: 28,
+    marginLeft: 15,
+  },
+   headerProfileIcon: { 
+    width: 28,
+    height: 28,
+    marginRight: 15,
+   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
-    marginTop: 50,
+    marginTop: 20,
   },
   searchBarContainer: {
     marginBottom: 20,
@@ -180,6 +221,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  
   listImage: {
     width: 130,
     height: 100,

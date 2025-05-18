@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { AbrigoContext } from './../../AppContext';
+import { AbrigoContext } from '../../AppContext';
 import { useNavigation } from '@react-navigation/native';
 
 function Voluntarios() {
