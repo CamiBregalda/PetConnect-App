@@ -1,50 +1,56 @@
 import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
+import TextEnderecoInput from './TextEnderecoInput';
 
-const TextCadastroUserInput = () => {
-  const [name, onChangeName] = React.useState('');
-  const [cpf, onChangeCpf] = React.useState('');
-  const [email, onChangeEmail] = React.useState('');
-  const [telefone, onChangeTelefone] = React.useState('');
-  const [endereco, onChangeEndereco] = React.useState('');
-
+const TextCadastroUserInput = ({ name, onChangeName, cpf, onChangeCpf, email, onChangeEmail, senha, onChangeSenha, telefone, onChangeTelefone, endereco, onChangeEndereco, errors }) => {
+  const getInputStyle = (fieldError) => [
+    styles.input,
+    fieldError && styles.inputError,
+  ];
+  
   return (
     <>
       <View>
         <TextInput
-          style={styles.input}
+          style={getInputStyle(errors.name)}
           onChangeText={onChangeName}
           value={name}
-          placeholder="Name"
+          placeholder="Nome"
           keyboardType="Name"
         />
         <TextInput
-          style={styles.input}
+          style={getInputStyle(errors.cpf)}
           onChangeText={onChangeCpf}
           value={cpf}
           placeholder="CPF"
           keyboardType="Cpf"
         />
         <TextInput
-          style={styles.input}
+          style={getInputStyle(errors.email)}
           onChangeText={onChangeEmail}
           value={email}
-          placeholder="email"
+          placeholder="Email"
           keyboardType="Email"
         />
         <TextInput
-          style={styles.input}
+          style={getInputStyle(errors.senha)}
+          onChangeText={onChangeSenha}
+          value={senha}
+          placeholder="Senha"
+          keyboardType="Senha"
+        />
+        <TextInput
+          style={getInputStyle(errors.telefone)}
           onChangeText={onChangeTelefone}
           value={telefone}
           placeholder="Telefone"
           keyboardType="Telefone"
         />
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangeEndereco}
-          value={endereco}
-          placeholder="Endereco"
-          keyboardType="Endereco"
+        
+        <TextEnderecoInput 
+          endereco={endereco} 
+          onChangeEndereco={onChangeEndereco} 
+          errors={errors.endereco}
         />
       </View>
     </>
@@ -60,6 +66,14 @@ const styles = StyleSheet.create({
     borderWidth: 0.2,
     borderBottomWidth: 1,
     padding: 10,
+  },
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+    shadowColor: 'red',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 3,
   },
 });
 

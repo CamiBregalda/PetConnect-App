@@ -1,9 +1,30 @@
 import { Request, Response } from "express";
 import * as userService from "../services/userService";
 import { validateImage } from '../utils/imageUtil';
+import { LoginRequest } from "../models/requests/LoginRequest";
 import multer from "multer";
 
 const upload = multer();
+
+export const loginUser = async (req: Request, res: Response) => {
+  try {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+      return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+    }
+
+    const usuario = await userService.loginUser(new LoginRequest(email, senha));
+
+    res.status(200).json({
+      email: usuario.email,
+      mensagem: 'Login realizado com sucesso',
+    });
+  } catch (error) {
+    console.error('Erro ao realizar login:', error);
+    res.status(500).json({ message: 'Falha ao realizar login' });
+  }
+};
 
 export const createUser = async (req: Request, res: Response) => {
   try {

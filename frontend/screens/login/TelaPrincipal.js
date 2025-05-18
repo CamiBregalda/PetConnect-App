@@ -1,9 +1,13 @@
 // HomeScreen.js
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 function HomeScreen() {
+  //const route = useRoute();
+  //const { email } = route.params;
+  //console.log('Email recebido:', email);
+
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -161,11 +165,11 @@ const styles = StyleSheet.create({
     height: 28,
     marginLeft: 15,
   },
-   headerProfileIcon: { 
+  headerProfileIcon: { 
     width: 28,
     height: 28,
     marginRight: 15,
-   },
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',

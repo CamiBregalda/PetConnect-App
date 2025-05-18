@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 import { EspecieEnum } from './enums/EspecieEnum';
+import { RacasPorEspecieRecord } from './enums/RacasPorEspecieRecord';
+import { Porte } from './enums/PorteEnum';
 
 export interface AnimalAttributes {
     id?: string;
@@ -7,8 +9,8 @@ export interface AnimalAttributes {
     sexo: string;
     dataNascimento?: Date;
     especie: EspecieEnum;
-    raca: string;
-    porte: string;
+    raca: String;
+    porte: Porte;
     castrado: boolean;
     doencas: string[];
     deficiencias: string[];
@@ -17,7 +19,7 @@ export interface AnimalAttributes {
     idDono: string;
     adotado: boolean;
     image?: Buffer;
-    ativo: boolean;
+    ativo?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -29,16 +31,16 @@ const AnimalSchema = new Schema<AnimalAttributes>(
         dataNascimento: { type: Date, required: false },
         especie: { type: String, enum: Object.values(EspecieEnum), required: true },
         raca: { type: String, required: true },
-        porte: { type: String, required: true },
+        porte: { type: String, enum: Object.values(Porte), required: true },
         castrado: { type: Boolean, required: true },
         doencas: { type: [String], required: true },
         deficiencias: { type: [String], required: true },
-        informacoes: { type: String, required: true },
         vacinas: { type: [String], required: true },
+        informacoes: { type: String, required: true },
         idDono: { type: String, required: true },
         adotado: { type: Boolean, required: true },
         image: { type: Buffer, required: false },
-        ativo: { type: Boolean, required: true },
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "animais",

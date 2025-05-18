@@ -1,12 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useRoute } from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import TextCadastroAbrigoInput from '../../components/TextCadastroAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
 
 function CadastroAbrigoScreen() {
+    const route = useRoute();
+    const idAdmDeAbrigo = route.params.idAdmAbrigo;
+
     const navigation = useNavigation();
+    const [nome, onChangeNome] = React.useState('');
+    const [cnpj, onChangeCnpj] = React.useState('');
+    const [email, onChangeEmail] = React.useState('');
+    const [telefone, onChangeTelefone] = React.useState('');
+    const [descricao, onChangeDescricao] = React.useState('');
+    const [endereco, onChangeEndereco] = React.useState({
+        rua: '',
+        numero: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+        cep: '',
+    });
     const [imageUri, setImageUri] = useState(null);
+
+    const [errors, setErrors] = React.useState({
+        nome: false,
+        cnpj: false,
+        email: false,
+        telefone: false,
+        descricao: false,
+        endereco: {
+            rua: false,
+            numero: false,
+            bairro: false,
+            cidade: false,
+            estado: false,
+            cep: false,
+        },
+        image: false,
+    });
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -21,11 +54,98 @@ function CadastroAbrigoScreen() {
         }
     };
 
+    const handleEnderecoChange = (campo, valor) => {
+        onChangeEndereco((prev) => ({
+            ...prev,
+            [campo]: valor,
+        }));
+    };
+
+    const handleCadastro = async () => {
+        const newErrors = {
+            nome: !nome.trim(),
+            cnpj: !cnpj.trim(),
+            email: !email.trim(),
+            telefone: !telefone.trim(),
+            descricao: !descricao.trim(),
+            endereco: {
+                rua: !endereco.rua.trim(),
+                numero: !endereco.numero.trim(),
+                bairro: !endereco.bairro.trim(),
+                cidade: !endereco.cidade.trim(),
+                estado: !endereco.estado.trim(),
+                cep: !endereco.cep.trim(),
+            },
+            image: !imageUri,
+        };
+
+        const hasError = Object.values(newErrors).some(e =>
+            typeof e === 'object'
+                ? Object.values(e).some(v => v)
+                : e
+        );
+        setErrors(newErrors);
+
+        if (hasError) {
+            Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        try {           
+            const response = await fetch(`http://192.168.3.5:3000/abrigos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: nome.trim(),
+                    cnpj: cnpj.trim(),
+                    email: email.trim(),
+                    telefone: telefone.trim(),
+                    descricao: descricao.trim(),
+                    endereco: {
+                        rua: endereco.rua.trim(),
+                        numero: endereco.numero.trim(),
+                        bairro: endereco.bairro.trim(),
+                        cidade: endereco.cidade.trim(),
+                        estado: endereco.estado.trim(),
+                        cep: endereco.cep.trim(),
+                    },
+                    idAdmAbrigo: idAdmDeAbrigo,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Cadastro inválido');
+            }
+
+            const data = await response.json();
+            navigation.navigate('CadastroAnimal');
+        } catch (error) {
+            console.error('Erro ao fazer cadastro:', error);
+            Alert.alert('Erro', 'Cadastro inválido');
+        }
+    };
+
     return (
         <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
         <Text style={styles.title}>Cadastrar Abrigo</Text>
-        <TextCadastroAbrigoInput />
+        <TextCadastroAbrigoInput
+            nome={nome}
+            onChangeNome={onChangeNome}
+            cnpj={cnpj}
+            onChangeCnpj={onChangeCnpj}
+            email={email}
+            onChangeEmail={onChangeEmail}
+            telefone={telefone}
+            onChangeTelefone={onChangeTelefone}
+            endereco={endereco}
+            onChangeEndereco={handleEnderecoChange}
+            descricao={descricao}
+            onChangeDescricao={onChangeDescricao}
+            errors={errors}
+        />
 
         <Pressable onPress={pickImage}>
             {imageUri ? (
@@ -37,9 +157,13 @@ function CadastroAbrigoScreen() {
             )}
         </Pressable>
 
+        {errors.image && (
+            <Text style={styles.errorText}>Imagem obrigatória</Text>
+        )}
+
         <Pressable
             style={styles.botao}
-            onPress={() => navigation.navigate('CadastroAnimal')} // Navega para o TabNavigator
+            onPress={handleCadastro}
         >
             <Text style={styles.textoBotao}>Cadastrar</Text>
         </Pressable>
@@ -94,6 +218,11 @@ const styles = StyleSheet.create({
     textoBotao: {
         color: 'white',
         fontSize: 16,
+    },
+    errorText: {
+        color: 'red',
+        marginTop: 8,
+        fontSize: 14,
     },
 });
 

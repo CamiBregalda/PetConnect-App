@@ -1,25 +1,149 @@
 import React from 'react';
 import { useNavigation } from "@react-navigation/native";
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import TextCadastroUserInput from '../../components/TextCadastroUserInput'; // Ajuste o path se necessário
+//import { BACKEND_BASE_URL } from 'expo-constants';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
+import TextCadastroUserInput from '../../components/TextCadastroUserInput';
 
 function CadastroUserScreen() {
     const navigation = useNavigation();
+    const [name, onChangeName] = React.useState('');
+    const [cpf, onChangeCpf] = React.useState('');
+    const [email, onChangeEmail] = React.useState('');
+    const [senha, onChangeSenha] = React.useState('');
+    const [telefone, onChangeTelefone] = React.useState('');
+    const [endereco, onChangeEndereco] = React.useState({
+        rua: '',
+        numero: '',
+        bairro: '',
+        cidade: '',
+        estado: '',
+        cep: '',
+    });
+
+    const [errors, setErrors] = React.useState({
+        name: false,
+        cpf: false,
+        email: false,
+        senha: false,
+        telefone: false,
+        endereco: {
+            rua: false,
+            numero: false,
+            bairro: false,
+            cidade: false,
+            estado: false,
+            cep: false,
+        },
+    });
+
+    const handleEnderecoChange = (campo, valor) => {
+        onChangeEndereco((prev) => ({
+            ...prev,
+            [campo]: valor,
+        }));
+    };
+
+    const handleCadastro = async () => {
+        const newErrors = {
+            name: !name.trim(),
+            cpf: !cpf.trim(),
+            email: !email.trim(),
+            senha: !senha.trim(),
+            telefone: !telefone.trim(),
+            endereco: {
+                rua: !endereco.rua.trim(),
+                numero: !endereco.numero.trim(),
+                bairro: !endereco.bairro.trim(),
+                cidade: !endereco.cidade.trim(),
+                estado: !endereco.estado.trim(),
+                cep: !endereco.cep.trim(),
+            },
+        };
+
+
+        const hasError = Object.values(newErrors).some(e =>
+            typeof e === 'object'
+                ? Object.values(e).some(v => v)
+                : e
+        );
+        setErrors(newErrors);
+
+        if (hasError) {
+            Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        /*
+        const hashedSenha = await Crypto.digestStringAsync(
+            Crypto.CryptoDigestAlgorithm.SHA256,
+            senha
+        );*/
+
+        try {           
+            const response = await fetch(`http://192.168.3.5:3000/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: name.trim(),
+                    email: email.trim(),
+                    senha: senha.trim(),
+                    cpf: cpf.trim(),
+                    telefone: telefone.trim(),
+                    endereco: {
+                        rua: endereco.rua.trim(),
+                        numero: endereco.numero.trim(),
+                        bairro: endereco.bairro.trim(),
+                        cidade: endereco.cidade.trim(),
+                        estado: endereco.estado.trim(),
+                        cep: endereco.cep.trim(),
+                    },
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Cadastro inválido');
+            }
+
+            const data = await response.json();
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Erro ao fazer cadastro:', error);
+            Alert.alert('Erro', 'Cadastro inválido');
+        }
+    };
 
     return (
+        <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
-        <Image
-            style={styles.logo}
-            source={require('../../img/PET.png')} // Ajuste o path se necessário
-        />
-        <TextCadastroUserInput />
-        <Pressable
-            style={styles.botao}
-            onPress={() => navigation.navigate('CadastroAbrigo')} // Navega para o TabNavigator
-        >
-            <Text style={styles.textoBotao}>Cadastrar</Text>
-        </Pressable>
+            <Image
+                style={styles.logo}
+                source={require('../../img/PET.png')}
+            />
+            <TextCadastroUserInput
+                name={name}
+                onChangeName={onChangeName}
+                cpf={cpf}
+                onChangeCpf={onChangeCpf}
+                email={email}
+                onChangeEmail={onChangeEmail}
+                senha={senha}
+                onChangeSenha={onChangeSenha}
+                telefone={telefone}
+                onChangeTelefone={onChangeTelefone}
+                endereco={endereco}
+                onChangeEndereco={handleEnderecoChange}
+                errors={errors}
+            />
+            <Pressable
+                style={styles.botao}
+                onPress={handleCadastro}
+            >
+                <Text style={styles.textoBotao}>Cadastrar</Text>
+            </Pressable>
         </View>
+        </ScrollView>
     );
 }
 
@@ -27,9 +151,9 @@ const styles = StyleSheet.create({
     divCadastro: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center', // Centraliza o conteúdo na tela de login
+        justifyContent: 'center',
         backgroundColor: 'white',
-        padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
+        padding: 50,
     },
     logo: {
         width: 150,

@@ -1,7 +1,9 @@
 import { Router } from 'express';
-import { createUser, getUsers, getUserById, updateUser, deleteUser, uploadImage, getImage, deleteImage } from '../controllers/userController';
+import { loginUser, createUser, getUsers, getUserById, updateUser, deleteUser, uploadImage, getImage, deleteImage } from '../controllers/userController';
 
 const router = Router();
+
+router.post('/login', loginUser);
 
 router.post('', createUser);
 router.get('', getUsers);

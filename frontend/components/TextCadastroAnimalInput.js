@@ -1,35 +1,110 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, TextInput, StyleSheet, Text, Pressable, TouchableOpacity, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GenericListInput } from './GenericListInput';
 
-const TextCadastroAnimalInput = () => {
-    const [nome, onChangeNome] = React.useState('');
-    const [sexo, onChangeSexo] = React.useState('');
-    const [dataNascimento, onChangeDataNascimento] = React.useState(new Date());
+
+
+const TextCadastroAnimalInput = (
+    { 
+        nome, onChangeNome, 
+        sexo, onChangeSexo, 
+        dataNascimento, onChangeDataNascimento, 
+        especie, onChangeEspecie, 
+        raca, onChangeRaca, 
+        porte, onChangePorte, 
+        castrado, onChangeCastrado, 
+        doencas, onChangeDoencas, 
+        deficiencias, onChangeDeficiencias,
+        vacinas, onChangeVacinas,
+        informacoesAdicionais, onChangeInformacoesAdicionais,
+        errors,
+    }) => {
+
+    const [listaEspecies, setListaEspecies] = React.useState([]);
+    const [listaRacas, setListaRacas] = React.useState([]);
+    const [listaPorte, setListaPorte] = React.useState([]);
+
+    const fetchRacas = async (especieSelecionada) => {
+        try {
+            if (!especieSelecionada) {
+                setListaRacas([]);
+                return;
+            }
+            const response = await fetch(`http://192.168.3.5:3000/especies/${especieSelecionada}/racas`);
+            if (!response.ok) throw new Error('Erro ao buscar raças');
+            const data = await response.json();
+            setListaRacas(data);
+        } catch (error) {
+            console.error('Erro ao buscar raças:', error);
+        }
+    };
+
+    React.useEffect(() => {
+        const fetchEspecies = async () => {
+            try {
+                const response = await fetch('http://192.168.3.5:3000/especies');
+                if (!response.ok) throw new Error('Erro ao buscar espécies');
+                const data = await response.json();
+                setListaEspecies(data);
+            } catch (error) {
+                console.error('Erro ao buscar espécies:', error);
+            }
+        };
+
+        const fetchPorte = async () => {
+            try {
+                const response = await fetch('http://192.168.3.5:3000/portes');
+                if (!response.ok) throw new Error('Erro ao buscar portes');
+                const data = await response.json();
+                setListaPorte(data);
+            } catch (error) {
+                console.error('Erro ao buscar portes:', error);
+            }
+        };
+
+        fetchEspecies();
+        fetchPorte();
+        if (especie) {
+            fetchRacas(especie);
+        }
+    }, []);
+    
     const [showDatePicker, setShowDatePicker] = React.useState(false);
-    const [especie, onChangeEspecie] = React.useState('');
-    const [raca, onChangeRaca] = React.useState('');
-    const [porte, onChangePorte] = React.useState('');
-    const [castrado, onChangeCastrado] = React.useState('');
-    const [doencas, onChangeDoencas] = React.useState(['']);
-    const [deficiencias, onChangeDeficiencias] = React.useState(['']);
-    const [vacinas, onChangeVacinas] = React.useState(['']);
-    const [informacoesAdicionais, onChangeInformacoesAdicionais] = React.useState('');
+
+    const getInputStyle = (fieldError) => [
+        styles.input,
+        fieldError && styles.inputError,
+    ];
+
+    const getInputSelectStyle = (fieldError) => [
+        styles.inputSelect,
+        fieldError && styles.inputError,
+    ];
+
+    const getInputDateStyle = (fieldError) => [
+        styles.dateInput,
+        fieldError && styles.inputError,
+    ];
+
+    const getDescricaoInputStyle = (fieldError) => [
+        styles.descricaoInput,
+        fieldError && styles.inputError,
+    ];
 
     return (
         <>
         <View>
             <TextInput
-                style={styles.input}
+                style={getInputStyle(errors.nome)}
                 onChangeText={onChangeNome}
                 value={nome}
                 placeholder="Nome"
                 keyboardType="Nome"
             />
 
-            <View style={styles.inputSelect}>
+            <View style={getInputSelectStyle(errors.sexo)}>
                 <Picker
                     selectedValue={sexo}
                     onValueChange={(itemValue) => onChangeSexo(itemValue)}
@@ -59,51 +134,57 @@ const TextCadastroAnimalInput = () => {
                 />
             )}
 
-            <View style={styles.input}>
+            <View style={getInputSelectStyle(errors.especie)}>
                 <Picker
                     selectedValue={especie}
-                    onValueChange={(itemValue) => onChangeEspecie(itemValue)}
+                    onValueChange={(itemValue) => {
+                        onChangeEspecie(itemValue);
+                        fetchRacas(itemValue);
+                    }}
                     style={styles.picker}
                 >
                     <Picker.Item label="Espécie" value="" />
-                    <Picker.Item label="Espécie 1" value="Feminino" />
-                    <Picker.Item label="Espécie 2" value="Masculino" />
+                    {listaEspecies.map((item, index) => (
+                        <Picker.Item key={index} label={item} value={item} />
+                    ))}
                 </Picker>
             </View>
 
-            <View style={styles.input}>
+            <View style={getInputSelectStyle(errors.raca)}>
                 <Picker
                     selectedValue={raca}
                     onValueChange={(itemValue) => onChangeRaca(itemValue)}
                     style={styles.picker}
                 >
                     <Picker.Item label="Raça" value="" />
-                    <Picker.Item label="Espécie 1" value="Feminino" />
-                    <Picker.Item label="Espécie 2" value="Masculino" />
+                    {listaRacas.map((item, index) => (
+                        <Picker.Item key={index} label={item} value={item} />
+                    ))}
                 </Picker>
             </View>
 
-            <View style={styles.input}>
+            <View style={getInputSelectStyle(errors.porte)}>
                 <Picker
                     selectedValue={porte}
                     onValueChange={(itemValue) => onChangePorte(itemValue)}
                     style={styles.picker}
                 >
                     <Picker.Item label="Porte" value="" />
-                    <Picker.Item label="Porte 1" value="Feminino" />
-                    <Picker.Item label="Porte 2" value="Masculino" />
+                    {listaPorte.map((item, index) => (
+                        <Picker.Item key={index} label={item} value={item} />
+                    ))}
                 </Picker>
             </View>
 
-            <View style={styles.input}>
+            <View style={getInputSelectStyle(errors.castrado)}>
                 <Picker
                     selectedValue={castrado}
                     onValueChange={(itemValue) => onChangeCastrado(itemValue)}
                     style={styles.picker}
                 >
-                    <Picker.Item label="Castrado(a)" value="" />
-                    <Picker.Item label="Castrado(a) 1" value="Sim" />
-                    <Picker.Item label="Castrado(a) 2" value="Não" />
+                    <Picker.Item label="Castrado(a)" value={null} />
+                    <Picker.Item label="Sim" value={true} />
+                    <Picker.Item label="Não" value={false} />
                 </Picker>
             </View>
 
@@ -124,7 +205,7 @@ const TextCadastroAnimalInput = () => {
             />
 
             <TextInput
-                style={[styles.input, styles.largeInput]}
+                style={getDescricaoInputStyle(errors.informacoesAdicionais)}
                 onChangeText={onChangeInformacoesAdicionais}
                 value={informacoesAdicionais}
                 placeholder="Informações Adicionais"
@@ -162,10 +243,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
-    largeInput: {
-        height: 150,
-        textAlignVertical: 'top',
-    },
     label: {
         fontWeight: 'bold',
         marginTop: 10,
@@ -186,7 +263,26 @@ const styles = StyleSheet.create({
         padding: 10,
         fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
         fontSize: Platform.OS === 'ios' ? 17 : 14,
-    }
+    },
+    inputError: {
+        borderColor: 'red',
+        borderWidth: 1,
+        shadowColor: 'red',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 3,
+    },
+    descricaoInput: {
+        width: 280,
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
+        paddingTop: 10,
+        padding: 10,
+        height: 150,
+        textAlignVertical: 'top',
+    },
 });
 
 export default TextCadastroAnimalInput;
