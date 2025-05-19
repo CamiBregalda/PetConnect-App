@@ -20,9 +20,9 @@ import PerfilCandidato from "../../screens/perfils/PerfilCandidato";
 import IconVoluntariar from '../../img/candidatos.png';
 import PerfilAnimal from "../../screens/perfils/PerfilAnimais";
 import PerfilCuidador from "../../screens/perfils/PerfilCuidador";
-import InfoScreen from "../../screens/user/InfoScreen";
+import InicialUser from "../../screens/user/InicialUser";
 import AnimaisUser from "../../screens/user/AnimaisUser";
-import RegistroScreen from "../../screens/user/RegistroScreen";
+import RegistroAbandono from "../../screens/user/RegistroAbandono";
 
 
 const Stack = createNativeStackNavigator();
@@ -151,9 +151,9 @@ export default function AppNavigator() {
         <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
         <Stack.Screen name="CadastroAnimal" component={CadastroAnimal} />
         <Stack.Screen name="TelaPrincipal" component={TelaPrincipal} />
-        <Stack.Screen name="RegistroScreen" component={RegistroScreen} />
+        <Stack.Screen name="RegistroAbandono" component={RegistroAbandono} />
         <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
-        <Stack.Screen name="InfoScreen" component={InfoScreen} />
+        <Stack.Screen name="InicialUser" component={InicialUser} />
 
 
         <Stack.Screen
@@ -207,7 +207,7 @@ export default function AppNavigator() {
         <Stack.Screen name="PerfilCandidato" component={PerfilCandidato} />
         <Stack.Screen name="PerfilCuidador" component={PerfilCuidador} />
         <Stack.Screen name="PerfilAnimal" component={PerfilAnimal} />
-        <Stack.Screen name="UsuarioInfo" component={InfoScreen} />
+        <Stack.Screen name="UsuarioInfo" component={InicialUser} />
       </Stack.Navigator>
     </NavigationContainer>
   );
