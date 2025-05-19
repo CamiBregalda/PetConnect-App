@@ -39,7 +39,7 @@ function PerfilCuidador({ route }) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://192.168.3.7:3000/cuidadores/${userId}`);
+        const response = await fetch(`http://192.168.3.20:3000/cuidadores/${userId}`);
         if (!response.ok) {
           let errorMessage = `Erro ao buscar cuidador: ${response.status}`;
           try {
@@ -92,7 +92,7 @@ function PerfilCuidador({ route }) {
           onPress: async () => {
             setIsDeleting(true);
             try {
-              const response = await fetch(`http://192.168.3.7:3000/cuidadores/${cuidadorDetalhes.id}`, {
+              const response = await fetch(`http://192.168.3.20:3000/cuidadores/${cuidadorDetalhes.id}`, {
                 method: 'DELETE',
               });
 
@@ -131,7 +131,7 @@ function PerfilCuidador({ route }) {
             setLoading(true);
             setError(null);
             try {
-                const response = await fetch(`http://192.168.3.7:3000/cuidadores/${userId}`);
+                const response = await fetch(`http://192.168.3.20:3000/cuidadores/${userId}`);
                 if (!response.ok) {
                     let errorMessage = `Erro ao buscar cuidador: ${response.status}`;
                     try { const errorData = await response.json(); if (errorData && errorData.message) errorMessage += ` - ${errorData.message}`; } catch (e) {}
@@ -191,7 +191,7 @@ function PerfilCuidador({ route }) {
   return (
     <ScrollView style={styles.scrollContainer}>
       <Image
-        source={{ uri: `http://192.168.3.7:3000/cuidadores/${cuidadorDetalhes.id}/imagem` }}
+        source={{ uri: `http://192.168.3.20:3000/cuidadores/${cuidadorDetalhes.id}/imagem` }}
         style={styles.profileHeaderImage}
         resizeMode="cover"
       />

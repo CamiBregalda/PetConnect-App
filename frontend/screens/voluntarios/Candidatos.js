@@ -12,7 +12,7 @@ function ListaCandidatosScreen() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = 'http://192.168.3.7:3000/candidaturas';
+      const apiUrl = 'http://192.168.3.20:3000/candidaturas';
 
       const response = await fetch(apiUrl, {
         method: 'GET',

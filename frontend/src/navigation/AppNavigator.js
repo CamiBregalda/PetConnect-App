@@ -52,7 +52,7 @@ function MainTabs({ navigation }) {
       ) {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'User' }],
+          routes: [{ name: 'TelaPrincipal' }],
         });
         return true;
       }
@@ -81,7 +81,7 @@ function MainTabs({ navigation }) {
           <TouchableOpacity onPress={() => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'User' }],
+              routes: [{ name: 'TelaPrincipal' }],
             });
           }}>
             <Image

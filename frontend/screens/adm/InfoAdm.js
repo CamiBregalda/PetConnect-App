@@ -20,7 +20,7 @@ function InfoAdm() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `http://192.168.3.7:3000/abrigos/${abrigoId}`; // Endpoint para buscar detalhes do abrigo pelo ID
+      const apiUrl = `http://192.168.3.20:3000/abrigos/${abrigoId}`; // Endpoint para buscar detalhes do abrigo pelo ID
       const response = await fetch(apiUrl);
 
       if (!response.ok) {

@@ -53,8 +53,8 @@ useLayoutEffect(() => {
       setError(null);
       try {
         const [animaisResponse, abrigosResponse] = await Promise.all([
-          fetch('http://192.168.3.7:3000/animais/'),
-          fetch('http://192.168.3.7:3000/abrigos/'),
+          fetch('http://192.168.3.20:3000/animais/'),
+          fetch('http://192.168.3.20:3000/abrigos/'),
         ]);
 
         if (!animaisResponse.ok || !abrigosResponse.ok) {
@@ -128,7 +128,7 @@ useLayoutEffect(() => {
           {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://192.168.3.7:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://192.168.3.20:3000/animais/${animal.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
@@ -143,7 +143,7 @@ useLayoutEffect(() => {
           {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
-                source={{ uri: `http://192.168.3.7:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://192.168.3.20:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>

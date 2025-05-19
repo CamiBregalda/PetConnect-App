@@ -21,7 +21,7 @@ function Voluntarios() {
       setLoading(true);
       setError(null);
       try {
-        const apiUrl = `http://192.168.3.7:3000/abrigos/${currentAbrigoId}/Cuidadores`;
+        const apiUrl = `http://192.168.3.20:3000/abrigos/${currentAbrigoId}/Cuidadores`;
 
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -71,7 +71,7 @@ function Voluntarios() {
               <View key={idx} style={styles.itemContainer}>
                 <TouchableOpacity key={cuidador.id} style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
                   <Image
-                    source={{ uri: `http://192.168.3.7:3000/cuidadores/${cuidador.id}/imagem` }}
+                    source={{ uri: `http://192.168.3.20:3000/cuidadores/${cuidador.id}/imagem` }}
                     style={styles.listImage} />
                 </TouchableOpacity>
                 <Text style={styles.listItemText}>{cuidador.nome}</Text>
