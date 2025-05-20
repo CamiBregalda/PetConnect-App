@@ -7,6 +7,7 @@ import { Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import TelaInicial from '../../screens/login/TelaInicial';
 import LoginScreen from '../../screens/login/LoginScreen';
 import CadastroUser from '../../screens/cadastros/CadastroUser';
+import AtualizarUserScreen from '../../screens/cadastros/AtualizarUser';
 import CadastroAbrigo from '../../screens/cadastros/CadastroAbrigo';
 import CadastroAnimal from '../../screens/cadastros/CadastroAnimal';
 import HomeAdm from '../../screens/adm/HomeAdm';
@@ -269,6 +270,7 @@ export default function AppNavigator() {
         <Stack.Screen name="TelaInicial" component={TelaInicial} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="CadastroUser" component={CadastroUser} />
+        <Stack.Screen name="AtualizarUser" component={AtualizarUserScreen} />
         <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
         <Stack.Screen name="CadastroAnimal" component={CadastroAnimal} />
         <Stack.Screen name="TelaPrincipal" component={TelaPrincipal} />
