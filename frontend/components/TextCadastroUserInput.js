@@ -38,6 +38,7 @@ const TextCadastroUserInput = ({ name, onChangeName, cpf, onChangeCpf, email, on
           value={senha}
           placeholder="Senha"
           keyboardType="Senha"
+          secureTextEntry={true}
         />
         <TextInput
           style={getInputStyle(errors.telefone)}

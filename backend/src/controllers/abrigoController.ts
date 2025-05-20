@@ -7,7 +7,7 @@
 
     export const createAbrigo = async (req: Request, res: Response) => {
         try {
-            const abrigo = await AbrigoService.createAbrigo(req.body);
+            const abrigo = await AbrigoService.createAbrigo(req.params.userId, req.body);
             res.status(201).json(abrigo);
         } catch (error: any) {
             res.status(500).json({ message: error.message });

@@ -14,15 +14,16 @@ const TextLoginInput = ({ username, onChangeUsername, password, onChangePassword
           style={getInputStyle(errors.username)}
           onChangeText={onChangeUsername}
           value={username}
-          placeholder="Username"
-          keyboardType="Username"
+          placeholder="Email"
+          keyboardType="Email"
         />
         <TextInput
           style={getInputStyle(errors.password)}
           onChangeText={onChangePassword}
           value={password}
-          placeholder="Password"
-          keyboardType="Password"
+          placeholder="Senha"
+          keyboardType="Senha"
+          secureTextEntry={true}
         />
       </View>
     </>

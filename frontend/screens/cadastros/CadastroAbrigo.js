@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 function CadastroAbrigoScreen() {
     const route = useRoute();
-    const idAdmDeAbrigo = route.params.idAdmAbrigo;
+    const userId = route.params.userId;
 
     const navigation = useNavigation();
     const [nome, onChangeNome] = React.useState('');
@@ -92,7 +92,7 @@ function CadastroAbrigoScreen() {
         }
 
         try {           
-            const response = await fetch(`http://192.168.3.5:3000/abrigos`, {
+            const response = await fetch(`http://192.168.3.5:3000/abrigos/${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,8 +110,7 @@ function CadastroAbrigoScreen() {
                         cidade: endereco.cidade.trim(),
                         estado: endereco.estado.trim(),
                         cep: endereco.cep.trim(),
-                    },
-                    idAdmAbrigo: idAdmDeAbrigo,
+                    }
                 }),
             });
 
