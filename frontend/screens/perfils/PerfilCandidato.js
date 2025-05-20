@@ -15,12 +15,12 @@ function PerfilCandidato({ route, onAprovado }) {
       setError(null);
       try {
         // Busca os detalhes do usuário
-        const userResponse = await fetch(`http://192.168.3.20:3000/users/${userId}`);
+        const userResponse = await fetch(`http://192.168.238.226:3000/users/${userId}`);
         const userData = await userResponse.json();
         setCandidatoDetalhes(userData);
 
         // Busca os detalhes da candidatura usando o ID da candidatura
-        const candidaturaResponse = await fetch(`http://192.168.3.20:3000/candidaturas/${candidaturaId}`);
+        const candidaturaResponse = await fetch(`http://192.168.238.226:3000/candidaturas/${candidaturaId}`);
         if (!candidaturaResponse.ok) {
           throw new Error(`Erro ao buscar candidatura: ${candidaturaResponse.status}`);
         }
@@ -40,7 +40,7 @@ function PerfilCandidato({ route, onAprovado }) {
 
   const aprovarCandidato = async () => {
     try {
-      const response = await fetch(`http://192.168.3.20:3000/candidaturas/${candidaturaId}`, {
+      const response = await fetch(`http://192.168.238.226:3000/candidaturas/${candidaturaId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ function PerfilCandidato({ route, onAprovado }) {
 
   const rejeitarCandidato = async () => {
     try {
-      const response = await fetch(`http://192.168.3.20:3000/candidaturas/${candidaturaId}`, { // Use candidaturaId
+      const response = await fetch(`http://192.168.238.226:3000/candidaturas/${candidaturaId}`, { // Use candidaturaId
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -111,11 +111,11 @@ function PerfilCandidato({ route, onAprovado }) {
 
             const buscarDetalhesCandidato = async () => {
               try {
-                const userResponse = await fetch(`http://192.168.3.20:3000/users/${userId}`);
+                const userResponse = await fetch(`http://192.168.238.226:3000/users/${userId}`);
                 const userData = await userResponse.json();
                 setCandidatoDetalhes(userData);
 
-                const candidaturaResponse = await fetch(`http://192.168.3.20:3000/candidaturas/${candidaturaId}`);
+                const candidaturaResponse = await fetch(`http://192.168.238.226:3000/candidaturas/${candidaturaId}`);
                 if (!candidaturaResponse.ok) {
                   throw new Error(`Erro ao buscar candidatura: ${candidaturaResponse.status}`);
                 }
@@ -150,7 +150,7 @@ function PerfilCandidato({ route, onAprovado }) {
     <View style={styles.container}>
       <View style={styles.infoContainer}>
         <Image
-          source={{ uri: `http://192.168.3.20:3000/users/${userId}/imagem` }}
+          source={{ uri: `http://192.168.238.226:3000/users/${userId}/imagem` }}
           style={styles.listImage} />
         {candidatoDetalhes && (
           <>

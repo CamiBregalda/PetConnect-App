@@ -30,6 +30,7 @@ import EventoDetalheAdm from '../../screens/adm/EventoDetalheAdm';
 import VoluntariosEvento from '../../screens/adm/VoluntariosEvento';
 import EditarEvento from '../../screens/adm/EditarEvento';
 import CriarEvento from '../../screens/adm/CriarEvento';
+import UsuarioInfo from '../../screens/user/InicialUser';
 
 
 const Stack = createNativeStackNavigator();
@@ -148,6 +149,119 @@ function MainTabs({ navigation }) {
   );
 }
 
+function UserTabs({ navigation }) {
+  useEffect(() => {
+    const backAction = () => {
+      const parentState = navigation.getState();
+      let currentTab = null;
+      const mainTabsRouteObject = parentState.routes[parentState.index];
+
+      if (mainTabsRouteObject && mainTabsRouteObject.state && mainTabsRouteObject.state.routeNames) {
+        const tabState = mainTabsRouteObject.state;
+        const tabIndex = tabState.index ?? 0;
+        currentTab = tabState.routeNames[tabIndex];
+      } else if (mainTabsRouteObject && mainTabsRouteObject.params && mainTabsRouteObject.params.screen) {
+        currentTab = mainTabsRouteObject.params.screen;
+      } else if (mainTabsRouteObject && mainTabsRouteObject.name === 'Home') {
+        currentTab = mainTabsRouteObject.name;
+      }
+
+      if (
+        currentTab === 'Home' ||
+        currentTab === 'Animais' ||
+        currentTab === 'Informações'
+      ) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'InicialUser' }],
+        });
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={({ route, navigation: tabNavigationProp }) => ({
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: '#8A2BE2',
+        },
+        headerTintColor: 'white',
+        headerTitleAlign: 'center',
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'TelaPrincipal' }],
+            });
+          }}>
+            <Image
+              source={require('../../img/seta.png')}
+              style={styles.homeIcon}
+            />
+          </TouchableOpacity>
+        ),
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === 'Home') {
+            iconName = focused
+              ? require('../../img/Home_Active.png')
+              : require('../../img/Home_Inactive.png');
+          } else if (route.name === 'Animais') {
+            iconName = focused
+              ? require('../../img/Animais_Active.png')
+              : require('../../img/Animais_Inactive.png');
+          } else if (route.name === 'Informações') {
+            iconName = focused
+              ? require('../../img/Profile_Active.png')
+              : require('../../img/Profile_Inactive.png');
+          }
+          return <Image source={iconName} style={{ width: size, height: size, tintColor: color }} />;
+        },
+        tabBarActiveTintColor: '#8A2BE2',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 100, paddingBottom: 5, paddingTop: 5 },
+        tabBarLabelStyle: { fontSize: 12 },
+      })}
+    >
+      <Tab.Screen
+        name="Animais"
+        component={AnimaisUser}
+        options={{
+          title: 'Animais',
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tab.Screen
+        name="Home"
+        component={InicialUser}
+        options={{
+          title: 'Usuario',
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tab.Screen
+        name="Informações"
+        component={RegistroAbandono}
+        options={{
+          title: 'Registrar Abandono',
+          tabBarShowLabel: false,
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
+
 export default function AppNavigator() {
   return (
     <NavigationContainer>
@@ -160,8 +274,7 @@ export default function AppNavigator() {
         <Stack.Screen name="TelaPrincipal" component={TelaPrincipal} />
         <Stack.Screen name="RegistroAbandono" component={RegistroAbandono} />
         <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
-        <Stack.Screen name="InicialUser" component={InicialUser} />
-        <Stack.Screen name="ListaEventos" component={ListaEventos} /> 
+        <Stack.Screen name="ListaEventos" component={ListaEventos} />
         <Stack.Screen name="EventoDetalhe" component={EventoDetalhe} />
         <Stack.Screen name="InfoAdm" component={InfoAdm} />
         <Stack.Screen name="EventosAdm" component={EventosAdm} />
@@ -169,6 +282,11 @@ export default function AppNavigator() {
         <Stack.Screen name="VoluntariosEvento" component={VoluntariosEvento} />
         <Stack.Screen name="EditarEvento" component={EditarEvento} />
         <Stack.Screen name="CriarEvento" component={CriarEvento} />
+        <Stack.Screen name="InicialUser"
+          component={UserTabs}
+          options={{
+            headerShown: false
+          }} />
 
         <Stack.Screen
           name="Main"
@@ -221,7 +339,7 @@ export default function AppNavigator() {
         <Stack.Screen name="PerfilCandidato" component={PerfilCandidato} />
         <Stack.Screen name="PerfilCuidador" component={PerfilCuidador} />
         <Stack.Screen name="PerfilAnimal" component={PerfilAnimal} />
-        <Stack.Screen name="UsuarioInfo" component={InicialUser} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

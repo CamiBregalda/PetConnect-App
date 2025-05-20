@@ -29,7 +29,7 @@ function HomeScreen() {
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('UsuarioInfo')}>
+        <TouchableOpacity onPress={() => navigation.navigate('InicialUser')}>
           <Image
             source={require('../../img/Profile_Active.png')}
             style={styles.headerProfileIcon}
@@ -45,8 +45,8 @@ function HomeScreen() {
       setError(null);
       try {
         const [animaisResponse, abrigosResponse] = await Promise.all([
-          fetch('http://192.168.3.20:3000/animais/'),
-          fetch('http://192.168.3.20:3000/abrigos/'),
+          fetch('http://192.168.238.226:3000/animais/'),
+          fetch('http://192.168.238.226:3000/abrigos/'),
         ]);
 
         if (!animaisResponse.ok || !abrigosResponse.ok) {
@@ -128,7 +128,7 @@ function HomeScreen() {
           {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://192.168.3.20:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://192.168.238.226:3000/animais/${animal.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
@@ -143,7 +143,7 @@ function HomeScreen() {
           {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
-                source={{ uri: `http://192.168.3.20:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://192.168.238.226:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>

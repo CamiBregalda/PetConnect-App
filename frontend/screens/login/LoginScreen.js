@@ -34,7 +34,7 @@ function LoginScreen() {
     );*/
 
     try {
-      const response = await fetch('http://192.168.3.20:3000/users/login', {
+      const response = await fetch('http://192.168.238.226:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

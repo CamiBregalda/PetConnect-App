@@ -10,10 +10,6 @@ export default function AnimaisUser() {
 
   return (
     <View style={styles.container}>
-      {/* Botão de voltar */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../../img/seta.png')} style={styles.backIcon} />
-      </TouchableOpacity>
 
       {/* Barra de filtro e busca */}
       <View style={styles.searchContainer}>
@@ -89,20 +85,7 @@ export default function AnimaisUser() {
         </View>
       </ScrollView>
 
-      {/* Menu inferior */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('AnimaisUser')}>
-          <Image source={require('../../img/Animais_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('InicialUser')}>
-          <Image source={require('../../img/Home_Active.png')} style={styles.navIconCenter} />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('RegistroAbandono')}>
-          <Image source={require('../../img/Profile_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

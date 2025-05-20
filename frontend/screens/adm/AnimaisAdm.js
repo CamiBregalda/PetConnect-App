@@ -16,8 +16,8 @@ function AnimaisAdm() {
     setError(null);
     try {
       const [animaisResponse, abrigoResponse] = await Promise.all([
-        fetch('http://192.168.3.20:3000/animais/'),
-        fetch(`http://192.168.3.20:3000/abrigos/${currentAbrigoId}`), // Busca as informações do abrigo
+        fetch('http://192.168.238.226:3000/animais/'),
+        fetch(`http://192.168.238.226:3000/abrigos/${currentAbrigoId}`), // Busca as informações do abrigo
       ]);
 
       if (!animaisResponse.ok || !abrigoResponse.ok) {
@@ -85,7 +85,7 @@ function AnimaisAdm() {
             <TouchableOpacity onPress={() => exibirDetalhesAnimal(item)} style={styles.animalItem}>
               {item.imagemUrl && (
                 <Image
-                  source={{ uri: `http://192.168.3.20:3000/animais/${item.id}/imagem` }}
+                  source={{ uri: `http://192.168.238.226:3000/animais/${item.id}/imagem` }}
                   style={styles.animalImage}
                 />
               )}
