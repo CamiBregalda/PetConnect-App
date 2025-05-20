@@ -23,6 +23,13 @@ import PerfilCuidador from "../../screens/perfils/PerfilCuidador";
 import InicialUser from "../../screens/user/InicialUser";
 import AnimaisUser from "../../screens/user/AnimaisUser";
 import RegistroAbandono from "../../screens/user/RegistroAbandono";
+import ListaEventos from '../../screens/adm/ListaEventos';
+import EventoDetalhe from '../../screens/adm/EventoDetalhe';
+import EventosAdm from '../../screens/adm/EventosAdm';
+import EventoDetalheAdm from '../../screens/adm/EventoDetalheAdm';
+import VoluntariosEvento from '../../screens/adm/VoluntariosEvento';
+import EditarEvento from '../../screens/adm/EditarEvento';
+import CriarEvento from '../../screens/adm/CriarEvento';
 
 
 const Stack = createNativeStackNavigator();
@@ -154,7 +161,14 @@ export default function AppNavigator() {
         <Stack.Screen name="RegistroAbandono" component={RegistroAbandono} />
         <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
         <Stack.Screen name="InicialUser" component={InicialUser} />
-
+        <Stack.Screen name="ListaEventos" component={ListaEventos} /> 
+        <Stack.Screen name="EventoDetalhe" component={EventoDetalhe} />
+        <Stack.Screen name="InfoAdm" component={InfoAdm} />
+        <Stack.Screen name="EventosAdm" component={EventosAdm} />
+        <Stack.Screen name="EventoDetalheAdm" component={EventoDetalheAdm} />
+        <Stack.Screen name="VoluntariosEvento" component={VoluntariosEvento} />
+        <Stack.Screen name="EditarEvento" component={EditarEvento} />
+        <Stack.Screen name="CriarEvento" component={CriarEvento} />
 
         <Stack.Screen
           name="Main"
