@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { StyleSheet, Text, View, Pressable, ActivityIndicator } from 'react-native';
-import { AbrigoContext } from './../../AppContext'; // Importe o Context
+import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { AbrigoContext } from './../../AppContext';
 
 function InfoAdm() {
   const navigation = useNavigation();
-  const { currentAbrigoId } = useContext(AbrigoContext); // Acesse o ID do abrigo do Context
+  const { currentAbrigoId } = useContext(AbrigoContext);
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,14 +13,14 @@ function InfoAdm() {
   const buscarInfoAbrigo = useCallback(async (abrigoId) => {
     if (!abrigoId) {
       setLoading(false);
-      setAbrigoInfo(null); // Limpa as informações se não houver ID
+      setAbrigoInfo(null);
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `http://192.168.3.7:3000/abrigos/${abrigoId}`; // Endpoint para buscar detalhes do abrigo pelo ID
+      const apiUrl = `http://192.168.3.20:3000/abrigos/${abrigoId}`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {
@@ -31,9 +31,9 @@ function InfoAdm() {
       const data = await response.json();
       setAbrigoInfo(data);
       setLoading(false);
-      navigation.setOptions({ title: data.nome || 'Informações do Abrigo' }); // Atualiza o título
+      navigation.setOptions({ title: data.nome || 'Informações do Abrigo' });
     } catch (err) {
-      console.error('InfoAdm: Erro ao buscar informações do abrigo:', err); // LOG
+      console.error('InfoAdm: Erro ao buscar informações do abrigo:', err);
       setError(err.message);
       setLoading(false);
       navigation.setOptions({ title: 'Erro ao Carregar' });
@@ -45,13 +45,16 @@ function InfoAdm() {
       if (currentAbrigoId) {
         buscarInfoAbrigo(currentAbrigoId);
       } else {
-        console.log('InfoAdm: Nenhum ID de abrigo no contexto ao focar.'); // LOG
         setLoading(false);
-        setAbrigoInfo(null); // Limpa as informações se não houver ID
+        setAbrigoInfo(null);
         navigation.setOptions({ title: 'Informações Gerais' });
       }
     }, [currentAbrigoId, buscarInfoAbrigo, navigation])
   );
+
+  const seVoluntariar = (abrigoId) => {
+    navigation.navigate('Voluntariarse', { abrigoId: abrigoId });
+  };
 
   if (loading) {
     return (
@@ -60,11 +63,6 @@ function InfoAdm() {
       </View>
     );
   }
-
-const seVoluntariar = (abrigoId) => { // Modifique a função para receber abrigoId
-    console.log(`Abrigo ID ao navegar para Voluntariarse: ${abrigoId}`); // Adicione este log
-    navigation.navigate('Voluntariarse', { abrigoId: abrigoId }); // Passa abrigoId como parâmetro
-  };
 
   if (error) {
     return (
@@ -82,7 +80,6 @@ const seVoluntariar = (abrigoId) => { // Modifique a função para receber abrig
 
   return (
     <View style={styles.container}>
-      
       {abrigoInfo && (
         <View style={styles.infoContainer}>
           <Text style={styles.infoTitle}>Informações do Abrigo</Text>
@@ -90,12 +87,53 @@ const seVoluntariar = (abrigoId) => { // Modifique a função para receber abrig
           {abrigoInfo.email && <Text>Email: {abrigoInfo.email}</Text>}
         </View>
       )}
+
+      {/* BLOCO DE EVENTOS COM DOIS TOQUES DIFERENTES */}
+      <View style={styles.eventosContainer}>
+        <TouchableOpacity
+          style={styles.eventosHeader}
+          onPress={() => navigation.navigate('ListaEventos', { abrigoId: currentAbrigoId })}
+        >
+          <Text style={styles.eventosTitle}>Nossos Eventos:</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.eventItem}
+          onPress={() => navigation.navigate('EventoDetalhe', {
+            evento: {
+              titulo: '15/05 Limpeza do Canil',
+              objetivo: 'Limpar e organizar o espaço dos animais.',
+              dataInicio: '15/05/2024',
+              dataFim: '15/05/2024',
+              detalhes: 'Levar luvas e materiais de limpeza.',
+            }
+          })}
+        >
+          <Text style={styles.eventText}>15/05 Limpeza do Canil</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.eventItem}
+          onPress={() => navigation.navigate('EventoDetalhe', {
+            evento: {
+              titulo: '26/05 Adoção na Praça',
+              objetivo: 'Evento de adoção pública.',
+              dataInicio: '26/05/2024',
+              dataFim: '26/05/2024',
+              detalhes: 'Traga coleiras e plaquinhas.',
+            }
+          })}
+        >
+          <Text style={styles.eventText}>26/05 Adoção na Praça</Text>
+        </TouchableOpacity>
+      </View>
+
       <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm')}>
         <Text style={styles.textoBotao}>Voluntarios</Text>
       </Pressable>
       <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
-          <Text style={styles.textoBotao}>Voluntariar-se</Text>
-        </Pressable>
+        <Text style={styles.textoBotao}>Voluntariar-se</Text>
+      </Pressable>
     </View>
   );
 }
@@ -140,6 +178,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 20,
+  },
+  eventosContainer: {
+    width: '90%',
+    backgroundColor: '#9333ea',
+    borderRadius: 10,
+    paddingBottom: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
+  eventosHeader: {
+    backgroundColor: '#9333ea',
+    padding: 12,
+  },
+  eventosTitle: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  eventItem: {
+    backgroundColor: '#e5e5e5',
+    padding: 8,
+    marginHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  eventText: {
+    color: '#333',
+    fontSize: 14,
   },
 });
 

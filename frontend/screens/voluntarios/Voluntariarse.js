@@ -25,7 +25,7 @@ function VoluntarioFormScreen() {
 
   const verificarInscricao = async () => {
     try {
-      const inscricaoUrl = `http://192.168.3.7:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
+      const inscricaoUrl = `http://192.168.3.20:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
       const response = await fetch(inscricaoUrl, {
         method: 'GET',
         headers: {
@@ -49,7 +49,7 @@ function VoluntarioFormScreen() {
       setLoadingUser(true);
       setError(null);
       try {
-        const userUrl = `http://192.168.3.7:3000/users/${userId}`;
+        const userUrl = `http://192.168.3.20:3000/users/${userId}`;
         const response = await fetch(userUrl, {
           method: 'GET',
           headers: {
@@ -97,7 +97,7 @@ function VoluntarioFormScreen() {
     }
 
     try {
-      const volunteerUrl = `http://192.168.3.7:3000/candidaturas`;
+      const volunteerUrl = `http://192.168.3.20:3000/candidaturas`;
       const volunteerResponse = await fetch(volunteerUrl, {
         method: 'POST',
         headers: {

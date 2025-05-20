@@ -34,7 +34,7 @@ function LoginScreen() {
     );*/
 
     try {
-      const response = await fetch('http://192.168.3.5:3000/users/login', {
+      const response = await fetch('http://192.168.3.20:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ function LoginScreen() {
       }
 
       const data = await response.json();
-      navigation.navigate('User', { email: data.email });
+      navigation.navigate('TelaPrincipal', { email: data.email });
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       Alert.alert('Erro', 'Login ou senha inválidos');

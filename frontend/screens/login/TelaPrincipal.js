@@ -1,13 +1,8 @@
-// HomeScreen.js
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 function HomeScreen() {
-  //const route = useRoute();
-  //const { email } = route.params;
-  //console.log('Email recebido:', email);
-
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,21 +10,20 @@ function HomeScreen() {
   const [error, setError] = useState(null);
   const navigation = useNavigation();
 
-useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
-      headerShown: true, 
+      headerShown: true,
       title: '',
       headerTitleAlign: 'center',
       headerStyle: {
-        backgroundColor: '#8A2BE2', // Cor de fundo do cabeçalho
+        backgroundColor: '#8A2BE2',
       },
-      headerTintColor: 'white', // Cor do título e botão de voltar
-      headerTitleAlign: 'center',
+      headerTintColor: 'white',
 
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Image
-            source={require('../../img/logout.png')} // Caminho para sua imagem
+            source={require('../../img/logout.png')}
             style={styles.headerLogoutIcon}
           />
         </TouchableOpacity>
@@ -37,13 +31,11 @@ useLayoutEffect(() => {
       headerRight: () => (
         <TouchableOpacity onPress={() => navigation.navigate('UsuarioInfo')}>
           <Image
-            source={require('../../img/Profile_Active.png')} // Caminho para sua imagem
+            source={require('../../img/Profile_Active.png')}
             style={styles.headerProfileIcon}
           />
         </TouchableOpacity>
       ),
-      // Se você quiser um botão de voltar personalizado ou nenhum, pode adicionar headerLeft aqui
-      // Exemplo: headerLeft: () => null, // para remover o botão de voltar padrão
     });
   }, [navigation]);
 
@@ -53,8 +45,8 @@ useLayoutEffect(() => {
       setError(null);
       try {
         const [animaisResponse, abrigosResponse] = await Promise.all([
-          fetch('http://192.168.3.7:3000/animais/'),
-          fetch('http://192.168.3.7:3000/abrigos/'),
+          fetch('http://192.168.3.20:3000/animais/'),
+          fetch('http://192.168.3.20:3000/abrigos/'),
         ]);
 
         if (!animaisResponse.ok || !abrigosResponse.ok) {
@@ -113,6 +105,14 @@ useLayoutEffect(() => {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>O que você procura hoje?</Text>
 
+      {/* 🔘 Botão para acessar a tela EventosAdm */}
+      <TouchableOpacity
+        style={styles.botaoEventosAdm}
+        onPress={() => navigation.navigate('EventosAdm')}
+      >
+        <Text style={styles.botaoEventosAdmTexto}>Ver Eventos do Admin</Text>
+      </TouchableOpacity>
+
       <View style={styles.searchBarContainer}>
         <TextInput
           style={styles.searchInput}
@@ -128,7 +128,7 @@ useLayoutEffect(() => {
           {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://192.168.3.7:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://192.168.3.20:3000/animais/${animal.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
@@ -143,7 +143,7 @@ useLayoutEffect(() => {
           {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
-                source={{ uri: `http://192.168.3.7:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://192.168.3.20:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>
@@ -160,12 +160,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f0',
   },
-  headerLogoutIcon: {  
+  headerLogoutIcon: {
     width: 28,
     height: 28,
     marginLeft: 15,
   },
-  headerProfileIcon: { 
+  headerProfileIcon: {
     width: 28,
     height: 28,
     marginRight: 15,
@@ -177,6 +177,19 @@ const styles = StyleSheet.create({
     color: '#333',
     textAlign: 'center',
     marginTop: 20,
+  },
+  botaoEventosAdm: {
+    backgroundColor: '#9333ea',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  botaoEventosAdmTexto: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   searchBarContainer: {
     marginBottom: 20,
@@ -225,7 +238,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
-  
   listImage: {
     width: 130,
     height: 100,
