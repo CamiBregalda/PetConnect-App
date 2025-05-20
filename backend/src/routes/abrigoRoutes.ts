@@ -14,7 +14,7 @@ import {
 
 const router = Router();
 
-router.post('/', createAbrigo);
+router.post('/:userId', createAbrigo);
 router.get('/', getAbrigos);
 router.get('/:id', getAbrigoById);
 router.get('/:id/animais', getAbrigoWithAnimais);
