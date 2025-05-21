@@ -50,6 +50,14 @@ export const getUserById = async (id: string) => {
     }
 };
 
+export const getUserByEmail = async (email: string) => {
+    try {
+        return await UserModel.findOne({ email, ativo: true }).select('-image');
+    } catch (error: any) {
+        throw new Error('Erro ao buscar usuário: ' + error.message);
+    }
+};
+
 export const updateUser = async (id: string, updatedData: any) => {
     try {
         const updatedFields = Object.keys(updatedData).reduce((acc: any, key) => {
