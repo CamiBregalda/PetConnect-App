@@ -37,6 +37,7 @@ import UsuarioInfo from '../../screens/user/InicialUser';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+
 function MainTabs({ navigation }) {
   useEffect(() => {
     const backAction = () => {
@@ -61,7 +62,7 @@ function MainTabs({ navigation }) {
       ) {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'TelaPrincipal' }],
+          routes: [{ name: 'TelaPrincipal', params: { userId } }],
         });
         return true;
       }
@@ -90,7 +91,7 @@ function MainTabs({ navigation }) {
           <TouchableOpacity onPress={() => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'TelaPrincipal' }],
+              routes: [{ name: 'TelaPrincipal', params: { userId } }],
             });
           }}>
             <Image
@@ -133,6 +134,7 @@ function MainTabs({ navigation }) {
       <Tab.Screen
         name="Home"
         component={HomeAdm}
+        initialParams={{ userId }}
         options={{
           title: 'Abrigo',
           tabBarShowLabel: false,
@@ -150,7 +152,9 @@ function MainTabs({ navigation }) {
   );
 }
 
-function UserTabs({ navigation }) {
+function UserTabs({ navigation, route }) {
+  const { userId } = route.params;
+
   useEffect(() => {
     const backAction = () => {
       const parentState = navigation.getState();
@@ -174,7 +178,7 @@ function UserTabs({ navigation }) {
       ) {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'InicialUser' }],
+          routes: [{ name: 'InicialUser', params: { userId } }],
         });
         return true;
       }
@@ -203,7 +207,7 @@ function UserTabs({ navigation }) {
           <TouchableOpacity onPress={() => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'TelaPrincipal' }],
+              routes: [{ name: 'TelaPrincipal', params: { userId } }],
             });
           }}>
             <Image
@@ -246,6 +250,7 @@ function UserTabs({ navigation }) {
       <Tab.Screen
         name="Home"
         component={InicialUser}
+        initialParams={{ userId }}
         options={{
           title: 'Usuario',
           tabBarShowLabel: false,

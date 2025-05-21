@@ -92,7 +92,7 @@ function CadastroAbrigoScreen() {
         }
 
         try {           
-            const response = await fetch(`http://192.168.3.5:3000/abrigos/${userId}`, {
+            const response = await fetch(`http://192.168.238.226:3000/abrigos/${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

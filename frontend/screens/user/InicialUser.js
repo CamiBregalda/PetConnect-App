@@ -1,20 +1,48 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
+
 export default function InicialUser() {
-  const navigation = useNavigation();
   const route = useRoute();
+  const { userId } = route.params;
+  const [userInfo, setUserInfo] = useState(null);
+  const navigation = useNavigation();
 
   const temFoto = true;
+  console.log('iddosuario:', userId);
+  const getUserInfo = async () => {
+    try {
+      const response = await fetch(`http://192.168.238.226:3000/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Erro ao buscar usuário');
+      }
+      const data = await response.json();
+      setUserInfo(data);
+      console.log('userInfo:', data);
+    }
+    catch (error) {
+      console.error('Erro ao buscar informações do usuário:', error);
+    }
+  }
+
+  useEffect(() => {
+    getUserInfo();
+
+  }, []);
 
   return (
     <View style={styles.container}>
-    
+
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        
+
         {temFoto ? (
           <Image source={require('../../img/teste.png')} style={styles.profileImage} />
         ) : (
@@ -23,16 +51,16 @@ export default function InicialUser() {
           </View>
         )}
 
-        
+
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
-            <Text style={styles.label}>Nome completo</Text>
+            <Text style={styles.label}>{userInfo ? userInfo.nome : 'Carregando...'}</Text>
             <Ionicons name="create-outline" size={20} color="#555" />
           </View>
-          <Text style={styles.description}>Minha descrição super hiper mega legal!</Text>
+          <Text style={styles.description}>{userInfo ? userInfo.descricao : ''}</Text>
         </View>
 
-  
+
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
             <Text style={styles.label}>Endereço:</Text>
@@ -45,7 +73,7 @@ export default function InicialUser() {
         </View>
       </ScrollView>
 
-      
+
     </View>
   );
 }

@@ -10,6 +10,7 @@ export interface UserAttributes {
     endereco: Endereco;
     idade?: number;
     ocupacao?: string;
+    descricao?: string;
     image?: Buffer;
     ativo?: boolean;
     createdAt?: Date;
@@ -26,6 +27,7 @@ const UserSchema = new Schema<UserAttributes>(
         endereco: { type: EnderecoSchema, required: true },
         idade: { type: Number, required: false },
         ocupacao: { type: String, required: false },
+        descricao: { type: String, required: false },
         image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: false },
     },

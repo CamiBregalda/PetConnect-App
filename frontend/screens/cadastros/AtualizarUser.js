@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
-import TextCadastroUserInput from '../../components/TextCadastroUserInput';
+import TextAtualizarUserInput from '../../components/TextAtualizacaoUserInput';
 
 function AtualizarUserScreen() {
     const navigation = useNavigation();
@@ -12,6 +12,7 @@ function AtualizarUserScreen() {
     const [telefone, onChangeTelefone] = React.useState('');
     const [idade, onChangeIdade] = React.useState('');
     const [ocupacao, onChangeOcupacao] = React.useState('');
+    const [descricao, onChangeDescricao] = React.useState('');
     const [endereco, onChangeEndereco] = React.useState({
         rua: '',
         numero: '',
@@ -48,7 +49,7 @@ function AtualizarUserScreen() {
 
     const getUser = async () => {
         try {
-            const response = await fetch(`http://192.168.3.5:3000/users/${userId}`, {
+            const response = await fetch(`http://192.168.238.226:3000/users/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,8 +67,9 @@ function AtualizarUserScreen() {
             onChangeIdade(data.idade);
             onChangeOcupacao(data.ocupacao);
             onChangeEndereco(data.endereco);
+            onChangeDescricao(data.descricao);
 
-            const imageResponse = await fetch(`http://192.168.3.5:3000/users/${userId}/image`);
+            const imageResponse = await fetch(`http://192.168.238.226:3000/users/${userId}/image`);
             if (imageResponse.ok) {
                 const imageBlob = await imageResponse.blob();
                 const imageUrl = URL.createObjectURL(imageBlob);
@@ -80,7 +82,7 @@ function AtualizarUserScreen() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://192.168.3.5:3000/users/${userId}`, {
+            const response = await fetch(`http://192.168.238.226:3000/users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,6 +93,7 @@ function AtualizarUserScreen() {
                     telefone: telefone.trim(),
                     idade: idade.trim(),
                     ocupacao: ocupacao.trim(),
+                    descricao: descricao.trim(),
                     endereco: {
                         rua: endereco.rua.trim(),
                         numero: endereco.numero.trim(),
@@ -121,7 +124,7 @@ function AtualizarUserScreen() {
                 style={styles.logo}
                 source={require('../../img/PET.png')}
             />
-            <TextCadastroUserInput
+            <TextAtualizarUserInput
                 name={name}
                 onChangeName={onChangeName}
                 cpf={cpf}
@@ -132,6 +135,8 @@ function AtualizarUserScreen() {
                 onChangeIdade={onChangeIdade}
                 ocupacao={ocupacao}
                 onChangeOcupacao={onChangeOcupacao}
+                descricao={descricao}
+                onChangeDescricao={onChangeDescricao}
                 endereco={endereco}
                 onChangeEndereco={handleEnderecoChange}
             />
@@ -184,4 +189,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CadastroUserScreen;
+export default AtualizarUserScreen;

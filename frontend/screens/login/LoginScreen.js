@@ -52,6 +52,7 @@ function LoginScreen() {
       }
 
       const data = await response.json();
+
       navigation.navigate('TelaPrincipal', { userId: data.id });
     } catch (error) {
       console.error('Erro ao fazer login:', error);

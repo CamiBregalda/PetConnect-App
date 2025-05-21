@@ -5,7 +5,9 @@ import { WebView } from 'react-native-webview';
 import { AbrigoContext } from './../../AppContext';
 
 function HomeAdm({ route }) {
-  const { abrigoId } = route.params;
+  const { abrigoId, userId } = route.params;
+  console.log('abrigoId:', abrigoId);
+  console.log('userId:', userId);
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [adminInfo, setAdminInfo] = useState(null); // Novo estado para as informações do administrador
   const [loading, setLoading] = useState(true);

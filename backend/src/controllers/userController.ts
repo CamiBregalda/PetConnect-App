@@ -17,6 +17,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const usuario = await userService.loginUser(new LoginRequest(email, senha));
 
     res.status(200).json({
+      id: usuario.id,
       email: usuario.email,
       mensagem: 'Login realizado com sucesso',
     });

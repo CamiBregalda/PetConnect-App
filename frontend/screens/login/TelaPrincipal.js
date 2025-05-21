@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 function HomeScreen() {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { userId } = route.params;
+
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigation = useNavigation();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -29,7 +32,7 @@ function HomeScreen() {
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('InicialUser')}>
+        <TouchableOpacity onPress={() => exibirDetalhesUsuario(userId)}>
           <Image
             source={require('../../img/Profile_Active.png')}
             style={styles.headerProfileIcon}
@@ -78,7 +81,14 @@ function HomeScreen() {
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {
-    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo } });
+    console.log('ID do abrigo:', userId);
+    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo, userId } });
+  };
+
+  const exibirDetalhesUsuario = (userId) => {
+    console.log('ID do usuário:', userId);
+    navigation.navigate('InicialUser', {userId: userId });
+    
   };
 
   const handleSearch = (text) => {

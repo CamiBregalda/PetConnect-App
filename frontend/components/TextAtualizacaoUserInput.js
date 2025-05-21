@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
 import TextEnderecoInput from './TextEnderecoInput';
 
-const TextCadastroUserInput = ({ nome, onChangeNome, cpf, onChangeCpf, telefone, onChangeTelefone, idade, onChangeIdade, ocupacao, onChangeOcupacao, endereco, onChangeEndereco }) => {
+const TextAtualizarUserInput = ({ nome, onChangeNome, cpf, onChangeCpf, telefone, onChangeTelefone, idade, onChangeIdade, ocupacao, onChangeOcupacao, descricao, onChangeDescricao, endereco, onChangeEndereco }) => {
   return (
     <>
       <View>
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default TextCadastroUserInput;
+export default TextAtualizarUserInput;
