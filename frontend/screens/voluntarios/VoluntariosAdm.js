@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { AbrigoContext } from '../../AppContext';
 import { useNavigation } from '@react-navigation/native';
+import { urlIp } from '@env';
 
 function Voluntarios() {
   const { currentAbrigoId } = useContext(AbrigoContext);
@@ -21,7 +22,7 @@ function Voluntarios() {
       setLoading(true);
       setError(null);
       try {
-        const apiUrl = `http://192.168.238.226:3000/abrigos/${currentAbrigoId}/Cuidadores`;
+        const apiUrl = `http://${urlIp}:3000/abrigos/${currentAbrigoId}/Cuidadores`;
 
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -71,7 +72,7 @@ function Voluntarios() {
               <View key={idx} style={styles.itemContainer}>
                 <TouchableOpacity key={cuidador.id} style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
                   <Image
-                    source={{ uri: `http://192.168.238.226:3000/cuidadores/${cuidador.id}/imagem` }}
+                    source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
                     style={styles.listImage} />
                 </TouchableOpacity>
                 <Text style={styles.listItemText}>{cuidador.nome}</Text>

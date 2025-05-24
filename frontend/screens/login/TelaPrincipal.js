@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { urlIp } from '@env';
 
 function HomeScreen() {
   const navigation = useNavigation();
@@ -48,8 +49,8 @@ function HomeScreen() {
       setError(null);
       try {
         const [animaisResponse, abrigosResponse] = await Promise.all([
-          fetch('http://192.168.238.226:3000/animais/'),
-          fetch('http://192.168.238.226:3000/abrigos/'),
+          fetch(`http://${urlIp}:3000/animais/`),
+          fetch(`http://${urlIp}:3000/abrigos/`),
         ]);
 
         if (!animaisResponse.ok || !abrigosResponse.ok) {
@@ -138,7 +139,7 @@ function HomeScreen() {
           {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://192.168.238.226:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
@@ -153,7 +154,7 @@ function HomeScreen() {
           {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
-                source={{ uri: `http://192.168.238.226:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import TextAtualizarUserInput from '../../components/TextAtualizacaoUserInput';
+import { urlIp } from '@env';
 
 function AtualizarUserScreen() {
     const navigation = useNavigation();
@@ -49,7 +50,7 @@ function AtualizarUserScreen() {
 
     const getUser = async () => {
         try {
-            const response = await fetch(`http://192.168.238.226:3000/users/${userId}`, {
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ function AtualizarUserScreen() {
             onChangeEndereco(data.endereco);
             onChangeDescricao(data.descricao);
 
-            const imageResponse = await fetch(`http://192.168.238.226:3000/users/${userId}/image`);
+            const imageResponse = await fetch(`http://${urlIp}:3000/users/${userId}/image`);
             if (imageResponse.ok) {
                 const imageBlob = await imageResponse.blob();
                 const imageUrl = URL.createObjectURL(imageBlob);
@@ -82,7 +83,7 @@ function AtualizarUserScreen() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://192.168.238.226:3000/users/${userId}`, {
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

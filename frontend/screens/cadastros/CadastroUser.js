@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 //import { BACKEND_BASE_URL } from 'expo-constants';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import TextCadastroUserInput from '../../components/TextCadastroUserInput';
+import { urlIp } from '@env';
 
 function CadastroUserScreen() {
     const navigation = useNavigation();
@@ -80,7 +81,7 @@ function CadastroUserScreen() {
         );*/
 
         try {           
-            const response = await fetch(`http://192.168.238.226:3000/users`, {
+            const response = await fetch(`http://${urlIp}:3000/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

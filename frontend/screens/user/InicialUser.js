@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { urlIp } from '@env';
 
 
 export default function InicialUser() {
@@ -14,7 +15,7 @@ export default function InicialUser() {
   console.log('iddosuario:', userId);
   const getUserInfo = async () => {
     try {
-      const response = await fetch(`http://192.168.238.226:3000/users/${userId}`, {
+      const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
