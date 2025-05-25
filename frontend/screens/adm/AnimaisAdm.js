@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { AbrigoContext } from './../../AppContext';
+import { urlIp } from '@env';
 
 function AnimaisAdm() {
   const navigation = useNavigation();
@@ -16,8 +17,8 @@ function AnimaisAdm() {
     setError(null);
     try {
       const [animaisResponse, abrigoResponse] = await Promise.all([
-        fetch('http://192.168.238.226:3000/animais/'),
-        fetch(`http://192.168.238.226:3000/abrigos/${currentAbrigoId}`), // Busca as informações do abrigo
+        fetch(`http://${urlIp}:3000/animais/`),
+        fetch(`http://${urlIp}:3000/abrigos/${currentAbrigoId}`), // Busca as informações do abrigo
       ]);
 
       if (!animaisResponse.ok || !abrigoResponse.ok) {
@@ -85,7 +86,7 @@ function AnimaisAdm() {
             <TouchableOpacity onPress={() => exibirDetalhesAnimal(item)} style={styles.animalItem}>
               {item.imagemUrl && (
                 <Image
-                  source={{ uri: `http://192.168.238.226:3000/animais/${item.id}/imagem` }}
+                  source={{ uri: `http://${urlIp}:3000/animais/${item.id}/imagem` }}
                   style={styles.animalImage}
                 />
               )}

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
 import TextAtualizarUserInput from '../../components/TextAtualizacaoUserInput';
+import { urlIp } from '@env';
 import * as ImagePicker from 'expo-image-picker';
+
 
 function AtualizarUserScreen() {
     const route = useRoute();
@@ -51,7 +53,8 @@ function AtualizarUserScreen() {
 
     const getUser = async () => {
         try {
-            const response = await fetch(`http://192.168.3.5:3000/users/${userId}`, {
+
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -82,9 +85,13 @@ function AtualizarUserScreen() {
                     }
             );
 
-            const responseImage = await fetch(`http://192.168.3.5:3000/users/${userId}/imagem`);
-            if (responseImage.ok) {
-                onChangeImageUri(`http://192.168.3.5:3000/users/${userId}/imagem`);
+
+            const imageResponse = await fetch(`http://${urlIp}:3000/users/${userId}/image`);
+            if (imageResponse.ok) {
+                const imageBlob = await imageResponse.blob();
+                const imageUrl = URL.createObjectURL(imageBlob);
+                setImageUri(imageUrl);
+
             }
         } catch (error) {
             console.error('Erro ao buscar usuário:', error);
@@ -108,7 +115,7 @@ function AtualizarUserScreen() {
         });
 
         try {
-            const response = await fetch(`http://192.168.3.5:3000/users/${userId}/imagem`, {
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}/imagem`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -151,7 +158,8 @@ function AtualizarUserScreen() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://192.168.3.5:3000/users/${userId}`, {
+
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
