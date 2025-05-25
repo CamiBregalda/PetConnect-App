@@ -2,11 +2,8 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { AbrigoContext } from './../../AppContext';
-import { urlIp } from '@env';
 
-function InfoAdm(route) {
-  const { userId } = route.params;
-  console.log('InfoAdm - userId:', userId);
+function InfoAdm() {
   const navigation = useNavigation();
   const { currentAbrigoId } = useContext(AbrigoContext);
   const [abrigoInfo, setAbrigoInfo] = useState(null);
@@ -23,7 +20,7 @@ function InfoAdm(route) {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
+      const apiUrl = `http://192.168.3.5:3000/abrigos/${abrigoId}`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { urlIp } from '@env';
 
 function HomeScreen() {
   const navigation = useNavigation();
@@ -49,8 +48,8 @@ function HomeScreen() {
       setError(null);
       try {
         const [animaisResponse, abrigosResponse] = await Promise.all([
-          fetch(`http://${urlIp}:3000/animais/`),
-          fetch(`http://${urlIp}:3000/abrigos/`),
+          fetch('http://192.168.238.226:3000/animais/'),
+          fetch('http://192.168.238.226:3000/abrigos/'),
         ]);
 
         if (!animaisResponse.ok || !abrigosResponse.ok) {
@@ -81,24 +80,10 @@ function HomeScreen() {
     navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal });
   };
 
- const exibirDetalhesAbrigo = (idDoAbrigo) => {
-  // Adicione logs para verificar os valores ANTES de navegar
-  console.log('Tela Anterior - Valor de idDoAbrigo:', idDoAbrigo);
-  console.log('Tela Anterior - Valor de userId:', userId); // Verifique este valor cuidadosamente no console
-
-  if (userId === undefined) {
-    console.error('ALERTA: userId é undefined ANTES de navegar para HomeAdm!');
-    // Você pode querer tratar este caso, talvez mostrando um alerta ou não navegando
-  }
-
-  navigation.navigate('Main', {
-    screen: 'Home', // Assumindo que HomeAdm é a tela 'Home' dentro do navegador 'Main'
-    params: {
-      abrigoId: idDoAbrigo,
-      userId: userId // Passando o userId
-    }
-  });
-};
+  const exibirDetalhesAbrigo = (idDoAbrigo) => {
+    console.log('ID do abrigo:', userId);
+    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo, userId } });
+  };
 
   const exibirDetalhesUsuario = (userId) => {
     console.log('ID do usuário:', userId);
@@ -153,7 +138,7 @@ function HomeScreen() {
           {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://192.168.238.226:3000/animais/${animal.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
@@ -168,7 +153,7 @@ function HomeScreen() {
           {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
-                source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://192.168.238.226:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>

@@ -3,7 +3,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
 import TextCadastroAnimalInput from '../../components/TextCadastroAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
-import { urlIp } from '@env';
 
 function CadastroAnimalScreen() {
     const route = useRoute();
@@ -64,7 +63,7 @@ function CadastroAnimalScreen() {
         });
 
         try {
-            const response = await fetch(`http://${urlIp}:3000/animais/${idAnimal}/imagem`, {
+            const response = await fetch(`http://192.168.3.5:3000/animais/${idAnimal}/imagem`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -111,8 +110,7 @@ function CadastroAnimalScreen() {
         };
 
         try {           
-
-            const response = await fetch(`http://${urlIp}:3000/animais`, {
+            const response = await fetch(`http://192.168.3.5:3000/animais`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
