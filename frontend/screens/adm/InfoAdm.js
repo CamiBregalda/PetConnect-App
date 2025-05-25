@@ -4,9 +4,10 @@ import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity 
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 
-function InfoAdm(route) {
-  const { userId } = route.params;
-  console.log('InfoAdm - userId:', userId);
+function InfoAdm() {
+//  const { userId } = route.params;
+//  console.log('InfoAdm - userId:', userId);
+
   const navigation = useNavigation();
   const { currentAbrigoId } = useContext(AbrigoContext);
   const [abrigoInfo, setAbrigoInfo] = useState(null);

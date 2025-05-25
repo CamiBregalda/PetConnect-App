@@ -41,10 +41,22 @@ const Tab = createBottomTabNavigator();
 
 
 function MainTabs({ navigation, route }) {
-  const { userId } = route.params;
+  // Adjust to correctly access nested params
+  const routeParams = route.params || {};
+  const actualParams = routeParams.params || {}; // Access the nested 'params' object
+
+  const userIdFromMainRoute = actualParams.userId;
+  const abrigoIdFromMainRoute = actualParams.abrigoId;
+
+  // For debugging:
+  console.log('MainTabs - route.params (raw):', route.params);
+  console.log('MainTabs - actualParams (for userId/abrigoId):', actualParams);
+  console.log('MainTabs - userIdFromMainRoute:', userIdFromMainRoute);
+  console.log('MainTabs - abrigoIdFromMainRoute:', abrigoIdFromMainRoute);
 
   useEffect(() => {
     const backAction = () => {
+      console.log('MainTabs backAction - userIdFromMainRoute:', userIdFromMainRoute); // For debugging
       const parentState = navigation.getState();
       let currentTab = null;
       const mainTabsRouteObject = parentState.routes[parentState.index];
@@ -59,100 +71,86 @@ function MainTabs({ navigation, route }) {
         currentTab = mainTabsRouteObject.name;
       }
 
-      if (
-        currentTab === 'Home' ||
-        currentTab === 'Animais' ||
-        currentTab === 'Informações'
-      ) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'TelaPrincipal', params: { userId } }],
-        });
+      if (currentTab === 'Home' || currentTab === 'Animais' || currentTab === 'Informações') {
+        if (userIdFromMainRoute) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }],
+          });
+        } else {
+          console.warn("MainTabs backAction: userIdFromMainRoute is undefined. Navigating to TelaPrincipal without userId.");
+          navigation.reset({ index: 0, routes: [{ name: 'TelaPrincipal' }] });
+        }
         return true;
       }
       return false;
     };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction
-    );
-
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
     return () => backHandler.remove();
-  }, [navigation]);
+  }, [navigation, userIdFromMainRoute]);
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
-      screenOptions={({ route, navigation: tabNavigationProp }) => ({
-        headerShown: true,
-        headerStyle: {
-          backgroundColor: '#8A2BE2',
-        },
-        headerTintColor: 'white',
-        headerTitleAlign: 'center',
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'TelaPrincipal', params: { userId } }],
-            });
-          }}>
-            <Image
-              source={require('../../img/seta.png')}
-              style={styles.homeIcon}
-            />
-          </TouchableOpacity>
-        ),
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === 'Home') {
-            iconName = focused
-              ? require('../../img/Home_Active.png')
-              : require('../../img/Home_Inactive.png');
-          } else if (route.name === 'Animais') {
-            iconName = focused
-              ? require('../../img/Animais_Active.png')
-              : require('../../img/Animais_Inactive.png');
-          } else if (route.name === 'Informações') {
-            iconName = focused
-              ? require('../../img/Profile_Active.png')
-              : require('../../img/Profile_Inactive.png');
-          }
-          return <Image source={iconName} style={{ width: size, height: size, tintColor: color }} />;
-        },
-        tabBarActiveTintColor: '#8A2BE2',
-        tabBarInactiveTintColor: 'gray',
-        tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 100, paddingBottom: 5, paddingTop: 5 },
-        tabBarLabelStyle: { fontSize: 12 },
-      })}
+      screenOptions={({ route: tabRoute, navigation: tabNavigationProp }) => {
+        console.log('MainTabs screenOptions - userIdFromMainRoute:', userIdFromMainRoute); // For debugging
+        return {
+          headerShown: true,
+          headerStyle: { backgroundColor: '#8A2BE2' },
+          headerTintColor: 'white',
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => {
+              console.log('MainTabs headerLeft onPress - userIdFromMainRoute:', userIdFromMainRoute); // For debugging
+              if (userIdFromMainRoute) {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }],
+                });
+              } else {
+                console.warn("MainTabs headerLeft: userIdFromMainRoute is undefined. Navigating to TelaPrincipal without userId.");
+                navigation.reset({ index: 0, routes: [{ name: 'TelaPrincipal' }] });
+              }
+            }}>
+              <Image source={require('../../img/seta.png')} style={styles.homeIcon} />
+            </TouchableOpacity>
+          ),
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            if (tabRoute.name === 'Home') {
+              iconName = focused ? require('../../img/Home_Active.png') : require('../../img/Home_Inactive.png');
+            } else if (tabRoute.name === 'Animais') {
+              iconName = focused ? require('../../img/Animais_Active.png') : require('../../img/Animais_Inactive.png');
+            } else if (tabRoute.name === 'Informações') {
+              iconName = focused ? require('../../img/Profile_Active.png') : require('../../img/Profile_Inactive.png');
+            }
+            return <Image source={iconName} style={{ width: size, height: size, tintColor: color }} />;
+          },
+          tabBarActiveTintColor: '#8A2BE2',
+          tabBarInactiveTintColor: 'gray',
+          tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 100, paddingBottom: 5, paddingTop: 5 },
+          tabBarLabelStyle: { fontSize: 12 },
+        };
+      }}
     >
       <Tab.Screen
         name="Animais"
         component={AnimaisAdm}
-        initialParams={{ userId }}
-        options={{
-          title: 'Animais',
-          tabBarShowLabel: false,
-        }}
+        initialParams={{ userId: userIdFromMainRoute }}
+        options={{ title: 'Animais', tabBarShowLabel: false }}
       />
       <Tab.Screen
         name="Home"
         component={HomeAdm}
-        initialParams={{ userId }}
-        options={{
-          title: 'Abrigo',
-          tabBarShowLabel: false,
-        }}
+        initialParams={{ userId: userIdFromMainRoute, abrigoId: abrigoIdFromMainRoute }}
+        options={{ title: 'Abrigo', tabBarShowLabel: false }}
       />
       <Tab.Screen
         name="Informações"
         component={InfoAdm}
-        initialParams={{ userId }}
-        options={{
-          title: 'Informações',
-          tabBarShowLabel: false,
-        }}
+        initialParams={{ userId: userIdFromMainRoute }}
+        options={{ title: 'Informações', tabBarShowLabel: false }}
       />
     </Tab.Navigator>
   );
@@ -197,7 +195,7 @@ function UserTabs({ navigation, route }) {
     );
 
     return () => backHandler.remove();
-  }, [navigation]);
+  }, [navigation, userId]);
 
   return (
     <Tab.Navigator

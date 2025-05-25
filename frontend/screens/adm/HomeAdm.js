@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView, params } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 
 function HomeAdm({ route }) {
-  const { abrigoId, userId } = route.params;
-  console.log('abrigoId:', abrigoId);
-  console.log('userId:', userId);
+  
+  const { userId, abrigoId } = route.params || {}; // Safe access
+  console.log('HomeAdm userId:', userId, 'abrigoId:', abrigoId);
+  // ... rest of your component
+
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [adminInfo, setAdminInfo] = useState(null); // Novo estado para as informações do administrador
   const [loading, setLoading] = useState(true);

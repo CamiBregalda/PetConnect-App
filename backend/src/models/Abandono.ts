@@ -10,7 +10,7 @@ export interface AbandonoAttributes {
     animalResgatado: boolean;
     idAbrigoResgatou?: Types.ObjectId;
     images: Imagem[];
-    ativo: boolean;
+    ativo: boolean; 
     createdAt?: Date;
     updatedAt?: Date;
 }
