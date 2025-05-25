@@ -81,10 +81,24 @@ function HomeScreen() {
     navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal });
   };
 
-  const exibirDetalhesAbrigo = (idDoAbrigo) => {
-    console.log('ID do abrigo:', userId);
-    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo, userId } });
-  };
+ const exibirDetalhesAbrigo = (idDoAbrigo) => {
+  // Adicione logs para verificar os valores ANTES de navegar
+  console.log('Tela Anterior - Valor de idDoAbrigo:', idDoAbrigo);
+  console.log('Tela Anterior - Valor de userId:', userId); // Verifique este valor cuidadosamente no console
+
+  if (userId === undefined) {
+    console.error('ALERTA: userId é undefined ANTES de navegar para HomeAdm!');
+    // Você pode querer tratar este caso, talvez mostrando um alerta ou não navegando
+  }
+
+  navigation.navigate('Main', {
+    screen: 'Home', // Assumindo que HomeAdm é a tela 'Home' dentro do navegador 'Main'
+    params: {
+      abrigoId: idDoAbrigo,
+      userId: userId // Passando o userId
+    }
+  });
+};
 
   const exibirDetalhesUsuario = (userId) => {
     console.log('ID do usuário:', userId);
