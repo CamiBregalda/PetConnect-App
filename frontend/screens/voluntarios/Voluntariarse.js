@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { urlIp } from '@env';
 
 function VoluntarioFormScreen() {
   const [nome, setNome] = useState('');
@@ -26,7 +25,7 @@ function VoluntarioFormScreen() {
 
   const verificarInscricao = async () => {
     try {
-      const inscricaoUrl = `http://${urlIp}:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
+      const inscricaoUrl = `http://192.168.238.226:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
       const response = await fetch(inscricaoUrl, {
         method: 'GET',
         headers: {
@@ -50,7 +49,7 @@ function VoluntarioFormScreen() {
       setLoadingUser(true);
       setError(null);
       try {
-        const userUrl = `http://${urlIp}:3000/users/${userId}`;
+        const userUrl = `http://192.168.238.226:3000/users/${userId}`;
         const response = await fetch(userUrl, {
           method: 'GET',
           headers: {
@@ -98,7 +97,7 @@ function VoluntarioFormScreen() {
     }
 
     try {
-      const volunteerUrl = `http://${urlIp}:3000/candidaturas`;
+      const volunteerUrl = `http://192.168.238.226:3000/candidaturas`;
       const volunteerResponse = await fetch(volunteerUrl, {
         method: 'POST',
         headers: {

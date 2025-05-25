@@ -3,7 +3,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import TextCadastroAbrigoInput from '../../components/TextCadastroAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
-import { urlIp } from '@env';
 
 function CadastroAbrigoScreen() {
     const route = useRoute();
@@ -79,7 +78,7 @@ function CadastroAbrigoScreen() {
         });
 
         try {
-            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`, {
+            const response = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}/imagem`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -127,10 +126,8 @@ function CadastroAbrigoScreen() {
             return;
         }
 
-
-        try {           
-            const response = await fetch(`http://${urlIp}:3000/abrigos/${userId}`, {
-
+        try {          
+            const response = await fetch(`http://192.168.3.5:3000/abrigos/${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

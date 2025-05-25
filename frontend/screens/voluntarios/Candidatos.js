@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { urlIp } from '@env';
 
 function ListaCandidatosScreen() {
   const [candidatos, setCandidatos] = useState(null);
@@ -13,7 +12,7 @@ function ListaCandidatosScreen() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `http://${urlIp}:3000/candidaturas`;
+      const apiUrl = 'http://192.168.238.226:3000/candidaturas';
 
       const response = await fetch(apiUrl, {
         method: 'GET',

@@ -3,7 +3,6 @@ import React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import TextLoginInput from '../../components/TextLoginInput';
-import { urlIp } from '@env';
 
 function LoginScreen() {
   const navigation = useNavigation();
@@ -35,7 +34,7 @@ function LoginScreen() {
     );*/
 
     try {
-      const response = await fetch(`http://${urlIp}:3000/users/login`, {
+      const response = await fetch('http://192.168.238.226:3000/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

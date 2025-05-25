@@ -26,13 +26,13 @@ import PerfilCuidador from "../../screens/perfils/PerfilCuidador";
 import InicialUser from "../../screens/user/InicialUser";
 import AnimaisUser from "../../screens/user/AnimaisUser";
 import RegistroAbandono from "../../screens/user/RegistroAbandono";
-import ListaEventos from '../../screens/eventos/ListaEventos';
-import EventoDetalhe from '../../screens/eventos/EventoDetalhe';
-import EventosAdm from '../../screens/eventos/EventosAdm';
-import EventoDetalheAdm from '../../screens/eventos/EventoDetalheAdm';
-import VoluntariosEvento from '../../screens/eventos/VoluntariosEvento';
-import EditarEvento from '../../screens/eventos/EditarEvento';
-import CriarEvento from '../../screens/eventos/CriarEvento';
+import ListaEventos from '../../screens/adm/ListaEventos';
+import EventoDetalhe from '../../screens/adm/EventoDetalhe';
+import EventosAdm from '../../screens/adm/EventosAdm';
+import EventoDetalheAdm from '../../screens/adm/EventoDetalheAdm';
+import VoluntariosEvento from '../../screens/adm/VoluntariosEvento';
+import EditarEvento from '../../screens/adm/EditarEvento';
+import CriarEvento from '../../screens/adm/CriarEvento';
 import UsuarioInfo from '../../screens/user/InicialUser';
 
 
@@ -40,9 +40,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 
-function MainTabs({ navigation, route }) {
-  const { userId } = route.params;
-
+function MainTabs({ navigation }) {
   useEffect(() => {
     const backAction = () => {
       const parentState = navigation.getState();
@@ -130,7 +128,6 @@ function MainTabs({ navigation, route }) {
       <Tab.Screen
         name="Animais"
         component={AnimaisAdm}
-        initialParams={{ userId }}
         options={{
           title: 'Animais',
           tabBarShowLabel: false,
@@ -148,7 +145,6 @@ function MainTabs({ navigation, route }) {
       <Tab.Screen
         name="Informações"
         component={InfoAdm}
-        initialParams={{ userId }}
         options={{
           title: 'Informações',
           tabBarShowLabel: false,

@@ -3,7 +3,6 @@ import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Scr
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import { AbrigoContext } from './../../AppContext';
-import { urlIp } from '@env';
 
 function HomeAdm({ route }) {
   const { abrigoId, userId } = route.params;
@@ -31,7 +30,7 @@ function HomeAdm({ route }) {
       setError(null);
       try {
         if (abrigoId) {
-          const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
+          const apiUrl = `http://192.168.238.226:3000/abrigos/${abrigoId}`;
           const response = await fetch(apiUrl);
 
           if (!response.ok) {
@@ -63,7 +62,7 @@ function HomeAdm({ route }) {
 
     const buscarInfoAdmin = async (idAdmAbrigo) => {
       try {
-        const adminApiUrl = `http://${urlIp}:3000/admAbrigo/${idAdmAbrigo}`; 
+        const adminApiUrl = `http://192.168.238.226:3000/admAbrigo/${idAdmAbrigo}`; 
         const adminResponse = await fetch(adminApiUrl);
 
         if (!adminResponse.ok) {
@@ -106,7 +105,7 @@ function HomeAdm({ route }) {
         <View style={styles.container}>
           <View>
           <Image 
-            source={{ uri: `http://${urlIp}:3000/abrigos/${abrigoInfo.id}/imagem` }} 
+            source={{ uri: `http://192.168.238.226:3000/abrigos/${abrigoInfo.id}/imagem` }} 
             style={styles.imgPerfil} />
           </View>
           <View style={styles.about}>
@@ -131,7 +130,7 @@ function HomeAdm({ route }) {
             <View style={styles.sobre}>
               <View style={styles.infoAdm}>
                 <Image
-                source={{ uri: `http://${urlIp}:3000/admAbrigo/${adminInfo.id}/imagem` }}
+                source={{ uri: `http://192.168.238.226:3000/admAbrigo/${adminInfo.id}/imagem` }}
                 style={styles.imgADM}
               />
                 <Text style={styles.nomeAdm}>{adminInfo.nome}</Text>
