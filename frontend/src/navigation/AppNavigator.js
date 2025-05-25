@@ -164,11 +164,21 @@ export default function AppNavigator() {
         <Stack.Screen name="ListaEventos" component={ListaEventos} /> 
         <Stack.Screen name="EventoDetalhe" component={EventoDetalhe} />
         <Stack.Screen name="InfoAdm" component={InfoAdm} />
-        <Stack.Screen name="EventosAdm" component={EventosAdm} />
-        <Stack.Screen name="EventoDetalheAdm" component={EventoDetalheAdm} />
         <Stack.Screen name="VoluntariosEvento" component={VoluntariosEvento} />
         <Stack.Screen name="EditarEvento" component={EditarEvento} />
         <Stack.Screen name="CriarEvento" component={CriarEvento} />
+
+          <Stack.Screen
+          name="EventosAdm"
+          component={EventosAdm}
+          options={{ headerShown: true }}
+        />
+
+        <Stack.Screen
+          name="EventoDetalheAdm"
+          component={EventoDetalheAdm}
+          options={{ headerShown: true }}
+        />
 
         <Stack.Screen
           name="Main"

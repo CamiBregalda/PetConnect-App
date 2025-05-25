@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function VoluntariosEvento() {
   const navigation = useNavigation();
@@ -14,9 +15,9 @@ export default function VoluntariosEvento() {
 
   return (
     <View style={styles.container}>
-      {/* Botão voltar */}
+
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
-        <Text style={styles.voltarTexto}>Voltar</Text>
+        <Ionicons name="arrow-back" size={28} color="#222" />
       </TouchableOpacity>
 
       <Text style={styles.titulo}>Voluntários do Evento</Text>

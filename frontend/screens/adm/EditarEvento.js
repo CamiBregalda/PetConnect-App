@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function EditarEvento() {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ export default function EditarEvento() {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
-        <Text style={styles.voltarTexto}>Voltar</Text>
+        <Ionicons name="arrow-back" size={28} color="#222" />
       </TouchableOpacity>
 
       <Text style={styles.titulo}>Edite seu Evento</Text>

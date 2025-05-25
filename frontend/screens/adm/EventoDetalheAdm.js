@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -7,13 +7,23 @@ export default function EventoDetalheAdm() {
   const route = useRoute();
   const { evento } = route.params;
 
+    useLayoutEffect(() => {
+      navigation.setOptions({
+        headerStyle: {
+          backgroundColor: '#9333ea',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        headerTitleAlign: 'center',
+        title: 'Nome', // ou o título que desejar
+      });
+    }, [navigation]);
+    
   return (
     <View style={styles.container}>
-      {/* Botão Voltar */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backText}>Voltar</Text>
-      </TouchableOpacity>
-
+      
       <ScrollView contentContainerStyle={styles.scroll}>
         {/* Objetivo */}
         <View style={styles.card}>
@@ -74,7 +84,7 @@ export default function EventoDetalheAdm() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 50 },
+  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 20 },
   scroll: { paddingBottom: 120, paddingHorizontal: 16 },
   backButton: { marginLeft: 16, marginBottom: 10 },
   backText: { color: '#9333ea', fontSize: 16 },
