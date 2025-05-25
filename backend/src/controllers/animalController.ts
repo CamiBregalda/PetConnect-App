@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as AnimalService from "../services/animalService";
 import { validateImage } from '../utils/imageUtil';
+import { fileTypeFromBuffer } from 'file-type';
 import multer from "multer";
 
 const upload = multer();
@@ -78,8 +79,10 @@ export const getImage = async (req: Request, res: Response) => {
         const animalId = req.params.id;
         const image = await AnimalService.getImage(animalId);
 
+        const type = await fileTypeFromBuffer(image);
+        
         res.writeHead(200, {
-            'Content-Type': 'image/jpeg',
+            'Content-Type': type?.mime || 'image/jpeg',
             'Content-Length': image.length,
         });
         return res.end(image);

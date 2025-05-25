@@ -12,10 +12,11 @@ export default function InicialUser() {
   const navigation = useNavigation();
 
   const temFoto = true;
-  console.log('iddosuario:', userId);
   const getUserInfo = async () => {
     try {
+
       const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
+
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,9 @@ export default function InicialUser() {
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
             <Text style={styles.label}>{userInfo ? userInfo.nome : 'Carregando...'}</Text>
-            <Ionicons name="create-outline" size={20} color="#555" />
+            <TouchableOpacity onPress={() => navigation.navigate('AtualizarUser', { userId: userId })}>
+              <Ionicons name="create-outline" size={20} color="#555" />
+            </TouchableOpacity>
           </View>
           <Text style={styles.description}>{userInfo ? userInfo.descricao : ''}</Text>
         </View>
@@ -65,7 +68,6 @@ export default function InicialUser() {
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
             <Text style={styles.label}>Endereço:</Text>
-            <Ionicons name="create-outline" size={20} color="#555" />
           </View>
           <View style={styles.mapPlaceholder}>
             <Text style={styles.mapText}>[Mapa do Google aqui]</Text>

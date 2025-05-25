@@ -27,7 +27,7 @@ useEffect(() => {
 }, []);*/
 
 
-const TextCadastroUserInput = ({nome, onChangeNome, cnpj, onChangeCnpj, email, onChangeEmail, telefone, onChangeTelefone, endereco, onChangeEndereco, descricao, onChangeDescricao, errors}) => {
+const TextCadastroAbrigoInput = ({nome, onChangeNome, cnpj, onChangeCnpj, email, onChangeEmail, telefone, onChangeTelefone, endereco, onChangeEndereco, descricao, onChangeDescricao, errors}) => {
     const getInputStyle = (fieldError) => [
         styles.input,
         fieldError && styles.inputError,
@@ -118,4 +118,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TextCadastroUserInput;
+export default TextCadastroAbrigoInput;

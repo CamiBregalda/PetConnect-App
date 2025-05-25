@@ -81,7 +81,9 @@ function CadastroUserScreen() {
         );*/
 
         try {           
+
             const response = await fetch(`http://${urlIp}:3000/users`, {
+
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
