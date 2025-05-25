@@ -4,9 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GenericListInput } from './GenericListInput';
 
-
-
-const TextCadastroAnimalInput = (
+const TextAtualizacaoAnimalInput = (
     { 
         nome, onChangeNome, 
         sexo, onChangeSexo, 
@@ -19,7 +17,8 @@ const TextCadastroAnimalInput = (
         deficiencias, onChangeDeficiencias,
         vacinas, onChangeVacinas,
         informacoesAdicionais, onChangeInformacoesAdicionais,
-        errors,
+        adotado, onChangeAdotado,
+        idDono, onChangeIdDono
     }) => {
 
     const [listaEspecies, setListaEspecies] = React.useState([]);
@@ -73,52 +72,46 @@ const TextCadastroAnimalInput = (
     
     const [showDatePicker, setShowDatePicker] = React.useState(false);
 
-    const getInputStyle = (fieldError) => [
-        styles.input,
-        fieldError && styles.inputError,
-    ];
-
-    const getInputSelectStyle = (fieldError) => [
-        styles.inputSelect,
-        fieldError && styles.inputError,
-    ];
-
-    const getDescricaoInputStyle = (fieldError) => [
-        styles.descricaoInput,
-        fieldError && styles.inputError,
-    ];
-
     return (
         <>
         <View>
-            <TextInput
-                style={getInputStyle(errors.nome)}
-                onChangeText={onChangeNome}
-                value={nome}
-                placeholder="Nome"
-                keyboardType="Nome"
-            />
-
-            <View style={getInputSelectStyle(errors.sexo)}>
-                <Picker
-                    selectedValue={sexo}
-                    onValueChange={(itemValue) => onChangeSexo(itemValue)}
-                    style={styles.picker}
-
-                >
-                    <Picker.Item label="Sexo" value="" style={styles.pickerItem} />
-                    <Picker.Item label="Feminino" value="Feminino" style={styles.pickerItemValue} />
-                    <Picker.Item label="Masculino" value="Masculino" style={styles.pickerItemValue} />
-                </Picker>
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Nome:</Text>
+                <TextInput
+                    style={[styles.input, {width: 225}]}
+                    onChangeText={onChangeNome}
+                    value={nome}
+                    placeholder="Nome"
+                    keyboardType="default"
+                />
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.label}>Data de Nascimento:</Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-                <Text style={styles.dateInput}>
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Sexo:</Text>
+                <View style={[styles.inputSelect, { width: 230 }]}>
+                    <Picker
+                        selectedValue={sexo}
+                        onValueChange={(itemValue) => onChangeSexo(itemValue)}
+                        style={[
+                            styles.picker,
+                            { color: sexo === '' ? '#808080' : '#000000' }
+                        ]}
+
+                    >
+                        <Picker.Item label="Sexo" value="" style={styles.pickerItem} />
+                        <Picker.Item label="Feminino" value="Feminino" style={styles.pickerItemValue} />
+                        <Picker.Item label="Masculino" value="Masculino" style={styles.pickerItemValue} />
+                    </Picker>
+                </View>
+            </View>
+
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Data de Nascimento:</Text>
+                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                    <Text style={styles.dateInput}>
                     {dataNascimento ? dataNascimento.toLocaleDateString() : 'Data de Nascimento'}
-                </Text>
-            </TouchableOpacity>
+                    </Text>
+                </TouchableOpacity>
             </View>
             {showDatePicker && (
                 <DateTimePicker
@@ -132,84 +125,130 @@ const TextCadastroAnimalInput = (
                 />
             )}
 
-            <View style={getInputSelectStyle(errors.especie)}>
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Sexo:</Text>
+                <View style={[styles.inputSelect, { width: 230 }]}>
                 <Picker
                     selectedValue={especie}
                     onValueChange={(itemValue) => {
                         onChangeEspecie(itemValue);
                         fetchRacas(itemValue);
                     }}
-                    style={styles.picker}
+                    style={[
+                        styles.picker,
+                        { color: especie === '' ? '#808080' : '#000000' }
+                    ]}
                 >
                     <Picker.Item label="Espécie" value="" style={styles.pickerItem} />
-                    {listaEspecies.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
-                    ))}
-                </Picker>
+                        {listaEspecies.map((item, index) => (
+                            <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
+                        ))}
+                    </Picker>
+                </View>
             </View>
 
-            <View style={getInputSelectStyle(errors.raca)}>
-                <Picker
-                    selectedValue={raca}
-                    onValueChange={(itemValue) => onChangeRaca(itemValue)}
-                    style={styles.picker}
-                >
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Raça:</Text>
+                <View style={[styles.inputSelect, { width: 230 }]}>
+                    <Picker
+                        selectedValue={raca}
+                        onValueChange={(itemValue) => onChangeRaca(itemValue)}
+                        style={[
+                            styles.picker,
+                            { color: raca === '' ? '#808080' : '#000000' }
+                        ]}
+                    >
                     <Picker.Item label="Raça" value="" style={styles.pickerItem} />
-                    {listaRacas.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
-                    ))}
-                </Picker>
+                        {listaRacas.map((item, index) => (
+                            <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
+                        ))}
+                    </Picker>
+                </View>
             </View>
 
-            <View style={getInputSelectStyle(errors.porte)}>
-                <Picker
-                    selectedValue={porte}
-                    onValueChange={(itemValue) => onChangePorte(itemValue)}
-                    style={styles.picker}
-                >
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Porte:</Text>
+                <View style={[styles.inputSelect, { width: 225 }]}>
+                    <Picker
+                        selectedValue={porte}
+                        onValueChange={(itemValue) => onChangePorte(itemValue)}
+                        style={[
+                            styles.picker,
+                            { color: porte === '' ? '#808080' : '#000000' }
+                        ]}
+                    >
                     <Picker.Item label="Porte" value="" style={styles.pickerItem} />
-                    {listaPorte.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
-                    ))}
-                </Picker>
+                        {listaPorte.map((item, index) => (
+                            <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
+                        ))}
+                    </Picker>
+                </View>
             </View>
 
-            <View style={getInputSelectStyle(errors.castrado)}>
-                <Picker
-                    selectedValue={castrado}
-                    onValueChange={(itemValue) => onChangeCastrado(itemValue)}
-                    style={styles.picker}
-                >
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Castrado:</Text>
+                <View style={[styles.inputSelect, { width: 205 }]}>
+                    <Picker
+                        selectedValue={castrado}
+                        onValueChange={(itemValue) => onChangeCastrado(itemValue)}
+                        style={[
+                            styles.picker,
+                            { color: castrado === null ? '#808080' : '#000000' }
+                        ]}
+                    >
                     <Picker.Item label="Castrado" value={null} style={styles.pickerItem} />
-                    <Picker.Item label="Sim" value={true} style={styles.pickerItemValue} />
-                    <Picker.Item label="Não" value={false} style={styles.pickerItemValue} />
-                </Picker>
+                        <Picker.Item label="Sim" value={true} style={styles.pickerItemValue} />
+                        <Picker.Item label="Não" value={false} style={styles.pickerItemValue} />
+                    </Picker>
+                </View>
             </View>
 
+            <Text style={styles.label}>Doenças:</Text>
             <GenericListInput
                 items={doencas}
                 setItems={onChangeDoencas}
                 placeholder="Doenças"
             />
+            <Text style={styles.label}>Deficiências:</Text>
             <GenericListInput
                 items={deficiencias}
                 setItems={onChangeDeficiencias}
                 placeholder="Deficiências"
             />
+            <Text style={styles.label}>Vacinas:</Text>
             <GenericListInput
                 items={vacinas}
                 setItems={onChangeVacinas}
                 placeholder="Vacinas"
             />
 
+            <Text style={styles.label}>Informações Adicionais:</Text>
             <TextInput
-                style={getDescricaoInputStyle(errors.informacoesAdicionais)}
+                style={styles.descricaoInput}
                 onChangeText={onChangeInformacoesAdicionais}
                 value={informacoesAdicionais}
                 placeholder="Informações Adicionais"
                 multiline
                 numberOfLines={4}
             />
+
+            <View style={styles.containerInput}>
+                <Text style={styles.label}>Adotado:</Text>
+                <View style={[styles.inputSelect, { width: 205 }]}>
+                <Picker
+                    selectedValue={adotado}
+                    onValueChange={(itemValue) => onChangeAdotado(itemValue)}
+                    style={[
+                            styles.picker,
+                            { color: castrado === null ? '#808080' : '#000000' }
+                        ]}
+                >
+                    <Picker.Item label="Adotado" value={null} style={styles.pickerItem} />
+                        <Picker.Item label="Sim" value={true} style={styles.pickerItemValue} />
+                        <Picker.Item label="Não" value={false} style={styles.pickerItemValue} />
+                    </Picker>
+                </View>
+            </View>
         </View>
         </>
     );
@@ -219,6 +258,10 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         marginTop: 10,
+    },
+    containerInput: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     input: {
         width: 280,
@@ -267,7 +310,6 @@ const styles = StyleSheet.create({
     },
     pickerItemValue: {
         fontSize: 14, 
-        color: '#000',
     },
     inputSelect: {
         width: 280,
@@ -279,14 +321,6 @@ const styles = StyleSheet.create({
         padding: 9,
         fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
         fontSize: Platform.OS === 'ios' ? 17 : 14,
-    },
-    inputError: {
-        borderColor: 'red',
-        borderWidth: 1,
-        shadowColor: 'red',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.6,
-        shadowRadius: 3,
     },
     descricaoInput: {
         width: 280,
@@ -301,4 +335,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TextCadastroAnimalInput;
+export default TextAtualizacaoAnimalInput;

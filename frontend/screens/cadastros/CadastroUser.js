@@ -80,7 +80,7 @@ function CadastroUserScreen() {
         );*/
 
         try {           
-            const response = await fetch(`http://192.168.238.226:3000/users`, {
+            const response = await fetch(`http://192.168.3.5:3000/users`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

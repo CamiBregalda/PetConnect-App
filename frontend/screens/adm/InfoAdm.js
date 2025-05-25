@@ -20,7 +20,7 @@ function InfoAdm() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `http://192.168.238.226:3000/abrigos/${abrigoId}`;
+      const apiUrl = `http://192.168.3.5:3000/abrigos/${abrigoId}`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {

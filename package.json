@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"cd frontend && npx expo start --interactive\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,12 +20,12 @@
   },
   "homepage": "https://github.com/CamiBregalda/PetConnect-App#readme",
   "dependencies": {
-    "expo": "^53.0.46",
-    "typescript": "^5.3.3",
-    "@types/react": "~18.3.12"
+    "@types/react": "~18.3.12",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "typescript": "^5.3.3",
-    "@types/react": "~18.3.12"
+    "@types/react": "~18.3.12",
+    "concurrently": "^9.1.2",
+    "typescript": "^5.3.3"
   }
 }

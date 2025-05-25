@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import TextCadastroAbrigoInput from '../../components/TextCadastroAbrigoInput';
+import TextAtualizacaoAbrigoInput from '../../components/TextAtualizacaoAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
 
-function CadastroAbrigoScreen() {
+function AtualizarAbrigoScreen() {
     const route = useRoute();
-    const { userId } = route.params;
+    const { userId, abrigoId } = route.params;
 
     const navigation = useNavigation();
     const [nome, onChangeNome] = React.useState('');
@@ -24,22 +24,9 @@ function CadastroAbrigoScreen() {
     });
     const [imageUri, setImageUri] = useState(null);
 
-    const [errors, setErrors] = React.useState({
-        nome: false,
-        cnpj: false,
-        email: false,
-        telefone: false,
-        descricao: false,
-        endereco: {
-            rua: false,
-            numero: false,
-            bairro: false,
-            cidade: false,
-            estado: false,
-            cep: false,
-        },
-        image: false,
-    });
+    useEffect(() => {
+            getAbrigo();
+    }, []);
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -60,6 +47,47 @@ function CadastroAbrigoScreen() {
             [campo]: valor,
         }));
     };
+
+    const getAbrigo = async () => {
+        try {
+            const response = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao buscar abrigo');
+            }
+
+            const data = await response.json();
+            onChangeNome(data.nome);
+            onChangeCnpj(data.cnpj);
+            onChangeEmail(data.email);
+            onChangeTelefone(data.telefone);
+            onChangeDescricao(data.descricao);
+            onChangeEndereco(
+                data.endereco && typeof data.endereco === 'object'
+                    ? data.endereco
+                    : {
+                        rua: '',
+                        numero: '',
+                        bairro: '',
+                        cidade: '',
+                        estado: '',
+                        cep: '',
+                    }
+            );
+
+            const responseImage = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}/imagem`);
+            if (responseImage.ok) {
+                setImageUri(`http://192.168.3.5:3000/abrigos/${abrigoId}/imagem`);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar abrigo:', error);
+        }
+    }
 
     const getImageMimeType = (uri) => {
         if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
@@ -96,61 +124,48 @@ function CadastroAbrigoScreen() {
         }
     };
 
-    const handleCadastro = async () => {
-        const newErrors = {
-            nome: !nome.trim(),
-            cnpj: !cnpj.trim(),
-            email: !email.trim(),
-            telefone: !telefone.trim(),
-            descricao: !descricao.trim(),
-            endereco: {
-                rua: !endereco.rua.trim(),
-                numero: !endereco.numero.trim(),
-                bairro: !endereco.bairro.trim(),
-                cidade: !endereco.cidade.trim(),
-                estado: !endereco.estado.trim(),
-                cep: !endereco.cep.trim(),
-            },
-            image: !imageUri,
-        };
+    const bodyData = {
+        nome: nome.trim(),
+        cnpj: cnpj.trim(),
+        email: email.trim(),
+        telefone: telefone.trim(),
+        descricao: descricao.trim(),
+        endereco: {
+            rua: (endereco.rua || '').trim(),
+            numero: (endereco.numero || '').trim(),
+            bairro: (endereco.bairro || '').trim(),
+            cidade: (endereco.cidade || '').trim(),
+            estado: (endereco.estado || '').trim(),
+            cep: (endereco.cep || '').trim(),
+        },
+    };
 
-        const hasError = Object.values(newErrors).some(e =>
-            typeof e === 'object'
-                ? Object.values(e).some(v => v)
-                : e
-        );
-        setErrors(newErrors);
-
-        if (hasError) {
-            Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
-            return;
+    for (const key in bodyData) {
+        if (typeof bodyData[key] === 'string' && bodyData[key] === '') {
+            delete bodyData[key];
         }
 
+        if (typeof bodyData[key] === 'object') {
+            for (const subKey in bodyData[key]) {
+                if (typeof bodyData[key][subKey] === 'string' && bodyData[key][subKey] === '') {
+                    delete bodyData[key][subKey];
+                }
+            }
+        }
+    }
+
+    const handleUpdate = async () => {
         try {          
-            const response = await fetch(`http://192.168.3.5:3000/abrigos/${userId}`, {
-                method: 'POST',
+            const response = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    nome: nome.trim(),
-                    cnpj: cnpj.trim(),
-                    email: email.trim(),
-                    telefone: telefone.trim(),
-                    descricao: descricao.trim(),
-                    endereco: {
-                        rua: endereco.rua.trim(),
-                        numero: endereco.numero.trim(),
-                        bairro: endereco.bairro.trim(),
-                        cidade: endereco.cidade.trim(),
-                        estado: endereco.estado.trim(),
-                        cep: endereco.cep.trim(),
-                    }
-                }),
+                body: JSON.stringify(bodyData),
             });
 
             if (!response.ok) {
-                throw new Error('Cadastro inválido');
+                throw new Error('Erro ao atualizar abrigo');
             }
 
             const data = await response.json();
@@ -159,18 +174,18 @@ function CadastroAbrigoScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('CadastroAnimal');
+            navigation.navigate('AnimaisUser', { userId: userId });
         } catch (error) {
-            console.error('Erro ao fazer cadastro:', error);
-            Alert.alert('Erro', 'Cadastro inválido');
+            console.error('Erro ao fazer update:', error);
+            Alert.alert('Erro', 'Atualização inválida');
         }
     };
 
     return (
         <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
-        <Text style={styles.title}>Cadastrar Abrigo</Text>
-        <TextCadastroAbrigoInput
+        <Text style={styles.title}>Atualizar Abrigo</Text>
+        <TextAtualizacaoAbrigoInput
             nome={nome}
             onChangeNome={onChangeNome}
             cnpj={cnpj}
@@ -183,7 +198,6 @@ function CadastroAbrigoScreen() {
             onChangeEndereco={handleEnderecoChange}
             descricao={descricao}
             onChangeDescricao={onChangeDescricao}
-            errors={errors}
         />
 
         <Pressable onPress={pickImage}>
@@ -196,15 +210,11 @@ function CadastroAbrigoScreen() {
             )}
         </Pressable>
 
-        {errors.image && (
-            <Text style={styles.errorText}>Imagem obrigatória</Text>
-        )}
-
         <Pressable
             style={styles.botao}
-            onPress={handleCadastro}
+            onPress={handleUpdate}
         >
-            <Text style={styles.textoBotao}>Cadastrar</Text>
+            <Text style={styles.textoBotao}>Atualizar</Text>
         </Pressable>
         </View>
         </ScrollView>
@@ -269,4 +279,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CadastroAbrigoScreen;
+export default AtualizarAbrigoScreen;

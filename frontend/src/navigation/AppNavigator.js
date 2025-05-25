@@ -7,9 +7,11 @@ import { Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import TelaInicial from '../../screens/login/TelaInicial';
 import LoginScreen from '../../screens/login/LoginScreen';
 import CadastroUser from '../../screens/cadastros/CadastroUser';
-import AtualizarUserScreen from '../../screens/cadastros/AtualizarUser';
+import AtualizarUser from '../../screens/cadastros/AtualizarUser';
 import CadastroAbrigo from '../../screens/cadastros/CadastroAbrigo';
+import AtualizarAbrigo from '../../screens/cadastros/AtualizarAbrigo';
 import CadastroAnimal from '../../screens/cadastros/CadastroAnimal';
+import AtualizarAnimal from '../../screens/cadastros/AtualizarAnimal';
 import HomeAdm from '../../screens/adm/HomeAdm';
 import AnimaisAdm from "../../screens/adm/AnimaisAdm";
 import InfoAdm from "../../screens/adm/InfoAdm";
@@ -242,6 +244,7 @@ function UserTabs({ navigation, route }) {
       <Tab.Screen
         name="Animais"
         component={AnimaisUser}
+        initialParams={{ userId }}
         options={{
           title: 'Animais',
           tabBarShowLabel: false,
@@ -259,6 +262,7 @@ function UserTabs({ navigation, route }) {
       <Tab.Screen
         name="Informações"
         component={RegistroAbandono}
+        initialParams={{ userId }}
         options={{
           title: 'Registrar Abandono',
           tabBarShowLabel: false,
@@ -275,9 +279,11 @@ export default function AppNavigator() {
         <Stack.Screen name="TelaInicial" component={TelaInicial} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="CadastroUser" component={CadastroUser} />
-        <Stack.Screen name="AtualizarUser" component={AtualizarUserScreen} />
+        <Stack.Screen name="AtualizarUser" component={AtualizarUser} />
         <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
+        <Stack.Screen name="AtualizarAbrigo" component={AtualizarAbrigo} />
         <Stack.Screen name="CadastroAnimal" component={CadastroAnimal} />
+        <Stack.Screen name="AtualizarAnimal" component={AtualizarAnimal} />
         <Stack.Screen name="TelaPrincipal" component={TelaPrincipal} />
         <Stack.Screen name="RegistroAbandono" component={RegistroAbandono} />
         <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
