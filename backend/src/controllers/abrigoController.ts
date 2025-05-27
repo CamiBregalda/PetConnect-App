@@ -1,13 +1,14 @@
     import { Request, Response } from 'express';
     import * as AbrigoService from '../services/abrigoService';
     import { validateImage } from '../utils/imageUtil';
+    import { fileTypeFromBuffer } from 'file-type';
     import multer from "multer";
 
     const upload = multer();
 
     export const createAbrigo = async (req: Request, res: Response) => {
         try {
-            const abrigo = await AbrigoService.createAbrigo(req.body);
+            const abrigo = await AbrigoService.createAbrigo(req.params.userId, req.body);
             res.status(201).json(abrigo);
         } catch (error: any) {
             res.status(500).json({ message: error.message });
@@ -66,7 +67,7 @@
         try {
             const abrigo = await AbrigoService.updateAbrigo(req.params.id, req.body);
             if (abrigo) {
-                res.status(200).json({ message: 'Abrigo atualizado com sucesso', abrigo });
+                res.status(200).json(abrigo);
             } else {
                 res.status(404).json({ message: 'Abrigo não encontrado' });
             }
@@ -113,8 +114,10 @@
             const abrigoId = req.params.id;
             const image = await AbrigoService.getImage(abrigoId);
 
+            const type = await fileTypeFromBuffer(image);
+            
             res.writeHead(200, {
-                'Content-Type': 'image/jpeg',
+                'Content-Type': type?.mime || 'image/jpeg',
                 'Content-Length': image.length,
             });
             return res.end(image);

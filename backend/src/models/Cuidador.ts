@@ -15,7 +15,7 @@ const CuidadorSchema = new Schema<CuidadorAttributes>(
         email: { type: String, required: true },
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         abrigoId: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
-        ativo: { type: Boolean, required: true },
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "cuidadores",

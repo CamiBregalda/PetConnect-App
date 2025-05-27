@@ -1,4 +1,5 @@
 import AnimalModel from "../models/Animal";
+import * as UserService from "./userService";
 
 export const createAnimal = async (data: any) => {
     try {
@@ -38,6 +39,20 @@ export const getAnimaisByAbrigoId = async (abrigoId: string) => {
 
 export const updateAnimal = async (id: string, updatedData: any) => {
     try {
+        if (updatedData.email && updatedData.adotado === true) {
+            for (const key in updatedData) {
+                if (key === "email") {
+                    const user = await UserService.getUserByEmail(updatedData[key]);
+
+                    if (user) {
+                        updatedData.idDono = user.id;
+                    } else {
+                        throw new Error("Usuário não encontrado");
+                    }
+                }
+            }
+        }
+
         const updatedFields = Object.keys(updatedData).reduce((acc, key) => {
             if (updatedData[key] != null) {
                 acc[key] = updatedData[key];

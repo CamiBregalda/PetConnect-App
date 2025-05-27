@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet, Text, Pressable, TouchableOpacity, Platfor
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GenericListInput } from './GenericListInput';
-
+import { urlIp } from '@env';
 
 
 const TextCadastroAnimalInput = (
@@ -32,7 +32,8 @@ const TextCadastroAnimalInput = (
                 setListaRacas([]);
                 return;
             }
-            const response = await fetch(`http://192.168.3.5:3000/especies/${especieSelecionada}/racas`);
+            const response = await fetch(`http://${urlIp}:3000/especies/${especieSelecionada}/racas`);
+
             if (!response.ok) throw new Error('Erro ao buscar raças');
             const data = await response.json();
             setListaRacas(data);
@@ -44,7 +45,8 @@ const TextCadastroAnimalInput = (
     React.useEffect(() => {
         const fetchEspecies = async () => {
             try {
-                const response = await fetch('http://192.168.3.5:3000/especies');
+                const response = await fetch(`http://${urlIp}:3000/especies`);
+
                 if (!response.ok) throw new Error('Erro ao buscar espécies');
                 const data = await response.json();
                 setListaEspecies(data);
@@ -55,7 +57,8 @@ const TextCadastroAnimalInput = (
 
         const fetchPorte = async () => {
             try {
-                const response = await fetch('http://192.168.3.5:3000/portes');
+                const response = await fetch(`http://${urlIp}:3000/portes`);
+              
                 if (!response.ok) throw new Error('Erro ao buscar portes');
                 const data = await response.json();
                 setListaPorte(data);
@@ -83,11 +86,6 @@ const TextCadastroAnimalInput = (
         fieldError && styles.inputError,
     ];
 
-    const getInputDateStyle = (fieldError) => [
-        styles.dateInput,
-        fieldError && styles.inputError,
-    ];
-
     const getDescricaoInputStyle = (fieldError) => [
         styles.descricaoInput,
         fieldError && styles.inputError,
@@ -111,17 +109,20 @@ const TextCadastroAnimalInput = (
                     style={styles.picker}
 
                 >
-                    <Picker.Item label="Sexo" value="" />
-                    <Picker.Item label="Feminino" value="Feminino" />
-                    <Picker.Item label="Masculino" value="Masculino" />
+                    <Picker.Item label="Sexo" value="" style={styles.pickerItem} />
+                    <Picker.Item label="Feminino" value="Feminino" style={styles.pickerItemValue} />
+                    <Picker.Item label="Masculino" value="Masculino" style={styles.pickerItemValue} />
                 </Picker>
             </View>
 
-            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateInput}>
-                <Text style={styles.input}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.label}>Data de Nascimento:</Text>
+            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+                <Text style={styles.dateInput}>
                     {dataNascimento ? dataNascimento.toLocaleDateString() : 'Data de Nascimento'}
                 </Text>
             </TouchableOpacity>
+            </View>
             {showDatePicker && (
                 <DateTimePicker
                     value={dataNascimento}
@@ -143,9 +144,9 @@ const TextCadastroAnimalInput = (
                     }}
                     style={styles.picker}
                 >
-                    <Picker.Item label="Espécie" value="" />
+                    <Picker.Item label="Espécie" value="" style={styles.pickerItem} />
                     {listaEspecies.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} />
+                        <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
                     ))}
                 </Picker>
             </View>
@@ -156,9 +157,9 @@ const TextCadastroAnimalInput = (
                     onValueChange={(itemValue) => onChangeRaca(itemValue)}
                     style={styles.picker}
                 >
-                    <Picker.Item label="Raça" value="" />
+                    <Picker.Item label="Raça" value="" style={styles.pickerItem} />
                     {listaRacas.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} />
+                        <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
                     ))}
                 </Picker>
             </View>
@@ -169,9 +170,9 @@ const TextCadastroAnimalInput = (
                     onValueChange={(itemValue) => onChangePorte(itemValue)}
                     style={styles.picker}
                 >
-                    <Picker.Item label="Porte" value="" />
+                    <Picker.Item label="Porte" value="" style={styles.pickerItem} />
                     {listaPorte.map((item, index) => (
-                        <Picker.Item key={index} label={item} value={item} />
+                        <Picker.Item key={index} label={item} value={item} style={styles.pickerItemValue} />
                     ))}
                 </Picker>
             </View>
@@ -182,9 +183,9 @@ const TextCadastroAnimalInput = (
                     onValueChange={(itemValue) => onChangeCastrado(itemValue)}
                     style={styles.picker}
                 >
-                    <Picker.Item label="Castrado(a)" value={null} />
-                    <Picker.Item label="Sim" value={true} />
-                    <Picker.Item label="Não" value={false} />
+                    <Picker.Item label="Castrado" value={null} style={styles.pickerItem} />
+                    <Picker.Item label="Sim" value={true} style={styles.pickerItemValue} />
+                    <Picker.Item label="Não" value={false} style={styles.pickerItemValue} />
                 </Picker>
             </View>
 
@@ -245,13 +246,31 @@ const styles = StyleSheet.create({
     },
     label: {
         fontWeight: 'bold',
+        marginLeft: 15,
         marginTop: 10,
-        marginBottom: 4,
+        marginBottom: 10,
+    },
+    dateInput: {
+        textAlign: 'center',
+        width: 130,
+        height: 40,
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
+        padding: 10,
     },
     picker: {
         color: '#808080',
         marginLeft: -10,
         marginTop: Platform.OS === 'android' ? -15 : -11,
+    },
+    pickerItem: {
+        fontSize: 14, 
+    },
+    pickerItemValue: {
+        fontSize: 14, 
+        color: '#000',
     },
     inputSelect: {
         width: 280,
@@ -260,7 +279,7 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         borderWidth: 0.2,
         borderBottomWidth: 1,
-        padding: 10,
+        padding: 9,
         fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
         fontSize: Platform.OS === 'ios' ? 17 : 14,
     },

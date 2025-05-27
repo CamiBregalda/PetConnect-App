@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView, params } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import { AbrigoContext } from './../../AppContext';
+import { urlIp } from '@env';
 
 function HomeAdm({ route }) {
-  const { abrigoId } = route.params;
+  
+  const { userId, abrigoId } = route.params || {}; // Safe access
+  console.log('HomeAdm userId:', userId, 'abrigoId:', abrigoId);
+  // ... rest of your component
+
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [adminInfo, setAdminInfo] = useState(null); // Novo estado para as informações do administrador
   const [loading, setLoading] = useState(true);
@@ -28,7 +33,7 @@ function HomeAdm({ route }) {
       setError(null);
       try {
         if (abrigoId) {
-          const apiUrl = `http://192.168.3.20:3000/abrigos/${abrigoId}`;
+          const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
           const response = await fetch(apiUrl);
 
           if (!response.ok) {
@@ -60,7 +65,7 @@ function HomeAdm({ route }) {
 
     const buscarInfoAdmin = async (idAdmAbrigo) => {
       try {
-        const adminApiUrl = `http://192.168.3.20:3000/admAbrigo/${idAdmAbrigo}`; 
+        const adminApiUrl = `http://${urlIp}:3000/admAbrigo/${idAdmAbrigo}`; 
         const adminResponse = await fetch(adminApiUrl);
 
         if (!adminResponse.ok) {
@@ -103,7 +108,7 @@ function HomeAdm({ route }) {
         <View style={styles.container}>
           <View>
           <Image 
-            source={{ uri: `http://192.168.3.20:3000/abrigos/${abrigoInfo.id}/imagem` }} 
+            source={{ uri: `http://${urlIp}:3000/abrigos/${abrigoInfo.id}/imagem` }} 
             style={styles.imgPerfil} />
           </View>
           <View style={styles.about}>
@@ -128,7 +133,7 @@ function HomeAdm({ route }) {
             <View style={styles.sobre}>
               <View style={styles.infoAdm}>
                 <Image
-                source={{ uri: `http://192.168.3.20:3000/admAbrigo/${adminInfo.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/admAbrigo/${adminInfo.id}/imagem` }}
                 style={styles.imgADM}
               />
                 <Text style={styles.nomeAdm}>{adminInfo.nome}</Text>

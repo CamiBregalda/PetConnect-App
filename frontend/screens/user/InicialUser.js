@@ -1,23 +1,50 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { urlIp } from '@env';
+
 
 export default function InicialUser() {
-  const navigation = useNavigation();
   const route = useRoute();
+  const { userId } = route.params;
+  const [userInfo, setUserInfo] = useState(null);
+  const navigation = useNavigation();
 
   const temFoto = true;
+  const getUserInfo = async () => {
+    try {
+
+      const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
+
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Erro ao buscar usuário');
+      }
+      const data = await response.json();
+      setUserInfo(data);
+      console.log('userInfo:', data);
+    }
+    catch (error) {
+      console.error('Erro ao buscar informações do usuário:', error);
+    }
+  }
+
+  useEffect(() => {
+    getUserInfo();
+
+  }, []);
 
   return (
     <View style={styles.container}>
-      
-      <TouchableOpacity onPress={() => navigation.navigate('TelaPrincipal')} style={styles.backButton}>
-        <Image source={require('../../img/seta.png')} style={styles.backIcon} />
-      </TouchableOpacity>
+
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        
+
         {temFoto ? (
           <Image source={require('../../img/teste.png')} style={styles.profileImage} />
         ) : (
@@ -26,20 +53,21 @@ export default function InicialUser() {
           </View>
         )}
 
-        
+
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
-            <Text style={styles.label}>Nome completo</Text>
-            <Ionicons name="create-outline" size={20} color="#555" />
+            <Text style={styles.label}>{userInfo ? userInfo.nome : 'Carregando...'}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AtualizarUser', { userId: userId })}>
+              <Ionicons name="create-outline" size={20} color="#555" />
+            </TouchableOpacity>
           </View>
-          <Text style={styles.description}>Minha descrição super hiper mega legal!</Text>
+          <Text style={styles.description}>{userInfo ? userInfo.descricao : ''}</Text>
         </View>
 
-  
+
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
             <Text style={styles.label}>Endereço:</Text>
-            <Ionicons name="create-outline" size={20} color="#555" />
           </View>
           <View style={styles.mapPlaceholder}>
             <Text style={styles.mapText}>[Mapa do Google aqui]</Text>
@@ -48,20 +76,7 @@ export default function InicialUser() {
         </View>
       </ScrollView>
 
-      
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('AnimaisUser')}>
-          <Image source={require('../../img/Animais_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('InicialUser')}>
-          <Image source={require('../../img/Home_Active.png')} style={styles.navIconCenter} />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('RegistroAbandono')}>
-          <Image source={require('../../img/Profile_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

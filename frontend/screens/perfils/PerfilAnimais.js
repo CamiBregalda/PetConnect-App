@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { urlIp } from '@env';
 
 function PerfilAnimal({ route }) {
   const { animalId, abrigoId } = route.params; // Removido 'animal' se não for usado diretamente aqui
@@ -50,7 +51,7 @@ useEffect(() => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://192.168.3.20:3000/animais/${animalId}`);
+        const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`);
         if (!response.ok) {
           throw new Error(`Erro na requisição: ${response.status}`);
         }
@@ -104,7 +105,7 @@ useEffect(() => {
                     setLoading(true);
                     setError(null);
                     try {
-                        const response = await fetch(`http://192.168.3.20:3000/animais/${animalId}`);
+                        const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`);
                         if (!response.ok) throw new Error(`Erro na requisição: ${response.status}`);
                         const data = await response.json();
                         setAnimalDetalhes(data);
@@ -141,7 +142,7 @@ const InfoRow = ({ label, value, style }) => ( // Adicionado 'style' como prop o
   return (
     <ScrollView style={styles.scrollContainer}>
       <Image
-        source={{ uri: `http://192.168.3.20:3000/animais/${animalDetalhes.id}/imagem` }}
+        source={{ uri: `http://${urlIp}:3000/animais/${animalDetalhes.id}/imagem` }}
         style={styles.animalHeaderImage}
         resizeMode="cover"
       />

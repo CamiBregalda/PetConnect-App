@@ -1,12 +1,19 @@
 import AbrigoModel from '../models/Abrigo';
 import { getAnimaisByAbrigoId } from './animalService';
 import { getCuidadoresByAbrigoId } from './cuidadorService';
+import * as AdmDeAbrigoService from '../services/admDeAbrigoService';
 import { AbrigoComAnimaisResponse } from "../models/responses/AbrigoComAnimaisResponse";
 import { AbrigoComCuidadoresResponse } from "../models/responses/AbrigoComCuidadoresResponse";
 
 
-export const createAbrigo = async (abrigoData: any) => {
+export const createAbrigo = async (userId: string, abrigoData: any) => {
     try {
+        const admDeAbrigo = await AdmDeAbrigoService.createAdmDeAbrigo({ userId: userId });
+        if (!admDeAbrigo) {
+            throw new Error('Administrador de abrigo não pôde ser criado!');
+        }
+
+        abrigoData.idAdmAbrigo = admDeAbrigo._id;
         const abrigo = new AbrigoModel(abrigoData);
         abrigo.ativo = true;
         await abrigo.save();

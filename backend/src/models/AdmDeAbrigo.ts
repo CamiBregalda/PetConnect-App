@@ -3,7 +3,7 @@ import { Schema, model, Types } from "mongoose";
 export interface AdmDeAbrigoAttributes {
     userId: Types.ObjectId;
     descricao?: string;
-    ativo: boolean;
+    ativo?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -12,7 +12,7 @@ const AdmDeAbrigoSchema = new Schema<AdmDeAbrigoAttributes>(
     {
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         descricao: { type: String, required: false },
-        ativo: { type: Boolean, required: true },
+        ativo: { type: Boolean, required: false },
     },
     {
         collection: "adm_de_abrigos",

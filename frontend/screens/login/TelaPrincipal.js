@@ -1,14 +1,21 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { urlIp } from '@env';
 
 function HomeScreen() {
+  const route = useRoute();
+  const userId = route.params?.userId; // Este é o userId da TelaPrincipal
+  const navigation = useNavigation();
+  const telaPrincipalUserId = route.params?.userId; // Este é o userId da TelaPrincipal
+  console.log('TelaPrincipal userId:', telaPrincipalUserId);
+
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
+  const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigation = useNavigation();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -29,7 +36,7 @@ function HomeScreen() {
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('UsuarioInfo')}>
+        <TouchableOpacity onPress={() => exibirDetalhesUsuario(userId)}>
           <Image
             source={require('../../img/Profile_Active.png')}
             style={styles.headerProfileIcon}
@@ -44,23 +51,27 @@ function HomeScreen() {
       setLoading(true);
       setError(null);
       try {
-        const [animaisResponse, abrigosResponse] = await Promise.all([
-          fetch('http://192.168.3.20:3000/animais/'),
-          fetch('http://192.168.3.20:3000/abrigos/'),
+        const [animaisResponse, abrigosResponse, eventosResponse] = await Promise.all([
+          fetch(`http://${urlIp}:3000/animais/`),
+          fetch(`http://${urlIp}:3000/abrigos/`),
+          fetch(`http://${urlIp}:3000/eventos/`),
         ]);
 
         if (!animaisResponse.ok || !abrigosResponse.ok) {
           const errorDetails = [];
           if (!animaisResponse.ok) errorDetails.push(`Erro ao buscar animais: ${animaisResponse.status}`);
           if (!abrigosResponse.ok) errorDetails.push(`Erro ao buscar abrigos: ${abrigosResponse.status}`);
+           if (!eventosResponse.ok) errorDetails.push(`Erro ao buscar eventos: ${eventosResponse.status}`);
           throw new Error(errorDetails.join('\n'));
         }
 
         const animaisData = await animaisResponse.json();
         const abrigosData = await abrigosResponse.json();
+        const eventosData = await eventosResponse.json();
 
         setAnimais(animaisData);
         setAbrigos(abrigosData);
+         setEventos(eventosData);
         setLoading(false);
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
@@ -78,7 +89,27 @@ function HomeScreen() {
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {
-    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: idDoAbrigo } });
+    // Pass both abrigoId and the userId from TelaPrincipal
+    navigation.navigate('Main', { // Route name is 'Main'
+      screen: 'Home',             // Target screen within 'Main'
+      params: {                   // These are the params for the 'Home' screen within 'Main'
+        abrigoId: idDoAbrigo,
+        userId: telaPrincipalUserId
+      }
+    });
+  };
+
+  const exibirDetalhesUsuario = (userId) => { // Renamed to avoid confusion
+    console.log('ID do usuário para perfil:', userId);
+    navigation.navigate('InicialUser', { userId: userId });
+  };
+
+  const exibirDetalhesEvento = (evento) => {
+    // Ajuste a rota e os parâmetros conforme sua tela de detalhes do evento
+    // Se o usuário for admin, pode ir para EventoDetalheAdm, senão para EventoDetalhe
+    // Aqui, vamos assumir uma navegação genérica para 'EventoDetalhe'
+    // Você pode adicionar lógica para verificar se o usuário é admin e navegar para 'EventoDetalheAdm'
+    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento });
   };
 
   const handleSearch = (text) => {
@@ -91,6 +122,10 @@ function HomeScreen() {
 
   const abrigosFiltrados = abrigos.filter(abrigo =>
     abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+const eventosFiltrados = eventos.filter(evento =>
+    evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -128,7 +163,7 @@ function HomeScreen() {
           {animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://192.168.3.20:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
@@ -143,7 +178,7 @@ function HomeScreen() {
           {abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
-                source={{ uri: `http://192.168.3.20:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage} />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>
@@ -151,6 +186,27 @@ function HomeScreen() {
           {abrigosFiltrados.length === 0 && <Text>Nenhum abrigo encontrado com esse nome.</Text>}
         </ScrollView>
       </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Próximos Eventos</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {eventosFiltrados.map((evento) => (
+            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
+              {/* Assumindo que seu evento tem um campo 'imagemUrl' ou similar.
+                  Se for um caminho local, use require().
+                  Se for uma URL completa do backend, use uri.
+                  Se o backend serve a imagem em um endpoint específico como /eventos/:id/imagem: */}
+              <Image
+                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem` }} // Ajuste este endpoint
+                style={styles.listImage}
+                onError={(e) => console.log('Erro ao carregar imagem do evento:', e.nativeEvent.error)} // Para debug
+              />
+              <Text style={styles.listItemText}>{evento.nome}</Text>
+            </TouchableOpacity>
+          ))}
+          {eventosFiltrados.length === 0 && searchTerm.length > 0 && <Text style={styles.notFoundText}>Nenhum evento encontrado.</Text>}
+        </ScrollView>
+      </View>
+
     </ScrollView>
   );
 }

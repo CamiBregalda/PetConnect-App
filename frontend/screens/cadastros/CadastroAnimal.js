@@ -1,13 +1,14 @@
-import React, { useState, useRoute } from 'react';
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
 import TextCadastroAnimalInput from '../../components/TextCadastroAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
+import { urlIp } from '@env';
 
 function CadastroAnimalScreen() {
-    const navigation = useNavigation();
     const route = useRoute();
-    const idDono = route.params.idDono;
+    const idDono = route.params.userId;
+    const navigation = useNavigation();
 
     const [nome, onChangeNome] = React.useState('');
     const [sexo, onChangeSexo] = React.useState('');
@@ -46,6 +47,41 @@ function CadastroAnimalScreen() {
         }
     };
 
+    const getImageMimeType = (uri) => {
+        if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
+        if (uri.endsWith('.png')) return 'image/png';
+        return 'image/jpeg';
+    };
+
+    const handleImageUpdate = async (idAnimal) => {
+        const mimeType = getImageMimeType(imageUri);
+
+        const formData = new FormData();
+        formData.append('image', {
+            uri: imageUri,
+            name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
+            type: mimeType,
+        });
+
+        try {
+            const response = await fetch(`http://${urlIp}:3000/animais/${idAnimal}/imagem`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Falha ao enviar a imagem');
+            }
+
+            console.log('Imagem enviada com sucesso');
+        } catch (error) {
+            console.error('Erro ao enviar imagem:', error);
+        }
+    };
+
     const handleCadastro = async () => {
         const newErrors = {
             nome: !nome.trim(),
@@ -75,7 +111,8 @@ function CadastroAnimalScreen() {
         };
 
         try {           
-            const response = await fetch(`http://192.168.3.5:3000/animais`, {
+
+            const response = await fetch(`http://${urlIp}:3000/animais`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +129,7 @@ function CadastroAnimalScreen() {
                     deficiencias: clearList(deficiencias),
                     vacinas: clearList(vacinas),
                     informacoes: informacoes.trim(),
-                    idDono: "682a3ccb7bdb8c892057266a",
+                    idDono: idDono,
                     adotado: false,
                 }),
             });
@@ -102,6 +139,11 @@ function CadastroAnimalScreen() {
             }
 
             const data = await response.json();
+
+            if (imageUri) {
+                await handleImageUpdate(data.id);
+            }
+
             navigation.navigate('Login');
         } catch (error) {
             console.error('Erro ao fazer cadastro:', error);
@@ -144,7 +186,7 @@ function CadastroAnimalScreen() {
                 <Image source={{ uri: imageUri }} style={styles.image} />
             ) : (
                 <View style={styles.imagePlaceholder}>
-                    <Text>Selecionar Imagem</Text>
+                    <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
                 </View>
             )}
         </Pressable>
@@ -198,6 +240,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 20,
+    },
+    imagePlaceholderText: {
+        color: '#888',
+        textAlign: 'center',
     },
     botao: {
         backgroundColor: '#8A2BE2',

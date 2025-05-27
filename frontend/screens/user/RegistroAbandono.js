@@ -8,12 +8,8 @@ export default function RegistroAbandono() {
 
   return (
     <View style={styles.container}>
-      {/* Botão de voltar */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../../img/seta.png')} style={styles.backIcon} />
-      </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+      <ScrollView >
         {/* Título */}
         <Text style={styles.title}>Registrar Abandono</Text>
 
@@ -55,24 +51,12 @@ export default function RegistroAbandono() {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Menu inferior */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('AnimaisUser')}>
-          <Image source={require('../../img/Animais_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('InicialUser')}>
-          <Image source={require('../../img/Home_Active.png')} style={styles.navIconCenter} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('RegistroAbandono')}>
-          <Image source={require('../../img/Profile_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 50 },
+  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 20 },
   backButton: { marginLeft: 16 },
   backIcon: { width: 24, height: 24, resizeMode: 'contain' },
   title: { textAlign: 'center', fontSize: 16, marginVertical: 20, color: '#333' },

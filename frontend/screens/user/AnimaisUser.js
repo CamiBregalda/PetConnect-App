@@ -6,14 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 export default function AnimaisUser() {
   const navigation = useNavigation();
   const route = useRoute();
+  const { userId } = route.params;
   const [search, setSearch] = useState('');
 
   return (
     <View style={styles.container}>
-      {/* Botão de voltar */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Image source={require('../../img/seta.png')} style={styles.backIcon} />
-      </TouchableOpacity>
 
       {/* Barra de filtro e busca */}
       <View style={styles.searchContainer}>
@@ -40,21 +37,27 @@ export default function AnimaisUser() {
               <Image source={require('../../img/Gato.png')} style={styles.itemImage} />
               <View style={styles.itemRow}>
                 <Text style={styles.itemText}>El Gato</Text>
-                <Ionicons name="create-outline" size={18} color="#555" />
+                <TouchableOpacity onPress={() => navigation.navigate('AtualizarAnimal', { userId, animalId: "680cf9162c0d16610e617013" })}>
+                  <Ionicons name="create-outline" size={18} color="#555" />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={styles.itemBox}>
               <Image source={require('../../img/Cachorro.png')} style={styles.itemImage} />
               <View style={styles.itemRow}>
                 <Text style={styles.itemText}>Doguinho</Text>
-                <Ionicons name="create-outline" size={18} color="#555" />
+                <TouchableOpacity onPress={() => navigation.navigate('AtualizarAnimal', { userId, animalId: "680cf9162c0d16610e617013" })}>
+                  <Ionicons name="create-outline" size={18} color="#555" />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={styles.itemBox}>
               <Image source={require('../../img/Gato.png')} style={styles.itemImage} />
               <View style={styles.itemRow}>
                 <Text style={styles.itemText}>Lua</Text>
-                <Ionicons name="create-outline" size={18} color="#555" />
+                <TouchableOpacity onPress={() => navigation.navigate('AtualizarAnimal', { userId, animalId: "680cf9162c0d16610e617013" })}>
+                  <Ionicons name="create-outline" size={18} color="#555" />
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -68,7 +71,9 @@ export default function AnimaisUser() {
               <Image source={require('../../img/Gato.png')} style={styles.itemImage} />
               <View style={styles.itemRow}>
                 <Text style={styles.itemText}>Mimi</Text>
-                <Ionicons name="create-outline" size={18} color="#555" />
+                <TouchableOpacity onPress={() => navigation.navigate('AtualizarAbrigo', { userId, abrigoId: "68331548e4e9d6df1a66c53a" })}>
+                  <Ionicons name="create-outline" size={18} color="#555" />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={styles.itemBox}>
@@ -89,20 +94,7 @@ export default function AnimaisUser() {
         </View>
       </ScrollView>
 
-      {/* Menu inferior */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity onPress={() => navigation.navigate('AnimaisUser')}>
-          <Image source={require('../../img/Animais_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('InicialUser')}>
-          <Image source={require('../../img/Home_Active.png')} style={styles.navIconCenter} />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('RegistroAbandono')}>
-          <Image source={require('../../img/Profile_Active.png')} style={styles.navIcon} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

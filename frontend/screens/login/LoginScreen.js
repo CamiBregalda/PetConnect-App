@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import TextLoginInput from '../../components/TextLoginInput';
+import { urlIp } from '@env';
 
 function LoginScreen() {
   const navigation = useNavigation();
@@ -34,7 +35,7 @@ function LoginScreen() {
     );*/
 
     try {
-      const response = await fetch('http://192.168.3.20:3000/users/login', {
+      const response = await fetch(`http://${urlIp}:3000/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +53,8 @@ function LoginScreen() {
       }
 
       const data = await response.json();
-      navigation.navigate('TelaPrincipal', { email: data.email });
+
+      navigation.navigate('TelaPrincipal', { userId: data.id });
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       Alert.alert('Erro', 'Login ou senha inválidos');

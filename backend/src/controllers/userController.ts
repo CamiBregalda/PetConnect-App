@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as userService from "../services/userService";
 import { validateImage } from '../utils/imageUtil';
 import { LoginRequest } from "../models/requests/LoginRequest";
+import { fileTypeFromBuffer } from 'file-type';
 import multer from "multer";
 
 const upload = multer();
@@ -17,6 +18,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const usuario = await userService.loginUser(new LoginRequest(email, senha));
 
     res.status(200).json({
+      id: usuario.id,
       email: usuario.email,
       mensagem: 'Login realizado com sucesso',
     });
@@ -99,8 +101,10 @@ export const getImage = async (req: Request, res: Response) => {
       const userId = req.params.id;
       const image = await userService.getImage(userId);
 
+      const type = await fileTypeFromBuffer(image);
+
       res.writeHead(200, {
-          'Content-Type': 'image/jpeg',
+          'Content-Type': type?.mime || 'image/jpeg',
           'Content-Length': image.length,
       });
       return res.end(image);
