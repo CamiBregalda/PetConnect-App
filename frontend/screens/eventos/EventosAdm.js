@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function EventosAdm() {
   const navigation = useNavigation();
+
+   useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: '#9333ea',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+      headerTitleAlign: 'center',
+      title: 'Eventos', // ou o título que desejar
+    });
+  }, [navigation]);
 
   // Lista simulada de eventos
   const eventos = [
@@ -23,34 +38,22 @@ export default function EventosAdm() {
 
   return (
     <View style={styles.container}>
-      {/* Botão voltar */}
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
-        <Text style={styles.voltarTexto}>Voltar</Text>
-      </TouchableOpacity>
-
-      {/* Botão para criar evento */}
+      
       <TouchableOpacity
         style={styles.botaoCriar}
         onPress={() => navigation.navigate('CriarEvento')}
       >
-        <Text style={styles.textoBotao}>Adicionar Evento</Text>
+        <Text style={styles.textoBotao}>Criar Evento</Text>
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.scroll}>
         {eventos.map((evento) => (
           <View key={evento.id} style={styles.cardContainer}>
-            {/* Botão editar */}
-            <TouchableOpacity
-              style={styles.editIcon}
-              onPress={() => navigation.navigate('EditarEvento', { evento })}
-            >
-              <Image
-                source={require('../../img/Profile_Active.png')}
-                style={styles.editImage}
-              />
+            
+            <TouchableOpacity style={styles.editIcon} onPress={() => navigation.navigate('EditarEvento', { evento })}>
+              <Ionicons name="create-outline" size={20} color="#555" />
             </TouchableOpacity>
 
-            {/* Evento inteiro é clicável para detalhes */}
             <TouchableOpacity
               onPress={() => navigation.navigate('EventoDetalheAdm', { evento })}
             >
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f1f1f1',
-    paddingTop: 50,
+    paddingTop: 20,
   },
   scroll: {
     paddingBottom: 120,
@@ -131,4 +134,3 @@ const styles = StyleSheet.create({
     tintColor: '#555',
   },
 });
-    
