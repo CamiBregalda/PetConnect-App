@@ -64,7 +64,6 @@ function HomeScreen() {
           fetch(`http://${urlIp}:3000/abrigos/`),
           fetch(`http://${urlIp}:3000/eventos/`),
         ]);
-
         const errorDetails = [];
         if (!animaisResponse.ok) errorDetails.push(`Animais: ${animaisResponse.status}`);
         if (!abrigosResponse.ok) errorDetails.push(`Abrigos: ${abrigosResponse.status}`);

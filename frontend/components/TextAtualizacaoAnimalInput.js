@@ -31,7 +31,7 @@ const TextAtualizacaoAnimalInput = (
                 setListaRacas([]);
                 return;
             }
-            const response = await fetch(`http://192.168.3.5:3000/especies/${especieSelecionada}/racas`);
+            const response = await fetch(`http://${urlIp}:3000/especies/${especieSelecionada}/racas`);
             if (!response.ok) throw new Error('Erro ao buscar raças');
             const data = await response.json();
             setListaRacas(data);
@@ -43,7 +43,7 @@ const TextAtualizacaoAnimalInput = (
     React.useEffect(() => {
         const fetchEspecies = async () => {
             try {
-                const response = await fetch('http://192.168.3.5:3000/especies');
+                const response = await fetch('http://${urlIp}:3000/especies');
                 if (!response.ok) throw new Error('Erro ao buscar espécies');
                 const data = await response.json();
                 setListaEspecies(data);
@@ -54,7 +54,7 @@ const TextAtualizacaoAnimalInput = (
 
         const fetchPorte = async () => {
             try {
-                const response = await fetch('http://192.168.3.5:3000/portes');
+                const response = await fetch('http://${urlIp}:3000/portes');
                 if (!response.ok) throw new Error('Erro ao buscar portes');
                 const data = await response.json();
                 setListaPorte(data);
