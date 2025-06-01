@@ -1,36 +1,28 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView, params } from 'react-native';
+import { View, Image, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+// Removido WebView daqui, pois será usado no AbrigoMapView
 import { useNavigation } from '@react-navigation/native';
-import { WebView } from 'react-native-webview';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
+import MapView from './../../components/MapView'; 
 
 function HomeAdm({ route }) {
-  
-  const { userId, abrigoId } = route.params || {}; // Safe access
+  const { userId, abrigoId } = route.params || {};
   console.log('HomeAdm userId:', userId, 'abrigoId:', abrigoId);
-  // ... rest of your component
 
   const [abrigoInfo, setAbrigoInfo] = useState(null);
-  const [adminInfo, setAdminInfo] = useState(null); // Novo estado para as informações do administrador
+  const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
   const { setCurrentAbrigoId } = useContext(AbrigoContext);
-  const htmlContent = `
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3594.9931725897354!2d-53.10019272460145!3d-25.704650077387758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94f048f00dd26185%3A0x3965e767d865130a!2sUTFPR%20-%20Dois%20Vizinhos!5e0!3m2!1spt-BR!2sbr!4v1745415525946!5m2!1spt-BR!2sbr"
-      width="960"
-      height="600"
-      style="border:0;"
-      allowfullscreen="" loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
-  `;
 
   useEffect(() => {
+
     const buscarInfoAbrigo = async () => {
       setLoading(true);
       setError(null);
+      // setMapCoordinates(null); // Não é mais necessário aqui
       try {
         if (abrigoId) {
           const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
@@ -46,26 +38,31 @@ function HomeAdm({ route }) {
           setCurrentAbrigoId(data.id);
           navigation.setOptions({ title: data.nome });
 
+          // A lógica de geocodificação e mapa será tratada pelo AbrigoMapView
+          // que receberá data.endereco como prop.
+
           if (data.idAdmAbrigo) {
-            buscarInfoAdmin(data.idAdmAbrigo);
+            await buscarInfoAdmin(data.idAdmAbrigo);
           } else {
-            setLoading(false);
+             setLoading(false); // Se não houver admin para buscar, para o loading aqui
           }
         } else {
-          setLoading(false);
+          setError("ID do abrigo não fornecido.");
           navigation.setOptions({ title: 'Abrigo' });
+          setLoading(false);
         }
       } catch (err) {
         console.error('Erro ao buscar informações do abrigo:', err);
         setError(err.message);
-        setLoading(false);
         navigation.setOptions({ title: 'Erro no Abrigo' });
+        setLoading(false);
       }
+      // setLoading(false) é chamado no finally de buscarInfoAdmin ou se não houver admin
     };
 
     const buscarInfoAdmin = async (idAdmAbrigo) => {
       try {
-        const adminApiUrl = `http://${urlIp}:3000/admAbrigo/${idAdmAbrigo}`; 
+        const adminApiUrl = `http://${urlIp}:3000/admAbrigo/${idAdmAbrigo}`;
         const adminResponse = await fetch(adminApiUrl);
 
         if (!adminResponse.ok) {
@@ -73,7 +70,6 @@ function HomeAdm({ route }) {
           console.error(`Erro ao buscar informações do administrador: ${adminResponse.status} - ${errorData.message || 'Erro desconhecido'}`);
           return;
         }
-
         const adminData = await adminResponse.json();
         setAdminInfo(adminData);
       } catch (err) {
@@ -84,164 +80,222 @@ function HomeAdm({ route }) {
     };
 
     buscarInfoAbrigo();
-  }, [navigation, abrigoId, setCurrentAbrigoId]);
+  }, [navigation, abrigoId, setCurrentAbrigoId, urlIp]);
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.containerLoadingError}>
         <ActivityIndicator size="large" color="#8A2BE2" />
       </View>
     );
   }
 
-  if (error) {
+  if (error && !abrigoInfo) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Erro ao carregar informações do abrigo: {error}</Text>
+      <View style={styles.containerLoadingError}>
+        <Text style={styles.errorText}>Erro: {error}</Text>
       </View>
     );
   }
 
   if (abrigoInfo) {
+    // Removida a lógica de mapaHtmlContent daqui
+
+    let enderecoCompletoParaExibir = "Endereço não fornecido";
+    if (abrigoInfo.endereco && typeof abrigoInfo.endereco === 'object') {
+      const { rua, numero, bairro, cidade, estado, cep } = abrigoInfo.endereco;
+      enderecoCompletoParaExibir = `${rua || ''}${numero ? ', ' + numero : ''}${bairro ? ' - ' + bairro : ''}\n${cidade || ''}${estado ? ' - ' + estado : ''}\n${cep ? 'CEP: ' + cep : ''}`.replace(/ ,|, \n|\n,/g, '\n').trim();
+    } else if (typeof abrigoInfo.endereco === 'string') { // Caso o endereço seja uma string simples
+         enderecoCompletoParaExibir = abrigoInfo.endereco;
+    }
+
+
     return (
       <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           <View>
-          <Image 
-            source={{ uri: `http://${urlIp}:3000/abrigos/${abrigoInfo.id}/imagem` }} 
-            style={styles.imgPerfil} />
+            <Image
+              source={{ uri: `http://${urlIp}:3000/abrigos/${abrigoInfo.id}/imagem` }}
+              style={styles.imgPerfil}
+              onError={(e) => console.log("Erro ao carregar imagem do abrigo:", e.nativeEvent.error)}
+            />
           </View>
+          {/* Mostra erros secundários (ex: falha ao buscar admin) como aviso se abrigoInfo carregou */}
+          {error && <Text style={styles.errorTextWarning}>Aviso: {error}</Text>}
+
           <View style={styles.about}>
             <Text style={styles.title}>Sobre o Abrigo: </Text>
-            <Text style={styles.descricao}>{abrigoInfo.descricao}</Text>
+            <Text style={styles.descricao}>{abrigoInfo.descricao || "Descrição não disponível."}</Text>
           </View>
 
           <View style={styles.mapa}>
             <Text style={styles.title}>Endereço:</Text>
+            <Text style={styles.enderecoTexto}>{enderecoCompletoParaExibir}</Text>
             <View style={styles.mapContainer}>
-              <WebView
-                style={styles.webView}
-                originWhitelist={['*']}
-                source={{ html: htmlContent }}
-              />
+              {/* Usa o novo componente AbrigoMapView */}
+              {abrigoInfo.endereco ? (
+                <MapView enderecoAbrigo={abrigoInfo.endereco} />
+              ) : (
+                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                  <Text>Endereço não disponível para exibir o mapa.</Text>
+                </View>
+              )}
             </View>
           </View>
 
-          {adminInfo && ( // Use o estado adminInfo para renderizar as informações do administrador
+          {adminInfo && (
             <View style={styles.aboutADM}>
-            <Text style={styles.title}>Sobre o Adiministrador: </Text>
-            <View style={styles.sobre}>
-              <View style={styles.infoAdm}>
-                <Image
-                source={{ uri: `http://${urlIp}:3000/admAbrigo/${adminInfo.id}/imagem` }}
-                style={styles.imgADM}
-              />
-                <Text style={styles.nomeAdm}>{adminInfo.nome}</Text>
-                <Text style={styles.descricao}>{adminInfo?.descricao}</Text>
+              <Text style={styles.title}>Sobre o Administrador: </Text>
+              <View style={styles.sobre}>
+                <View style={styles.infoAdm}>
+                  {adminInfo.id && (
+                    <Image
+                      source={{ uri: `http://${urlIp}:3000/admAbrigo/${adminInfo.id}/imagem` }}
+                      style={styles.imgADM}
+                      onError={(e) => console.log("Erro ao carregar imagem do admin:", e.nativeEvent.error)}
+                    />
+                  )}
+                  <Text style={styles.nomeAdm}>{adminInfo.nome || "Nome não disponível"}</Text>
+                  <Text style={styles.descricao}>{adminInfo.descricao || "Descrição não disponível."}</Text>
+                </View>
               </View>
-              
             </View>
-          </View>
           )}
         </View>
       </ScrollView>
     );
   }
+  return (
+    <View style={styles.containerLoadingError}>
+      <Text>Nenhuma informação do abrigo para exibir.</Text>
+    </View>
+  );
 }
 
+// Seus estilos permanecem aqui (ajuste o path do import do AbrigoMapView se necessário)
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
+    backgroundColor: '#f0f0f0',
   },
   container: {
+    flexGrow: 1,
+    padding: 20,
+    alignItems: 'center',
+  },
+  containerLoadingError: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
     backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    paddingTop: 20,
-    justifyContent: 'center',
   },
   imgPerfil: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: 'purple',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
+    color: '#333',
   },
-  descricao:{
-    fontSize: 17,
+  descricao: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'justify',
+    lineHeight: 22,
   },
   about: {
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 20,
     backgroundColor: 'white',
-    width: 320,
-    minHeight: 130,
-    padding: 10,
-    borderRadius: 15,
-    
+    width: '100%',
+    maxWidth: 350,
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.20,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   mapa: {
     justifyContent: 'center',
     backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 10,
-  },
-  mapContainer: {
-    width: '300',
-    height: '190',
     borderRadius: 10,
-    overflow: 'hidden',
-  },
-  aboutADM: {
-    marginTop: 20,
+    padding: 15,
     marginBottom: 20,
-    width: 320,
-    borderRadius: 15,
-    padding: 10,
+    width: '100%',
+    maxWidth: 350,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.20,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  enderecoTexto: {
+    fontSize: 15,
+    color: '#444',
+    textAlign: 'center',
+    marginBottom: 10,
+    lineHeight: 20,
+  },
+  mapContainer: { // Este container agora envolve o AbrigoMapView
+    width: '100%',
+    height: 200, // Defina a altura desejada para o mapa
+    borderRadius: 8,
+    overflow: 'hidden', // Importante para o borderRadius do WebView funcionar
+    backgroundColor: '#e0e0e0', // Placeholder enquanto o mapa carrega
+  },
+  // Removido styles.webView pois está dentro de AbrigoMapView.js
+  aboutADM: {
+    marginTop: 10,
+    marginBottom: 20,
+    width: '100%',
+    maxWidth: 350,
+    borderRadius: 10,
+    padding: 15,
     backgroundColor: 'white',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.20,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   sobre: {
-    width: 310,
-    padding: 20,
-    borderRadius: 15,
-
-
-    justifyContent: 'space-between', // Opcional: espaça nome/descrição e imagem
+    width: '100%',
+    alignItems: 'center',
   },
   infoAdm: {
-    flexDirection: 'column',
-    marginRight: 10, // Opcional: Espaço entre texto e imagem
+    alignItems: 'center',
   },
   nomeAdm: {
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 20,
+    color: '#333',
+    marginTop: 10,
   },
   imgADM: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    marginBottom: 20,
-
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    marginBottom: 10,
+    backgroundColor: '#e0e0e0',
   },
   errorText: {
     color: 'red',
-    fontSize: 22,
+    fontSize: 16,
     textAlign: 'center',
   },
-  button: {
-    backgroundColor: '#8A2BE2',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  errorTextWarning: {
+    color: 'orange',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
 

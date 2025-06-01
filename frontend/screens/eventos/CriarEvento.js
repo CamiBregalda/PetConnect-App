@@ -26,7 +26,7 @@ export default function CriarEvento() {
 
   return (
     <View style={styles.container}>
-      {/* Voltar */}
+      
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
         <Ionicons name="arrow-back" size={28} color="#222" />
       </TouchableOpacity>

@@ -2,13 +2,15 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
+import TelaFiltro from '../../components/TelaFiltro'; // Importa o componente do modal de filtro
+
+// Não é mais necessário importar Enums aqui, pois TelaFiltro cuidará disso
+// import { EspecieEnum, PorteEnum } from '../../src/models/enums';
 
 function HomeScreen() {
   const route = useRoute();
-  const userId = route.params?.userId; // Este é o userId da TelaPrincipal
+  const telaPrincipalUserId = route.params?.userId;
   const navigation = useNavigation();
-  const telaPrincipalUserId = route.params?.userId; // Este é o userId da TelaPrincipal
-  console.log('TelaPrincipal userId:', telaPrincipalUserId);
 
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
@@ -17,34 +19,40 @@ function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    especie: null,
+    raca: null,
+    porte: null,
+  });
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      title: '',
+      title: '', // Pode ser 'PetConnect' ou um logo
       headerTitleAlign: 'center',
       headerStyle: {
         backgroundColor: '#8A2BE2',
       },
       headerTintColor: 'white',
-
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Image
-            source={require('../../img/logout.png')}
+            source={require('../../img/logout.png')} // Certifique-se que o caminho está correto
             style={styles.headerLogoutIcon}
           />
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TouchableOpacity onPress={() => exibirDetalhesUsuario(userId)}>
+        <TouchableOpacity onPress={() => exibirDetalhesUsuario(telaPrincipalUserId)}>
           <Image
-            source={require('../../img/Profile_Active.png')}
+            source={require('../../img/Profile_Active.png')} // Certifique-se que o caminho está correto
             style={styles.headerProfileIcon}
           />
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, telaPrincipalUserId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,12 +65,13 @@ function HomeScreen() {
           fetch(`http://${urlIp}:3000/eventos/`),
         ]);
 
-        if (!animaisResponse.ok || !abrigosResponse.ok) {
-          const errorDetails = [];
-          if (!animaisResponse.ok) errorDetails.push(`Erro ao buscar animais: ${animaisResponse.status}`);
-          if (!abrigosResponse.ok) errorDetails.push(`Erro ao buscar abrigos: ${abrigosResponse.status}`);
-           if (!eventosResponse.ok) errorDetails.push(`Erro ao buscar eventos: ${eventosResponse.status}`);
-          throw new Error(errorDetails.join('\n'));
+        const errorDetails = [];
+        if (!animaisResponse.ok) errorDetails.push(`Animais: ${animaisResponse.status}`);
+        if (!abrigosResponse.ok) errorDetails.push(`Abrigos: ${abrigosResponse.status}`);
+        if (!eventosResponse.ok) errorDetails.push(`Eventos: ${eventosResponse.status}`);
+
+        if (errorDetails.length > 0) {
+          throw new Error(errorDetails.join(', '));
         }
 
         const animaisData = await animaisResponse.json();
@@ -71,11 +80,11 @@ function HomeScreen() {
 
         setAnimais(animaisData);
         setAbrigos(abrigosData);
-         setEventos(eventosData);
-        setLoading(false);
+        setEventos(eventosData);
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
-        setError(err.message);
+        setError(`Falha ao carregar dados: ${err.message}`);
+      } finally {
         setLoading(false);
       }
     };
@@ -84,129 +93,137 @@ function HomeScreen() {
   }, []);
 
   const exibirDetalhesAnimal = (animal) => {
-    console.log(`ID do Dono (Abrigo): ${animal.idDono}`);
-    navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal });
+    navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal, userId: telaPrincipalUserId });
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {
-    // Pass both abrigoId and the userId from TelaPrincipal
-    navigation.navigate('Main', { // Route name is 'Main'
-      screen: 'Home',             // Target screen within 'Main'
-      params: {                   // These are the params for the 'Home' screen within 'Main'
-        abrigoId: idDoAbrigo,
-        userId: telaPrincipalUserId
-      }
+    navigation.navigate('Main', {
+      screen: 'Home', // Supondo que 'Home' seja a rota para HomeAdm
+      params: { abrigoId: idDoAbrigo, userId: telaPrincipalUserId }
     });
   };
 
-  const exibirDetalhesUsuario = (userId) => { // Renamed to avoid confusion
-    console.log('ID do usuário para perfil:', userId);
+  const exibirDetalhesUsuario = (userId) => {
     navigation.navigate('InicialUser', { userId: userId });
   };
 
   const exibirDetalhesEvento = (evento) => {
-    // Ajuste a rota e os parâmetros conforme sua tela de detalhes do evento
-    // Se o usuário for admin, pode ir para EventoDetalheAdm, senão para EventoDetalhe
-    // Aqui, vamos assumir uma navegação genérica para 'EventoDetalhe'
-    // Você pode adicionar lógica para verificar se o usuário é admin e navegar para 'EventoDetalheAdm'
-    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento });
+    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento, userId: telaPrincipalUserId });
   };
 
   const handleSearch = (text) => {
     setSearchTerm(text);
   };
 
-  const animaisFiltrados = animais.filter(animal =>
-    animal.nome.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleApplyAdvancedFilters = (filtersFromModal) => {
+    setActiveFilters(filtersFromModal);
+    // A filtragem da lista de animais ocorrerá automaticamente pois `animaisFiltrados` depende de `activeFilters`
+  };
+
+  const animaisFiltrados = animais.filter(animal => {
+    const nomeMatch = animal.nome ? animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+    const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
+    const racaMatch = activeFilters.raca ? animal.raca === activeFilters.raca : true;
+    const porteMatch = activeFilters.porte ? animal.porte === activeFilters.porte : true;
+    const disponivelMatch = animal.disponivelAdocao === true || animal.disponivelAdocao === undefined;
+
+    return nomeMatch && especieMatch && racaMatch && porteMatch && disponivelMatch;
+  });
 
   const abrigosFiltrados = abrigos.filter(abrigo =>
-    abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    abrigo.nome ? abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 
-const eventosFiltrados = eventos.filter(evento =>
-    evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  const eventosFiltrados = eventos.filter(evento =>
+    evento.nome ? evento.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 
   if (loading) {
-    return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
+    return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
   }
 
   if (error) {
-    return <View style={styles.container}><Text style={styles.errorText}>Erro ao carregar dados: {error}</Text></View>;
+    return <View style={styles.errorContainer}><Text style={styles.errorText}>{error}</Text></View>;
   }
 
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>O que você procura hoje?</Text>
 
-      {/* 🔘 Botão para acessar a tela EventosAdm */}
+      {/* Botão de Gerenciar Eventos (Admin) - Mantenha se necessário */}
       <TouchableOpacity
         style={styles.botaoEventosAdm}
-        onPress={() => navigation.navigate('EventosAdm')}
+        onPress={() => navigation.navigate('EventosAdm', { userId: telaPrincipalUserId })}
       >
-        <Text style={styles.botaoEventosAdmTexto}>Ver Eventos do Admin</Text>
+        <Text style={styles.botaoEventosAdmTexto}>Gerenciar Eventos (Admin)</Text>
       </TouchableOpacity>
 
-      <View style={styles.searchBarContainer}>
+      <View style={styles.searchAndFilterContainer}>
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar por nome..."
           value={searchTerm}
           onChangeText={handleSearch}
         />
+        <TouchableOpacity onPress={() => setFilterModalVisible(true)} style={styles.filterIconContainer}>
+           <Image source={require('../../img/Filtro.png')} style={styles.filterIcon} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Animais para Adoção</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {animaisFiltrados.map((animal) => (
+          {animaisFiltrados.length > 0 ? animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
                 source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem` }}
-                style={styles.listImage} />
+                style={styles.listImage}
+                onError={(e) => console.log('Erro img animal:', e.nativeEvent.error)}
+              />
               <Text style={styles.listItemText}>{animal.nome}</Text>
             </TouchableOpacity>
-          ))}
-          {animaisFiltrados.length === 0 && <Text>Nenhum animal encontrado com esse nome.</Text>}
+          )) : <Text style={styles.notFoundText}>Nenhum animal encontrado.</Text>}
         </ScrollView>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Abrigos</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {abrigosFiltrados.map((abrigo) => (
+          {abrigosFiltrados.length > 0 ? abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
               <Image
                 source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
-                style={styles.listImage} />
+                style={styles.listImage}
+                onError={(e) => console.log('Erro img abrigo:', e.nativeEvent.error)}
+              />
               <Text style={styles.listItemText}>{abrigo.nome}</Text>
             </TouchableOpacity>
-          ))}
-          {abrigosFiltrados.length === 0 && <Text>Nenhum abrigo encontrado com esse nome.</Text>}
-        </ScrollView>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Próximos Eventos</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {eventosFiltrados.map((evento) => (
-            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
-              {/* Assumindo que seu evento tem um campo 'imagemUrl' ou similar.
-                  Se for um caminho local, use require().
-                  Se for uma URL completa do backend, use uri.
-                  Se o backend serve a imagem em um endpoint específico como /eventos/:id/imagem: */}
-              <Image
-                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem` }} // Ajuste este endpoint
-                style={styles.listImage}
-                onError={(e) => console.log('Erro ao carregar imagem do evento:', e.nativeEvent.error)} // Para debug
-              />
-              <Text style={styles.listItemText}>{evento.nome}</Text>
-            </TouchableOpacity>
-          ))}
-          {eventosFiltrados.length === 0 && searchTerm.length > 0 && <Text style={styles.notFoundText}>Nenhum evento encontrado.</Text>}
+          )) : <Text style={styles.notFoundText}>Nenhum abrigo encontrado.</Text>}
         </ScrollView>
       </View>
 
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Próximos Eventos</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {eventosFiltrados.length > 0 ? eventosFiltrados.map((evento) => (
+            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
+              <Image
+                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem` }}
+                style={styles.listImage}
+                onError={(e) => console.log('Erro img evento:', e.nativeEvent.error)}
+              />
+              <Text style={styles.listItemText}>{evento.nome}</Text>
+            </TouchableOpacity>
+          )) : <Text style={styles.notFoundText}>Nenhum evento encontrado.</Text>}
+        </ScrollView>
+      </View>
+
+      <TelaFiltro
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        onApplyFilters={handleApplyAdvancedFilters}
+        currentFilters={activeFilters} // Passa os filtros ativos para o modal
+      />
     </ScrollView>
   );
 }
@@ -215,92 +232,166 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
+    paddingBottom: 20, // Espaço no final da rolagem
+  },
+  loadingContainer: { // Estilo para centralizar o ActivityIndicator
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  errorContainer: { // Estilo para centralizar a mensagem de erro
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f0f0f0',
   },
   headerLogoutIcon: {
     width: 28,
     height: 28,
     marginLeft: 15,
+    tintColor: 'white',
   },
   headerProfileIcon: {
-    width: 28,
-    height: 28,
+    width: 30,
+    height: 30,
     marginRight: 15,
+    // tintColor: 'white', // Se a imagem do perfil precisar de tint
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#333',
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 25,
+    marginBottom: 25,
   },
   botaoEventosAdm: {
-    backgroundColor: '#9333ea',
+    backgroundColor: '#8A2BE2',
     marginHorizontal: 20,
-    marginBottom: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
+    marginBottom: 25,
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   botaoEventosAdmTexto: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 16,
   },
-  searchBarContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 10,
+  searchAndFilterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 25,
+    paddingHorizontal: 15,
   },
   searchInput: {
-    height: 40,
-    borderColor: 'gray',
+    flex: 1,
+    height: 45,
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 10,
-    paddingLeft: 10,
+    borderRadius: 25,
+    paddingLeft: 20,
+    paddingRight: 15, // Ajustado
     backgroundColor: 'white',
+    fontSize: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  filterIconContainer: {
+    padding: 10,
+    marginLeft: 10,
+    borderRadius: 20, // Para um visual mais arredondado se usar ícone
+    // backgroundColor: '#e0e0e0', // Fundo opcional para o botão de filtro
+  },
+  filterIconText: {
+    fontSize: 14,
+    color: '#333', // Cor do texto do filtro
+    fontWeight: '600',
+  },
+  filterIcon: { // Se você usar uma imagem de ícone
+    width: 24,
+    height: 24,
+    tintColor: '#333',
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 25,
     backgroundColor: "white",
-    padding: 20,
-    borderRadius: 15,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingTop: 15,
+    paddingBottom: 10,
+    marginHorizontal: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: 'black',
+    marginBottom: 15,
+    color: '#333',
   },
   listItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    marginRight: 15,
+    marginRight: 12,
     alignItems: 'center',
-    justifyContent: 'center',
-    width: 150,
-    height: 150,
+    width: 160,
+    height: 200,
+    backgroundColor: 'white',
+    padding: 10,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    justifyContent: 'flex-start',
+  },
+  listImage: {
+    width: '100%',
+    height: 110,
+    borderRadius: 8,
+    marginBottom: 10,
+    resizeMode: 'cover',
+    backgroundColor: '#e0e0e0', // Placeholder visual
   },
   listItemText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 5,
+    fontSize: 15,
+    fontWeight: '600',
     textAlign: 'center',
-    color: "#8A2BE2",
+    color: "#8A2BE2", // Cor roxa para o nome
+  },
+  listItemSubText: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: "#666",
+    marginTop: 4,
   },
   errorText: {
     color: 'red',
     fontSize: 16,
     textAlign: 'center',
-    marginTop: 20,
+    paddingHorizontal: 20,
   },
-  listImage: {
-    width: 130,
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 0,
-    resizeMode: 'cover',
-  },
+  notFoundText: {
+    // marginLeft: 10, // Removido para centralizar melhor
+    marginTop: 10,
+    color: '#666',
+    fontStyle: 'italic',
+    paddingHorizontal: 10,
+    width: 150, // Para ter uma largura definida no scroll horizontal
+    textAlign: 'center', // Centraliza o texto
+    alignSelf: 'center', // Centraliza o componente Text dentro do ScrollView
+    flex: 1, // Para ocupar o espaço disponível se for o único item
+  }
 });
 
 export default HomeScreen;

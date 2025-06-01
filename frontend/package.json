@@ -22,6 +22,7 @@
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-dotenv": "^3.4.11",
+    "react-native-maps": "^1.23.8",
     "react-native-webview": "^13.13.5"
   },
   "devDependencies": {
