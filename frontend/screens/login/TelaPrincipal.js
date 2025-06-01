@@ -61,7 +61,7 @@ function HomeScreen() {
           const errorDetails = [];
           if (!animaisResponse.ok) errorDetails.push(`Erro ao buscar animais: ${animaisResponse.status}`);
           if (!abrigosResponse.ok) errorDetails.push(`Erro ao buscar abrigos: ${abrigosResponse.status}`);
-           if (!eventosResponse.ok) errorDetails.push(`Erro ao buscar eventos: ${eventosResponse.status}`);
+          if (!eventosResponse.ok) errorDetails.push(`Erro ao buscar eventos: ${eventosResponse.status}`);
           throw new Error(errorDetails.join('\n'));
         }
 
@@ -71,7 +71,7 @@ function HomeScreen() {
 
         setAnimais(animaisData);
         setAbrigos(abrigosData);
-         setEventos(eventosData);
+        setEventos(eventosData);
         setLoading(false);
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
@@ -117,15 +117,15 @@ function HomeScreen() {
   };
 
   const animaisFiltrados = animais.filter(animal =>
-    animal.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    animal.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const abrigosFiltrados = abrigos.filter(abrigo =>
-    abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    abrigo.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
 const eventosFiltrados = eventos.filter(evento =>
-    evento.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    evento.nome?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
