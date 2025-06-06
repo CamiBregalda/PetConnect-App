@@ -11,6 +11,8 @@ function HomeScreen() {
   const route = useRoute();
   const telaPrincipalUserId = route.params?.userId;
   const navigation = useNavigation();
+  const userId = telaPrincipalUserId;
+  console.log('HomeScreen - userId from route.params:', userId);
 
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
@@ -96,8 +98,9 @@ function HomeScreen() {
   };
 
   const exibirDetalhesAbrigo = (idDoAbrigo) => {
+    console.log('TelaPrincipal - Saindo com userId:', telaPrincipalUserId, 'para abrigoId:', idDoAbrigo); // Modifiquei o log para clareza
     navigation.navigate('Main', {
-      screen: 'Home', // Supondo que 'Home' seja a rota para HomeAdm
+      screen: 'Home', 
       params: { abrigoId: idDoAbrigo, userId: telaPrincipalUserId }
     });
   };

@@ -1,24 +1,30 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, Image, TouchableOpacity } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'; // Adicionado useRoute
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 
-function AnimaisAdm() {
+function AnimaisAdm() { // Removido route como prop
   const navigation = useNavigation();
+  const route = useRoute(); // Hook para acessar os parâmetros da rota
+  const { userId } = route.params || {}; // Acessa userId passado via initialParams
+  console.log('AnimaisAdm - userId from route.params:', userId);
+
   const { currentAbrigoId } = useContext(AbrigoContext);
   const [todosAnimais, setTodosAnimais] = useState([]);
-  const [abrigoInfo, setAbrigoInfo] = useState(null); // Novo estado para as informações do abrigo
+  const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const buscarDados = useCallback(async () => {
+    console.log('AnimaisAdm buscarDados - currentAbrigoId:', currentAbrigoId, 'userId:', userId);
     setLoading(true);
     setError(null);
     try {
+      // Adapte as URLs se precisarem do userId
       const [animaisResponse, abrigoResponse] = await Promise.all([
-        fetch(`http://${urlIp}:3000/animais/`),
-        fetch(`http://${urlIp}:3000/abrigos/${currentAbrigoId}`), // Busca as informações do abrigo
+        fetch(`http://${urlIp}:3000/animais/`), // Esta rota busca todos, depois filtramos. OK.
+        fetch(`http://${urlIp}:3000/abrigos/${currentAbrigoId}`),
       ]);
 
       if (!animaisResponse.ok || !abrigoResponse.ok) {
@@ -32,16 +38,16 @@ function AnimaisAdm() {
       const abrigoData = await abrigoResponse.json();
 
       setTodosAnimais(animaisData);
-      setAbrigoInfo(abrigoData); // Armazena as informações do abrigo
+      setAbrigoInfo(abrigoData);
       setLoading(false);
-      navigation.setOptions({ title: abrigoData?.nome || 'Animais do Abrigo' }); // Define o título com o nome do abrigo
+      navigation.setOptions({ title: abrigoData?.nome || 'Animais do Abrigo' });
     } catch (err) {
       console.error('Erro ao buscar dados:', err);
       setError(err.message);
       setLoading(false);
       navigation.setOptions({ title: 'Erro ao Carregar' });
     }
-  }, [currentAbrigoId, navigation]);
+  }, [currentAbrigoId, navigation, userId]);
 
   const animaisDoAbrigo = React.useMemo(() => {
     if (currentAbrigoId && todosAnimais.length > 0) {
@@ -51,7 +57,9 @@ function AnimaisAdm() {
   }, [todosAnimais, currentAbrigoId]);
 
   const exibirDetalhesAnimal = (animal) => {
-    navigation.navigate('PerfilAnimal', { animalId: animal.id });
+    // Passar userId para PerfilAnimal
+    navigation.navigate('PerfilAnimal', { animalId: animal.id, userId: userId, abrigoId: currentAbrigoId /* ou animal.idDono */ });
+    console.log('AnimaisAdm exibirDetalhesAnimal - animalId:', animal.id, 'userId:', userId);
   };
 
   useFocusEffect(
