@@ -29,8 +29,8 @@ export default function AnimaisUser() {
       setLoading(true);
       setError(null);
       try {
-        const respAdot = await fetch(`http://${urlIp}:3000/animais/adotados/${userId}`);
-        const respVolt = await fetch(`http://${urlIp}:3000/abrigos/voluntarios/${userId}`);
+        const respAdot = await fetch(`http://${urlIp}:3000/animais/usuario/${userId}`);
+        const respVolt = await fetch(`http://${urlIp}:3000/abrigos/usuario/${userId}`);
 
         const errorDetails = [];
         if (!respAdot.ok) errorDetails.push(`Adotados: ${respAdot.status}`);

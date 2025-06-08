@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import * as EventoService from "../services/eventoService";
 import EventoModel from "../models/Evento";
+import { validateImage } from '../utils/imageUtil';
+import { fileTypeFromBuffer } from 'file-type';
+import multer from "multer";
+
+const upload = multer();
 
 export const createEvento = async (req: Request, res: Response) => {
     try {
@@ -33,42 +38,23 @@ export const getEventoById = async (req: Request, res: Response) => {
 };
 
 export const updateEvento = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    console.log('ID recebido no backend:', id);
-
-    if (!id) {
-      console.error('ID do evento não fornecido');
-      return res.status(400).json({ error: 'ID do evento não fornecido' });
-    }
-
-    const updatedData = req.body;
-    console.log('Dados recebidos para atualização:', updatedData);
-
-    const evento = await EventoModel.findByIdAndUpdate(id, updatedData, { new: true });
-
-    if (!evento) {
-      console.error('Evento não encontrado');
-      return res.status(404).json({ error: 'Evento não encontrado' });
-    }
-
-    res.status(200).json(evento);
-  } catch (error) {
-    console.error('Erro ao atualizar evento:', error);
-    res.status(500).json({ error: 'Erro ao atualizar evento.' });
-  }
-};
-
-export const uploadEventoImagem = async (req: Request, res: Response) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'Nenhuma imagem foi enviada.' });
+        const eventoId = req.params.id;
+
+        if (!eventoId) {
+        return res.status(400).json({ error: 'ID do evento não fornecido' });
         }
 
-        res.status(200).json({ message: 'Imagem enviada com sucesso!' });
+        const updatedData = req.body;
+        const evento = await EventoService.updateEvento(eventoId, updatedData);
+
+        if (!evento) {
+        return res.status(404).json({ error: 'Evento não encontrado' });
+        }
+
+        res.status(200).json(evento);
     } catch (error) {
-        console.error('Erro ao processar upload de imagem:', error);
-        res.status(500).json({ error: 'Erro ao enviar a imagem.' });
+        res.status(500).json({ error: 'Erro ao atualizar evento.' });
     }
 };
 
@@ -87,5 +73,54 @@ export const getEventosByAbrigoId = async (req: Request, res: Response) => {
         res.status(200).json(eventos);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+export const uploadImage = [
+    upload.single('image'),
+    async (req: Request, res: Response) => {
+        try {
+            const eventoId = req.params.id;
+            validateImage(req.file);
+            const imageBuffer = req.file?.buffer;
+
+            if (!imageBuffer) {
+                return res.status(400).json({ message: 'Imagem não enviada' });
+            }
+
+            const evento = await EventoService.uploadImage(eventoId, imageBuffer);
+            return res.status(200).json(evento);
+        } catch (error: any) {
+            return res.status(500).json({ message: error.message });
+        }
+    }
+];
+
+export const getImage = async (req: Request, res: Response) => {
+    try {
+        const eventoId = req.params.id;
+        const image = await EventoService.getImage(eventoId);
+
+        const type = await fileTypeFromBuffer(image);
+
+        res.writeHead(200, {
+            'Content-Type': type?.mime || 'image/jpeg',
+            'Content-Length': image.length,
+        });
+        return res.end(image);
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteImage = async (req: Request, res: Response) => {
+    const eventoId = req.params.id;
+
+    try {
+        await EventoService.deleteImage(eventoId);
+
+        return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
     }
 };

@@ -9,7 +9,7 @@ export interface AbandonoAttributes {
     descricao: string;
     animalResgatado: boolean;
     idAbrigoResgatou?: Types.ObjectId;
-    images: Imagem[];
+    image?: Buffer;
     ativo: boolean; 
     createdAt?: Date;
     updatedAt?: Date;
@@ -22,7 +22,7 @@ const AbandonoSchema = new Schema<AbandonoAttributes>(
         descricao: { type: String, required: true },
         animalResgatado: { type: Boolean, required: true },
         idAbrigoResgatou: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: false },
-        images: [{ type: [ImagemSchema], default: [], required: false }],
+        image: { type: Buffer, required: false },
         ativo: { type: Boolean, required: false },
     },
     {

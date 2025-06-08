@@ -1,13 +1,20 @@
 import AbandonoModel from "../models/Abandono";
 import { AbandonoAttributes } from "../models/Abandono";
 import { Imagem } from "../models/Imagem";
+import * as UsuarioService from "./userService";
+import { AbandonoComUsuarioResponse } from "../models/responses/AbandonoComUsuarioResponse";
 
 export const createAbandono = async (data: AbandonoAttributes) => {
     try {
+        const usuario = await UsuarioService.getUserByEmail(data.emailUser);
+        if (!usuario) {
+            throw new Error("Usuário não encontrado");
+        }
+
         const abandono = new AbandonoModel(data);
         abandono.ativo = true;
         await abandono.save();
-        return abandono;
+        return AbandonoComUsuarioResponse.fromEntities(abandono, usuario);
     } catch (error: any) {
         throw new Error("Erro ao criar abandono: " + error.message);
     }
@@ -15,7 +22,17 @@ export const createAbandono = async (data: AbandonoAttributes) => {
 
 export const getAbandono = async () => {
     try {
-        return await AbandonoModel.find({ ativo: true }).select('-images');
+        const abandonos = await AbandonoModel.find({ ativo: true }).select('-images');
+
+        const responses = await Promise.all(abandonos.map(async (abandono) => {
+            const usuario = await UsuarioService.getUserByEmail(abandono.emailUser);
+            if (!usuario) {
+                throw new Error("Usuário não encontrado");
+            }
+            return AbandonoComUsuarioResponse.fromEntities(abandono, usuario);
+        }));
+
+        return responses;
     } catch (error: any) {
         throw new Error("Erro ao buscar abandono: " + error.message);
     }

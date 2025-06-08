@@ -26,8 +26,7 @@ export default function VoluntariosEvento() {
       setError(null);
 
      
-      const endpoint = `http://${urlIp}:3000/cuidadores/eventos/${eventoId}/voluntarios`;
-      console.log('Fetch de voluntários em:', endpoint);
+      const endpoint = `http://${urlIp}:3000/cuidadores/eventos/${eventoId}`;
 
       try {
         const response = await fetch(endpoint);

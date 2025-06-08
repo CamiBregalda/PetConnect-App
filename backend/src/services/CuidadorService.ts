@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import CuidadorModel, { CuidadorFactory } from "../models/Cuidador";
 import { CuidadorResponse } from "../models/responses/CuidadorResponse";
 import * as UserService from './userService';
-
+import * as EventoService from './eventoService';
 
 export const createCuidador = async (data: any) => {
     try {
@@ -89,14 +89,20 @@ export const getCuidadoresByAbrigoId = async (abrigoId: string) => {
     }
 };
 
-export const getVoluntariosPorEvento = async (eventoId: string) => {
+export const getCuidadoresByEventoId = async (eventoId: string) => {
     try {
-        return await CuidadorModel.find({ eventoId }).populate('userId');
-    } catch (error) {
-        throw new Error('Erro ao buscar voluntários por evento');
+        const evento = await EventoService.getEventoById(eventoId);
+        if (!evento || !evento.idAbrigo) {
+            throw new Error("Evento não encontrado ou sem abrigo associado");
+        }
+
+        const listCuidadores = await CuidadorModel.find({ abrigoId: evento.idAbrigo, ativo: true }).populate('userId');
+
+        return listCuidadores.map((cuidador) => CuidadorResponse.fromEntities(cuidador));
+    } catch (error: any) {
+        throw new Error("Erro ao buscar cuidadores do abrigo do evento: " + error.message);
     }
 };
-
 
 export const updateCuidador = async (id: string, updatedData: any) => {
     try {

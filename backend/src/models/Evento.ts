@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { Endereco, EnderecoSchema } from "./Endereco";
 
 export interface EventoAttributes extends Document {
   titulo: string;
@@ -6,14 +7,9 @@ export interface EventoAttributes extends Document {
   objetivo: string;
   dataInicio: string;
   dataFim: string;
-  endereco: {
-    rua: string;
-    numero: string;
-    bairro: string;
-    cidade: string;
-    estado: string;
-    cep: string;
-  };
+  endereco: Endereco;
+  idAbrigo: mongoose.Schema.Types.ObjectId;
+  image?: Buffer;
   imagemUrl?: string;
 }
 
@@ -24,16 +20,10 @@ const eventoSchema = new mongoose.Schema({
   objetivo:   { type: String, required: true },
   dataInicio: { type: Date,   required: true },
   dataFim:    { type: Date,   required: true },
-  endereco: {
-    rua:    { type: String, required: true },
-    numero: { type: String, required: true },
-    bairro: { type: String, required: true },
-    cidade: { type: String, required: true },
-    estado: { type: String, required: true },
-    cep:    { type: String, required: true },
-  },
-  idAbrigo: { type: mongoose.Schema.Types.ObjectId, ref: 'Abrigo', required: true },
-  ativo:    { type: Boolean, default: true },
+  endereco:   { type: EnderecoSchema, required: true },
+  idAbrigo:   { type: mongoose.Schema.Types.ObjectId, ref: 'Abrigo', required: true },
+  image:      { type: Buffer, required: false },
+  ativo:      { type: Boolean, default: true },
 }, {
   timestamps: true
 });

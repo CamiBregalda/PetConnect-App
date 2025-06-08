@@ -73,6 +73,24 @@ export const getAbrigoWithCuidadores = async (abrigoId: string) => {
     }
 };
 
+export const getAbrigosPorUsuario = async (userId: string) => {
+    try {
+        const abrigos = await AbrigoModel.find({ cuidadores: userId, ativo: true }).select('-image');
+        const abrigoAdm = await AdmDeAbrigoService.getAdmDeAbrigoByUserId(userId);
+        if (abrigoAdm && abrigoAdm.id) {
+            const abrigo = await getAbrigoByAdmId(abrigoAdm.id);
+            abrigos.push(abrigo);
+        }
+
+        if (!abrigos || abrigos.length === 0) {
+            throw new Error('Abrigos não encontrados');
+        }
+        return abrigos;
+    } catch (error: any) {
+        throw new Error('Erro ao buscar abrigos por usuário: ' + error.message);
+    }
+};
+
 export const updateAbrigo = async (id: string, updatedData: any) => {
     try {
         const updatedFields = Object.keys(updatedData).reduce((acc: any, key) => {

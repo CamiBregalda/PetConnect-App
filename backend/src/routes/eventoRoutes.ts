@@ -7,7 +7,9 @@ import {
     updateEvento,
     deleteEvento,
     getEventosByAbrigoId,
-    uploadEventoImagem
+    uploadImage,
+    getImage,
+    deleteImage
 } from '../controllers/eventoController';
 
 const router = Router();
@@ -19,6 +21,9 @@ router.get('/:id', getEventoById);
 router.put('/:id', updateEvento);
 router.delete('/:id', deleteEvento);
 router.get("/abrigo/:idAbrigo", getEventosByAbrigoId);
-router.post('/eventos/:id/imagem', upload.single('image'), uploadEventoImagem);
+
+router.post('/:id/imagem', uploadImage);
+router.get('/:id/imagem', getImage);
+router.delete('/:id/imagem', deleteImage);
 
 export default router;

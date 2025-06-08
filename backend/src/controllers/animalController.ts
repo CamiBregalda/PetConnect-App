@@ -37,6 +37,17 @@ export const getAnimalById = async (req: Request, res: Response) => {
     }
 };
 
+export const getAnimaisAdotadosPorUsuario = async (req: Request, res: Response) => {
+    try {
+        const userId = req.params.userId;
+        const adotados = await AnimalService.getAnimaisAdotadosPorUsuario(userId);
+        return res.json(adotados);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Erro interno' });
+    }
+};
+
 export const updateAnimal = async (req: Request, res: Response) => {
     try {
         const updatedAnimal = await AnimalService.updateAnimal(req.params.id, req.body);
@@ -54,17 +65,6 @@ export const deleteAnimal = async (req: Request, res: Response) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-export async function getAnimaisAdotadosPorUsuario(req: Request, res: Response) {
-  try {
-    const { userId } = req.params;
-    const adotados = await Animal.find({ adotadoPor: userId });
-    return res.json(adotados);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Erro interno' });
-  }
-}
 
 export const uploadImage = [
     upload.single('image'),
