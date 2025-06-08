@@ -19,7 +19,7 @@ router.put('/:id', updateAbandono);
 router.delete('/:id', deleteAbandono);
 
 router.post('/:id/imagem', addImage);
-router.get('/:id/imagem/:image', getImage);
-router.delete('/:id/imagem/:image', deleteImage);
+router.get('/:id/imagem', getImage);
+router.delete('/:id/imagem', deleteImage);
 
 export default router;

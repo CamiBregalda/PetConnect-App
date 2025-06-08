@@ -1,6 +1,5 @@
 import { Schema, model, Types } from "mongoose";
 import { Endereco, EnderecoSchema } from "./Endereco";
-import { Imagem, ImagemSchema } from "./Imagem";
 
 export interface AbandonoAttributes {
     id?: string;
@@ -10,7 +9,7 @@ export interface AbandonoAttributes {
     animalResgatado: boolean;
     idAbrigoResgatou?: Types.ObjectId;
     image?: Buffer;
-    ativo: boolean; 
+    ativo?: boolean; 
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -29,12 +28,12 @@ const AbandonoSchema = new Schema<AbandonoAttributes>(
         collection: "abandono",
         timestamps: true,
         toJSON: {
-        virtuals: true,
-        transform: (_, ret) => {
-            ret.id = ret._id;
-            delete ret._id;
-            delete ret.__v;
-        },
+            virtuals: true,
+            transform: (_, ret) => {
+                ret.id = ret._id;
+                delete ret._id;
+                delete ret.__v;
+            },
         },
     }
 );

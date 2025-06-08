@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import * as AbandonoService from "../services/abandonoService";
 import { validateImage } from '../utils/imageUtil';
-import { Imagem } from "../models/Imagem";
+import { fileTypeFromBuffer } from 'file-type';
 import multer from "multer";
 
 const upload = multer();
@@ -58,22 +58,16 @@ export const addImage = [
     upload.single('image'),
     async (req: Request, res: Response) => {
         try {
-            const userId = req.params.id;
+            const abandonoId = req.params.id;
             validateImage(req.file);
             const imageBuffer = req.file?.buffer;
-            const imageName = req.file?.originalname;
 
-            if (!imageBuffer || !imageName) {
+            if (!imageBuffer) {
                 return res.status(400).json({ message: 'Imagem não enviada' });
             }
 
-            const imagem: Imagem = {
-                name: imageName,
-                image: imageBuffer
-            };
-
-            const user = await AbandonoService.addImage(userId, imagem);
-            return res.status(200).json(user);
+            const abandono = await AbandonoService.addImage(abandonoId, imageBuffer);
+            return res.status(200).json(abandono);
         } catch (error: any) {
             return res.status(500).json({ message: error.message });
         }
@@ -82,13 +76,13 @@ export const addImage = [
 
 export const getImage = async (req: Request, res: Response) => {
     try {
-        const userId = req.params.id;
-        const imagem = req.params.image;
+        const abandonoId = req.params.id;
+        const image = await AbandonoService.getImage(abandonoId);
 
-        const image = await AbandonoService.getImage(userId, imagem);
+        const type = await fileTypeFromBuffer(image);
 
         res.writeHead(200, {
-            'Content-Type': 'image/jpeg',
+            'Content-Type': type?.mime || 'image/jpeg',
             'Content-Length': image.length,
         });
         return res.end(image);
@@ -98,11 +92,10 @@ export const getImage = async (req: Request, res: Response) => {
 };
 
 export const deleteImage = async (req: Request, res: Response) => {
-    const userId = req.params.id;
-    const imagem = req.params.image;
+    const abandonoId = req.params.id;
 
     try {
-        await AbandonoService.deleteImage(userId, imagem);
+        await AbandonoService.deleteImage(abandonoId);
 
         return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
     } catch (error: any) {
