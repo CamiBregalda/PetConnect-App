@@ -3,6 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
 import TextAtualizacaoAnimalInput from '../../components/TextAtualizacaoAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
+import { urlIp } from '@env';
 
 function AtualizarAnimalScreen() {
     const route = useRoute();
@@ -21,8 +22,6 @@ function AtualizarAnimalScreen() {
     const [deficiencias, onChangeDeficiencias] = React.useState(['']);
     const [vacinas, onChangeVacinas] = React.useState(['']);
     const [informacoes, onChangeInformacoes] = React.useState('');
-    const [idDono, onChangeIdDono] = React.useState(userId);
-    const [adotado, onChangeAdotado] = React.useState(false);
     const [imageUri, onChangeImageUri] = React.useState(null);
 
     useEffect(() => {
@@ -62,8 +61,6 @@ function AtualizarAnimalScreen() {
             onChangeDeficiencias(data.deficiencias);
             onChangeVacinas(data.vacinas);
             onChangeInformacoes(data.informacoes);
-            onChangeIdDono(data.idDono);
-            onChangeAdotado(data.adotado);
 
             const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`);
             if (responseImage.ok) {
@@ -137,9 +134,7 @@ function AtualizarAnimalScreen() {
         doencas: clearList(doencas),
         deficiencias: clearList(deficiencias),
         vacinas: clearList(vacinas),
-        informacoes: informacoes.trim(),
-        idDono: idDono,
-        adotado: adotado,
+        informacoes: informacoes.trim()
     };
 
     for (const key in bodyData) {
@@ -202,10 +197,6 @@ function AtualizarAnimalScreen() {
                 onChangeVacinas={onChangeVacinas}
                 informacoesAdicionais={informacoes}
                 onChangeInformacoesAdicionais={onChangeInformacoes}
-                adotado={adotado}
-                onChangeAdotado={onChangeAdotado}
-                idDono={idDono}
-                onChangeIdDono={onChangeIdDono}
             />
 
             <Pressable onPress={pickImage}>

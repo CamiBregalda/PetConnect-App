@@ -231,24 +231,6 @@ const TextAtualizacaoAnimalInput = (
                 multiline
                 numberOfLines={4}
             />
-
-            <View style={styles.containerInput}>
-                <Text style={styles.label}>Adotado:</Text>
-                <View style={[styles.inputSelect, { width: 205 }]}>
-                <Picker
-                    selectedValue={adotado}
-                    onValueChange={(itemValue) => onChangeAdotado(itemValue)}
-                    style={[
-                            styles.picker,
-                            { color: castrado === null ? '#808080' : '#000000' }
-                        ]}
-                >
-                    <Picker.Item label="Adotado" value={null} style={styles.pickerItem} />
-                        <Picker.Item label="Sim" value={true} style={styles.pickerItemValue} />
-                        <Picker.Item label="Não" value={false} style={styles.pickerItemValue} />
-                    </Picker>
-                </View>
-            </View>
         </View>
         </>
     );

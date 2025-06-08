@@ -79,6 +79,27 @@ export const updateAnimal = async (id: string, updatedData: any) => {
     }
 };
 
+export const updateAdocaoStatus = async (id: string, updatedData: any) => {
+    try {
+        const user = await UserService.getUserByEmail(updatedData.email);
+        if (!user) {
+            throw new Error("Usuário não encontrado");
+        }
+
+        const animal = await AnimalModel.findOne({ _id: id, ativo: true });
+        if (!animal) {
+            throw new Error("Animal não encontrado");
+        }
+
+        animal.idDono = user.id;
+        animal.adotado = true;
+        const updatedAnimal = await AnimalModel.findByIdAndUpdate(id, animal).select('-image');
+        return updatedAnimal;
+    } catch (error: any) {
+        throw new Error("Erro ao atualizar status de adoção: " + error.message);
+    }
+};
+
 export const deleteAnimal = async (id: string) => {
     try {
         const animal = await AnimalModel.findOne({ _id: id, ativo: true });

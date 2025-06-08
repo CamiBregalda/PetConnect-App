@@ -5,6 +5,7 @@ import {
     getAnimalById,
     getAnimaisAdotadosPorUsuario,
     updateAnimal,
+    updateAdocaoStatus,
     deleteAnimal,
     uploadImage,
     getImage,
@@ -19,6 +20,7 @@ router.get("/:id", getAnimalById);
 router.get('/usuario/:userId', getAnimaisAdotadosPorUsuario);
 router.put("/:id", updateAnimal);
 router.delete("/:id", deleteAnimal);
+router.put('/:id/adotado', updateAdocaoStatus);
 
 router.post('/:id/imagem', uploadImage);
 router.get('/:id/imagem', getImage);

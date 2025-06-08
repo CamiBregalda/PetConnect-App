@@ -3,6 +3,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import TextAtualizacaoAbrigoInput from '../../components/TextAtualizacaoAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
+import { urlIp } from '@env';
 
 function AtualizarAbrigoScreen() {
     const route = useRoute();
