@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as EventoService from "../services/eventoService";
+import EventoModel from "../models/Evento";
 
 export const createEvento = async (req: Request, res: Response) => {
     try {
@@ -32,11 +33,42 @@ export const getEventoById = async (req: Request, res: Response) => {
 };
 
 export const updateEvento = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    console.log('ID recebido no backend:', id);
+
+    if (!id) {
+      console.error('ID do evento não fornecido');
+      return res.status(400).json({ error: 'ID do evento não fornecido' });
+    }
+
+    const updatedData = req.body;
+    console.log('Dados recebidos para atualização:', updatedData);
+
+    const evento = await EventoModel.findByIdAndUpdate(id, updatedData, { new: true });
+
+    if (!evento) {
+      console.error('Evento não encontrado');
+      return res.status(404).json({ error: 'Evento não encontrado' });
+    }
+
+    res.status(200).json(evento);
+  } catch (error) {
+    console.error('Erro ao atualizar evento:', error);
+    res.status(500).json({ error: 'Erro ao atualizar evento.' });
+  }
+};
+
+export const uploadEventoImagem = async (req: Request, res: Response) => {
     try {
-        const updatedEvento = await EventoService.updateEvento(req.params.id, req.body);
-        res.status(200).json(updatedEvento);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        if (!req.file) {
+            return res.status(400).json({ error: 'Nenhuma imagem foi enviada.' });
+        }
+
+        res.status(200).json({ message: 'Imagem enviada com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao processar upload de imagem:', error);
+        res.status(500).json({ error: 'Erro ao enviar a imagem.' });
     }
 };
 

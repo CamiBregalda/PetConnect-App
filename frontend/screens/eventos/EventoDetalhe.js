@@ -1,66 +1,102 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useLayoutEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import MapView from './../../components/MapView'; 
 
-export default function EventoDetalhe() {
+export default function EventoDetalheUsuario() {
   const navigation = useNavigation();
   const route = useRoute();
   const { evento } = route.params;
 
+ 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: { backgroundColor: '#9333ea' },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold' },
+      headerTitleAlign: 'center',
+      title: evento.titulo || 'Detalhes do Evento',
+    });
+  }, [navigation, evento]);
+
+
+  const formatarData = data => {
+    if (!data) return 'Data não informada';
+    return new Date(data).toLocaleDateString('pt-BR');
+  };
+
+ 
+  const formatarEndereco = endereco => {
+    if (!endereco) return 'Endereço não informado';
+    const { rua, numero, bairro, cidade, estado, cep } = endereco;
+    return `${rua || ''}${numero ? ', ' + numero : ''}${
+      bairro ? ' - ' + bairro : ''
+    }, ${cidade || ''}${estado ? ' - ' + estado : ''}${
+      cep ? ' - CEP: ' + cep : ''
+    }`.trim();
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backText}>Voltar</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
+        <Ionicons name="arrow-back" size={28} color="#222" />
       </TouchableOpacity>
-
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Objetivo */}
+
         <View style={styles.card}>
-          <Text style={styles.label}>Objetivo do Evento:</Text>
-          <Text style={styles.text}>{evento.objetivo || 'Um Evento muito legal! :D'}</Text>
+          <Text style={styles.label}>Título:</Text>
+          <Text style={styles.text}>{evento.titulo || 'Título não informado'}</Text>
         </View>
 
-        {/* Endereço */}
+        <View style={styles.card}>
+          <Text style={styles.label}>Objetivo:</Text>
+          <Text style={styles.text}>{evento.objetivo || 'Objetivo não informado'}</Text>
+        </View>
+
         <View style={styles.card}>
           <Text style={styles.label}>Endereço:</Text>
-          <Image source={require('../../img/PET.png')} style={styles.mapa} />
-          <Text style={styles.text}>Rua Fulano de Tall, 666</Text>
-        </View>
-
-        {/* Datas */}
-        <View style={styles.card}>
-          <Text style={styles.label}>Data:</Text>
-          <View style={styles.row}>
-            <Text>Início: {evento.dataInicio || '12/05/2024'}</Text>
-            <Text>Fim: {evento.dataFim || '25/05/2024'}</Text>
+          <Text style={styles.text}>{formatarEndereco(evento.endereco)}</Text>
+          <View style={styles.mapContainer}>
+            {evento.endereco ? (
+              <MapView enderecoAbrigo={evento.endereco} />
+            ) : (
+              <Text style={styles.text}>Endereço não disponível para exibir o mapa.</Text>
+            )}
           </View>
         </View>
 
-        {/* Fotos */}
         <View style={styles.card}>
-          <Text style={styles.label}>Fotos</Text>
+          <Text style={styles.label}>Datas:</Text>
+          <Text style={styles.text}>Início: {formatarData(evento.dataInicio)}</Text>
+          <Text style={styles.text}>Fim: {formatarData(evento.dataFim)}</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.label}>Fotos:</Text>
           <View style={styles.row}>
-            <Image source={require('../../img/Gato.png')} style={styles.foto} />
-            <Image source={require('../../img/Gato.png')} style={styles.foto} />
+            {evento.imagemUrl ? (
+              <Image source={{ uri: evento.imagemUrl }} style={styles.foto} />
+            ) : (
+              <Text style={styles.text}>Nenhuma foto disponível</Text>
+            )}
           </View>
         </View>
 
-        {/* Detalhes */}
         <View style={styles.card}>
           <Text style={styles.label}>Detalhes:</Text>
-          <Text style={styles.text}>{evento.detalhes || 'AAAAAAA'}</Text>
+          <Text style={styles.text}>{evento.detalhes || 'Nenhum detalhe adicional informado'}</Text>
         </View>
-      </ScrollView>
 
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 50 },
-  scroll: { paddingBottom: 120, paddingHorizontal: 16 },
-  backButton: { marginLeft: 16, marginBottom: 10 },
-  backText: { color: '#9333ea', fontSize: 16 },
+  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 40 },
+  voltar: { marginLeft: 16, marginBottom: 10 },
+  scroll: { paddingTop: 20, paddingBottom: 120, paddingHorizontal: 16 },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -79,32 +115,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 20,
   },
-  mapa: {
-    width: '100%',
-    height: 150,
-    borderRadius: 10,
-    marginBottom: 8,
-  },
   foto: {
     width: 100,
     height: 100,
     borderRadius: 10,
     marginRight: 8,
   },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 12,
-    paddingBottom: 24,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+  mapContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#e0e0e0',
   },
-  navIcon: { width: 28, height: 28, resizeMode: 'contain' },
-  navIconCenter: { width: 32, height: 32, resizeMode: 'contain' },
 });

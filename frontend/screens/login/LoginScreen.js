@@ -1,5 +1,5 @@
 import React from 'react';
-//import * as Crypto from 'expo-crypto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import TextLoginInput from '../../components/TextLoginInput';
@@ -53,8 +53,11 @@ function LoginScreen() {
       }
 
       const data = await response.json();
-
+      
+      await AsyncStorage.setItem('userId', data.id);
       navigation.navigate('TelaPrincipal', { userId: data.id });
+      
+      
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       Alert.alert('Erro', 'Login ou senha inválidos');

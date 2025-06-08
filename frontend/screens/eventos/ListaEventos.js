@@ -1,25 +1,51 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { urlIp } from '@env';
 
 export default function ListaEventos() {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const [eventos, setEventos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Simulação de eventos
-  const eventos = [
-    {
-      id: 1,
-      titulo: 'Evento 1',
-      descricao: 'Evento maneiro!!',
-      imagem: require('../../img/teste.png'),
-    },
-    {
-      id: 2,
-      titulo: 'Evento 2',
-      descricao: 'Evento super maneiro!!',
-      imagem: require('../../img/teste.png'),
-    },
-  ];
+  useEffect(() => {
+    const fetchEventos = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`http://${urlIp}:3000/eventos/`);
+        if (!response.ok) throw new Error('Erro ao buscar eventos');
+        const data = await response.json();
+        setEventos(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (isFocused) {
+      fetchEventos();
+    }
+  }, [isFocused]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#9333ea" />
+        <Text style={{ marginTop: 10 }}>Carregando eventos...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: 'red' }}>Erro: {error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -30,13 +56,18 @@ export default function ListaEventos() {
       <ScrollView contentContainerStyle={styles.scroll}>
         {eventos.map((evento) => (
           <TouchableOpacity
-            key={evento.id}
+            key={evento._id}
             style={styles.eventoBox}
             onPress={() => navigation.navigate('EventoDetalhe', { evento })}
           >
             <Text style={styles.eventoTitulo}>{evento.titulo}</Text>
             <Text style={styles.eventoDescricao}>{evento.descricao}</Text>
-            <Image source={evento.imagem} style={styles.eventoImagem} />
+            {evento.imagemUrl && (
+              <Image
+                source={{ uri: evento.imagemUrl }}
+                style={styles.eventoImagem}
+              />
+            )}
           </TouchableOpacity>
         ))}
       </ScrollView>

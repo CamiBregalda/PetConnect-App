@@ -26,5 +26,9 @@ app.use('/abandonos', abandonoRoutes);
 app.use('/candidaturas', candidaturaRoutes);
 app.use('/especies', especieRoutes);
 app.use('/portes', porteRoutes);
+app.use('/geocode', enderecoRoutes);
+app.use('/animais', especieRoutes);
+app.use('/animais', porteRoutes);
+app.use('/animais', animaisRoutes); 
 
 export default app;

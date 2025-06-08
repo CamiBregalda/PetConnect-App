@@ -3,6 +3,7 @@ import * as AnimalService from "../services/animalService";
 import { validateImage } from '../utils/imageUtil';
 import { fileTypeFromBuffer } from 'file-type';
 import multer from "multer";
+import Animal from '../models/Animal';
 
 const upload = multer();
 
@@ -53,6 +54,17 @@ export const deleteAnimal = async (req: Request, res: Response) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export async function getAnimaisAdotadosPorUsuario(req: Request, res: Response) {
+  try {
+    const { userId } = req.params;
+    const adotados = await Animal.find({ adotadoPor: userId });
+    return res.json(adotados);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Erro interno' });
+  }
+}
 
 export const uploadImage = [
     upload.single('image'),

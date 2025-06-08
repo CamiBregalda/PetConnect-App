@@ -5,6 +5,7 @@ export interface CuidadorAttributes {
     email: string;
     userId: Types.ObjectId;
     abrigoId?: Types.ObjectId;
+    eventoId?: Types.ObjectId;
     ativo: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -15,6 +16,7 @@ const CuidadorSchema = new Schema<CuidadorAttributes>(
         email: { type: String, required: true },
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         abrigoId: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
+        eventoId: { type: Schema.Types.ObjectId, ref: 'Evento' },
         ativo: { type: Boolean, required: false },
     },
     {
@@ -24,6 +26,7 @@ const CuidadorSchema = new Schema<CuidadorAttributes>(
             virtuals: true,
             transform: (_, ret) => {
                 ret.id = ret._id;
+                ret.eventoId = ret.eventoId;
                 delete ret._id;
                 delete ret.__v;
             }
@@ -40,6 +43,7 @@ export class CuidadorFactory {
             email: user.email,
             userId,
             abrigoId,
+            eventoId: null, 
             ativo: true,
         });
     }

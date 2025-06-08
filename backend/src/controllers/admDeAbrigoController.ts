@@ -3,6 +3,7 @@ import * as AdmDeAbrigoService from "../services/admDeAbrigoService";
 import * as UserService from "../services/userService";
 import { validateImage } from '../utils/imageUtil';
 import multer from "multer";
+import AdmDeAbrigoModel from '../models/AdmDeAbrigo';
 
 const upload = multer();
 
@@ -37,13 +38,20 @@ export const getAdmDeAbrigoById = async (req: Request, res: Response) => {
 };
 
 export const getAdmDeAbrigoWithAbrigo = async (req: Request, res: Response) => {
+  try {
     const { id } = req.params;
-    try {
-        const result = await AdmDeAbrigoService.getAdmDeAbrigoWithAbrigo(id);
-        res.status(200).json(result);
-    } catch (error: any) {
-        res.status(400).json({ error: error.message });
+
+    const admDeAbrigo = await AdmDeAbrigoModel.findOne({ userId: id }).populate('abrigo');
+
+    if (!admDeAbrigo) {
+      return res.status(404).json({ error: 'Administrador de abrigo não encontrado' });
     }
+
+    return res.json({ abrigo: admDeAbrigo.abrigo });
+  } catch (error) {
+    console.error('Erro ao buscar administrador e abrigo:', error);
+    return res.status(500).json({ error: 'Erro ao buscar administrador e abrigo' });
+  }
 };
 
 export const updateAdmDeAbrigo = async (req: Request, res: Response) => {

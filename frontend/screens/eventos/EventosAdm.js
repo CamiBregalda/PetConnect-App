@@ -1,12 +1,20 @@
-import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useLayoutEffect, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { urlIp } from '@env';
+
+
+const BACKEND_URL = `http://${urlIp}:3000/eventos/`;
 
 export default function EventosAdm() {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const [eventos, setEventos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-   useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: {
         backgroundColor: '#9333ea',
@@ -16,29 +24,50 @@ export default function EventosAdm() {
         fontWeight: 'bold',
       },
       headerTitleAlign: 'center',
-      title: 'Eventos', // ou o título que desejar
+      title: 'Eventos',
     });
   }, [navigation]);
 
-  // Lista simulada de eventos
-  const eventos = [
-    {
-      id: 1,
-      titulo: 'Evento 1',
-      descricao: 'Evento maneiro!!',
-      imagem: require('../../img/teste.png'),
-    },
-    {
-      id: 2,
-      titulo: 'Evento 2',
-      descricao: 'Evento super maneiro!!',
-      imagem: require('../../img/teste.png'),
-    },
-  ];
+  useEffect(() => {
+    const fetchEventos = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(BACKEND_URL);
+        if (!response.ok) throw new Error('Erro ao buscar eventos');
+        const data = await response.json();
+        setEventos(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isFocused) {
+      fetchEventos();
+    }
+  }, [isFocused]);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#9333ea" />
+        <Text style={{ marginTop: 10 }}>Carregando eventos...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: 'red' }}>Erro: {error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      
       <TouchableOpacity
         style={styles.botaoCriar}
         onPress={() => navigation.navigate('CriarEvento')}
@@ -47,22 +76,37 @@ export default function EventosAdm() {
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={styles.scroll}>
-        {eventos.map((evento) => (
-          <View key={evento.id} style={styles.cardContainer}>
-            
-            <TouchableOpacity style={styles.editIcon} onPress={() => navigation.navigate('EditarEvento', { evento })}>
-              <Ionicons name="create-outline" size={20} color="#555" />
-            </TouchableOpacity>
+        {eventos.length === 0 ? (
+          <Text style={{ textAlign: 'center', marginTop: 30, color: '#555' }}>
+            Nenhum evento cadastrado.
+          </Text>
+        ) : (
+          eventos.map((evento) => (
+            <View key={evento._id} style={styles.cardContainer}>
+              <TouchableOpacity
+                style={styles.editIcon}
+                onPress={() =>
 
-            <TouchableOpacity
-              onPress={() => navigation.navigate('EventoDetalheAdm', { evento })}
-            >
-              <Text style={styles.titulo}>{evento.titulo}</Text>
-              <Text style={styles.descricao}>{evento.descricao}</Text>
-              <Image source={evento.imagem} style={styles.imagem} />
-            </TouchableOpacity>
-          </View>
-        ))}
+                  navigation.navigate('EditarEvento', { evento })}
+              >
+                <Ionicons name="create-outline" size={20} color="#555" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate('EventoDetalheAdm', { evento })}
+              >
+                <Text style={styles.titulo}>{evento.titulo}</Text>
+                <Text style={styles.descricao}>{evento.descricao}</Text>
+
+                {evento.imagemUrl ? (
+                  <Image source={{ uri: evento.imagemUrl }} style={styles.imagem} />
+                ) : (
+                  <Image source={require('../../img/teste.png')} style={styles.imagem} />
+                )}
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   );
