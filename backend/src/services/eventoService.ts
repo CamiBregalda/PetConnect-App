@@ -14,7 +14,7 @@ export const createEvento = async (data: EventoAttributes) => {
 
 export const getEventos = async () => {
     try {
-        return await EventoModel.find({ ativo: true });
+        return await EventoModel.find({ ativo: true }).select('-image');
     } catch (error: any) {
         throw new Error("Erro ao buscar eventos: " + error.message);
     }
@@ -22,7 +22,7 @@ export const getEventos = async () => {
 
 export const getEventoById = async (id: string) => {
     try {
-        return await EventoModel.findOne({ _id: id, ativo: true });
+        return await EventoModel.findOne({ _id: id, ativo: true }).select('-image');
     } catch (error: any) {
         throw new Error("Erro ao buscar evento: " + error.message);
     }
