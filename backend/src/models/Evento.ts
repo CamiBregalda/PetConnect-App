@@ -1,39 +1,41 @@
-import { Schema, model, Types } from "mongoose";
-import { Endereco, EnderecoSchema } from "./Endereco";
+import mongoose, { Schema, Document } from 'mongoose';
 
-export interface EventoAttributes {
-    titulo: string;
-    descricao: string;
-    endereco: Endereco;
-    data: Date;
-    idAbrigo?: Types.ObjectId;
-    ativo: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
+export interface EventoAttributes extends Document {
+  titulo: string;
+  descricao: string;
+  objetivo: string;
+  dataInicio: string;
+  dataFim: string;
+  endereco: {
+    rua: string;
+    numero: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    cep: string;
+  };
+  imagemUrl?: string;
 }
 
-const EventoSchema = new Schema<EventoAttributes>(
-    {
-        titulo: { type: String, required: true },
-        descricao: { type: String, required: true },
-        endereco: { type: EnderecoSchema, required: true },
-        data: { type: Date, required: true },
-        idAbrigo: { type: Schema.Types.ObjectId, ref: 'Abrigo', required: true },
-        ativo: { type: Boolean, required: false },
-    },
-    {
-        collection: "eventos",
-        timestamps: true,
-        toJSON: {
-            virtuals: true,
-            transform: (_, ret) => {
-                ret.id = ret._id;
-                delete ret._id;
-                delete ret.__v;
-            }
-        }
-    }
-);
 
-const EventoModel = model<EventoAttributes>("Evento", EventoSchema);
-export default EventoModel;
+const eventoSchema = new mongoose.Schema({
+  titulo:     { type: String, required: true },
+  descricao:  { type: String, required: true },
+  objetivo:   { type: String, required: true },
+  dataInicio: { type: Date,   required: true },
+  dataFim:    { type: Date,   required: true },
+  endereco: {
+    rua:    { type: String, required: true },
+    numero: { type: String, required: true },
+    bairro: { type: String, required: true },
+    cidade: { type: String, required: true },
+    estado: { type: String, required: true },
+    cep:    { type: String, required: true },
+  },
+  idAbrigo: { type: mongoose.Schema.Types.ObjectId, ref: 'Abrigo', required: true },
+  ativo:    { type: Boolean, default: true },
+}, {
+  timestamps: true
+});
+
+export default mongoose.model<EventoAttributes>('Evento', eventoSchema);

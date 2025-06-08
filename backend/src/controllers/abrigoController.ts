@@ -1,139 +1,152 @@
-    import { Request, Response } from 'express';
-    import * as AbrigoService from '../services/abrigoService';
-    import { validateImage } from '../utils/imageUtil';
-    import { fileTypeFromBuffer } from 'file-type';
-    import multer from "multer";
+import { Request, Response } from 'express';
+import * as AbrigoService from '../services/AbrigoService';
+import { validateImage } from '../utils/imageUtil';
+import { fileTypeFromBuffer } from 'file-type';
+import multer from "multer";
+import Abrigo from '../models/Abrigo';
 
-    const upload = multer();
+const upload = multer();
 
-    export const createAbrigo = async (req: Request, res: Response) => {
-        try {
-            const abrigo = await AbrigoService.createAbrigo(req.params.userId, req.body);
-            res.status(201).json(abrigo);
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
+export const createAbrigo = async (req: Request, res: Response) => {
+    try {
+        const abrigo = await AbrigoService.createAbrigo(req.params.userId, req.body);
+        res.status(201).json(abrigo);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getAbrigos = async (req: Request, res: Response) => {
+    try {
+        const abrigos = await AbrigoService.getAbrigos();
+        res.status(200).json(abrigos);
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getAbrigoById = async (req: Request, res: Response) => {
+    try {
+        const abrigo = await AbrigoService.getAbrigoById(req.params.id);
+        if (abrigo) {
+            res.status(200).json(abrigo);
+        } else {
+            res.status(404).json({ message: 'Abrigo não encontrado' });
         }
-    };
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-    export const getAbrigos = async (req: Request, res: Response) => {
-        try {
-            const abrigos = await AbrigoService.getAbrigos();
-            res.status(200).json(abrigos);
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
+export const getAbrigoWithAnimais = async (req: Request, res: Response) => {
+    try {
+        const abrigo = await AbrigoService.getAbrigoWithAnimais(req.params.id);
+        if (abrigo) {
+            res.status(200).json(abrigo);
+        } else {
+            res.status(404).json({ message: 'Abrigo não encontrado' });
         }
-    };
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-    export const getAbrigoById = async (req: Request, res: Response) => {
-        try {
-            const abrigo = await AbrigoService.getAbrigoById(req.params.id);
-            if (abrigo) {
-                res.status(200).json(abrigo);
-            } else {
-                res.status(404).json({ message: 'Abrigo não encontrado' });
-            }
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
+export const getAbrigoWithCuidadores = async (req: Request, res: Response) => {
+    try {
+        const cuidador = await AbrigoService.getAbrigoWithCuidadores(req.params.id);
+        if (cuidador) {
+            res.status(200).json(cuidador);
+        } else {
+            res.status(404).json({ message: 'Abrigo não encontrado' });
         }
-    };
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-    export const getAbrigoWithAnimais = async (req: Request, res: Response) => {
-        try {
-            const abrigo = await AbrigoService.getAbrigoWithAnimais(req.params.id);
-            if (abrigo) {
-                res.status(200).json(abrigo);
-            } else {
-                res.status(404).json({ message: 'Abrigo não encontrado' });
-            }
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
+export const updateAbrigo = async (req: Request, res: Response) => {
+    try {
+        const abrigo = await AbrigoService.updateAbrigo(req.params.id, req.body);
+        if (abrigo) {
+            res.status(200).json(abrigo);
+        } else {
+            res.status(404).json({ message: 'Abrigo não encontrado' });
         }
-    };
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-    export const getAbrigoWithCuidadores = async (req: Request, res: Response) => {
-        try {
-            const cuidador = await AbrigoService.getAbrigoWithCuidadores(req.params.id);
-            if (cuidador) {
-                res.status(200).json(cuidador);
-            } else {
-                res.status(404).json({ message: 'Abrigo não encontrado' });
-            }
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
+export const deleteAbrigo = async (req: Request, res: Response) => {
+    try {
+        const abrigo = await AbrigoService.deleteAbrigo(req.params.id);
+        if (abrigo) {
+            res.status(200).json({ message: 'Abrigo marcado como inativo' });
+        } else {
+            res.status(404).json({ message: 'Abrigo não encontrado' });
         }
-    };
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
-    export const updateAbrigo = async (req: Request, res: Response) => {
-        try {
-            const abrigo = await AbrigoService.updateAbrigo(req.params.id, req.body);
-            if (abrigo) {
-                res.status(200).json(abrigo);
-            } else {
-                res.status(404).json({ message: 'Abrigo não encontrado' });
-            }
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
-        }
-    };
+export async function getAbrigosPorVoluntario(req: Request, res: Response) {
+    try {
+        const { userId } = req.params;
+        const abrigos = await Abrigo.find({ voluntarios: userId });
+        return res.json(abrigos);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Erro interno' });
+    }
+}
 
-    export const deleteAbrigo = async (req: Request, res: Response) => {
-        try {
-            const abrigo = await AbrigoService.deleteAbrigo(req.params.id);
-            if (abrigo) {
-                res.status(200).json({ message: 'Abrigo marcado como inativo' });
-            } else {
-                res.status(404).json({ message: 'Abrigo não encontrado' });
-            }
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
-        }
-    };
-
-    export const uploadImage = [
-        upload.single('image'),
-        async (req: Request, res: Response) => {
-            try {
-                const abrigoId = req.params.id;
-                validateImage(req.file);
-                const imageBuffer = req.file?.buffer;
-
-                if (!imageBuffer) {
-                    return res.status(400).json({ message: 'Imagem não enviada' });
-                }
-
-                const user = await AbrigoService.uploudImage(abrigoId, imageBuffer);
-                return res.status(200).json(user);
-            } catch (error: any) {
-                return res.status(500).json({ message: error.message });
-            }
-        }
-    ];
-
-    export const getImage = async (req: Request, res: Response) => {
+export const uploadImage = [
+    upload.single('image'),
+    async (req: Request, res: Response) => {
         try {
             const abrigoId = req.params.id;
-            const image = await AbrigoService.getImage(abrigoId);
+            validateImage(req.file);
+            const imageBuffer = req.file?.buffer;
 
-            const type = await fileTypeFromBuffer(image);
-            
-            res.writeHead(200, {
-                'Content-Type': type?.mime || 'image/jpeg',
-                'Content-Length': image.length,
-            });
-            return res.end(image);
+            if (!imageBuffer) {
+                return res.status(400).json({ message: 'Imagem não enviada' });
+            }
+
+            const user = await AbrigoService.uploudImage(abrigoId, imageBuffer);
+            return res.status(200).json(user);
         } catch (error: any) {
             return res.status(500).json({ message: error.message });
         }
-    };
+    }
+];
 
-    export const deleteImage = async (req: Request, res: Response) => {
+export const getImage = async (req: Request, res: Response) => {
+    try {
         const abrigoId = req.params.id;
+        const image = await AbrigoService.getImage(abrigoId);
 
-        try {
-            await AbrigoService.deleteImage(abrigoId);
+        const type = await fileTypeFromBuffer(image);
 
-            return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
-        } catch (error: any) {
-            return res.status(500).json({ message: error.message });
-        }
-    };
+        res.writeHead(200, {
+            'Content-Type': type?.mime || 'image/jpeg',
+            'Content-Length': image.length,
+        });
+        return res.end(image);
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+export const deleteImage = async (req: Request, res: Response) => {
+    const abrigoId = req.params.id;
+
+    try {
+        await AbrigoService.deleteImage(abrigoId);
+
+        return res.status(200).json({ message: 'Imagem excluída com sucesso!' });
+    } catch (error: any) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+

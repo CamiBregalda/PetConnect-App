@@ -10,10 +10,7 @@ export default function RegistroAbandono() {
     <View style={styles.container}>
 
       <ScrollView >
-        {/* Título */}
-        <Text style={styles.title}>Registrar Abandono</Text>
-
-        {/* Descrição */}
+        
         <TextInput
           placeholder="Informações sobre animal"
           style={styles.textArea}

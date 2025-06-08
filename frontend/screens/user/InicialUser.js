@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
-
+import MapView from './../../components/MapView'; // Componente de mapa
 
 export default function InicialUser() {
   const route = useRoute();
@@ -11,82 +11,113 @@ export default function InicialUser() {
   const [userInfo, setUserInfo] = useState(null);
   const navigation = useNavigation();
 
-  const temFoto = true;
+  // Configura header com saudação e botão de edição
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: userInfo ? `${userInfo.nome}` : 'Usuário',
+      headerStyle: { backgroundColor: '#9333ea' },
+      headerTintColor: '#fff',
+      headerTitleStyle: { fontWeight: 'bold' },
+      headerTitleAlign: 'center',
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate('AtualizarUser', { userId })}
+        >
+          <Ionicons name="create-outline" size={24} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, userInfo]);
+
+  // Busca os dados do usuário
   const getUserInfo = async () => {
     try {
-
       const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
-
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      if (!response.ok) {
-        throw new Error('Erro ao buscar usuário');
-      }
+      if (!response.ok) throw new Error('Erro ao buscar usuário');
       const data = await response.json();
       setUserInfo(data);
-      console.log('userInfo:', data);
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Erro ao buscar informações do usuário:', error);
     }
-  }
+  };
 
   useEffect(() => {
     getUserInfo();
-
   }, []);
+
+  // Formata o endereço completo
+  const formatarEndereco = endereco => {
+    if (!endereco) return 'Endereço não informado';
+    const { rua, numero, bairro, cidade, estado, cep } = endereco;
+    return `${rua || ''}${numero ? ', ' + numero : ''}${
+      bairro ? ' - ' + bairro : ''
+    }, ${cidade || ''}${estado ? ' - ' + estado : ''}${
+      cep ? ' - CEP: ' + cep : ''
+    }`.trim();
+  };
 
   return (
     <View style={styles.container}>
-
-
       <ScrollView contentContainerStyle={styles.scrollContainer}>
 
-        {temFoto ? (
-          <Image source={require('../../img/teste.png')} style={styles.profileImage} />
-        ) : (
-          <View style={styles.profilePlaceholder}>
-            <Text style={styles.placeholderText}>Sem foto</Text>
-          </View>
-        )}
+        {/* Foto de perfil dinâmica */}
+        <Image
+          source={{
+            uri:
+              userInfo?.imagemUrl || userInfo?.avatarUrl ||
+              'https://via.placeholder.com/150'
+          }}
+          style={styles.profileImage}
+        />
 
-
+        {/* Informações básicas */}
         <View style={styles.infoBox}>
           <View style={styles.headerRow}>
-            <Text style={styles.label}>{userInfo ? userInfo.nome : 'Carregando...'}</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AtualizarUser', { userId: userId })}>
-              <Ionicons name="create-outline" size={20} color="#555" />
-            </TouchableOpacity>
+            <Text style={styles.label}>
+              {userInfo ? userInfo.nome : 'Carregando...'}
+            </Text>
           </View>
-          <Text style={styles.description}>{userInfo ? userInfo.descricao : ''}</Text>
+          <Text style={styles.description}>
+            {userInfo?.descricao || 'Sem descrição cadastrada.'}
+          </Text>
         </View>
 
-
+        {/* Endereço e Mapa */}
         <View style={styles.infoBox}>
-          <View style={styles.headerRow}>
-            <Text style={styles.label}>Endereço:</Text>
+          <Text style={styles.label}>Endereço:</Text>
+          <View style={styles.mapContainer}>
+            {userInfo?.endereco ? (
+              <MapView enderecoAbrigo={userInfo.endereco} />
+            ) : (
+              <Text style={styles.text}>Endereço não disponível para o mapa.</Text>
+            )}
           </View>
-          <View style={styles.mapPlaceholder}>
-            <Text style={styles.mapText}>[Mapa do Google aqui]</Text>
-          </View>
-          <Text style={styles.addressText}>Rua Fulano de Tall, 666</Text>
+          <Text style={styles.addressText}>
+            {formatarEndereco(userInfo?.endereco)}
+          </Text>
         </View>
       </ScrollView>
-
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1' },
-  backButton: { marginTop: 50, marginLeft: 16 },
-  backIcon: { width: 24, height: 24, resizeMode: 'contain' },
-  scrollContainer: { alignItems: 'center', paddingVertical: 20, paddingBottom: 120 },
-
+  container: {
+    flex: 1,
+    backgroundColor: '#f1f1f1',
+  },
+  scrollContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingBottom: 120,
+  },
+  editButton: {
+    marginRight: 16,
+  },
   profileImage: {
     width: 150,
     height: 150,
@@ -94,20 +125,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     marginBottom: 20,
   },
-  profilePlaceholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: '#9333ea',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  placeholderText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-
   infoBox: {
     width: '90%',
     backgroundColor: '#fff',
@@ -122,46 +139,34 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  label: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  description: { fontSize: 14, color: '#555' },
-  mapPlaceholder: {
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  description: {
+    fontSize: 14,
+    color: '#555',
+  },
+  mapContainer: {
     width: '100%',
-    height: 150,
-    backgroundColor: '#e0e0e0',
+    height: 200,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    overflow: 'hidden',
+    backgroundColor: '#e0e0e0',
     marginTop: 8,
   },
-  mapText: { color: '#555', fontSize: 12 },
-  addressText: { marginTop: 8, textAlign: 'center', color: '#333', fontSize: 14 },
-
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 12,
-    paddingBottom: 55,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+  text: {
+    color: '#555',
+    fontSize: 12,
   },
-  navIcon: {
-    width: 28,
-    height: 28,
-    resizeMode: 'contain',
-  },
-  navIconCenter: {
-    width: 32,
-    height: 32,
-    resizeMode: 'contain',
+  addressText: {
+    marginTop: 8,
+    textAlign: 'center',
+    color: '#333',
+    fontSize: 14,
   },
 });

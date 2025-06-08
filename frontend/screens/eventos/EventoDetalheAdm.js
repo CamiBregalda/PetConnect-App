@@ -1,83 +1,102 @@
 import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import MapView from './../../components/MapView';
 
 export default function EventoDetalheAdm() {
   const navigation = useNavigation();
   const route = useRoute();
   const { evento } = route.params;
 
-    useLayoutEffect(() => {
-      navigation.setOptions({
-        headerStyle: {
-          backgroundColor: '#9333ea',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-        headerTitleAlign: 'center',
-        title: 'Nome', // ou o título que desejar
-      });
-    }, [navigation]);
-    
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: '#9333ea',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+      headerTitleAlign: 'center',
+      title: evento.titulo || 'Detalhes do Evento',
+    });
+  }, [navigation, evento]);
+
+  const formatarData = (data) => {
+    if (!data) return 'Data não informada';
+    const dataObj = new Date(data);
+    return dataObj.toLocaleDateString('pt-BR'); 
+  };
+
+  const formatarEndereco = (endereco) => {
+    if (!endereco) return 'Endereço não informado';
+    const { rua, numero, bairro, cidade, estado, cep } = endereco;
+    return `${rua || ''}${numero ? ', ' + numero : ''}${bairro ? ' - ' + bairro : ''}, ${cidade || ''}${estado ? ' - ' + estado : ''}${cep ? ' - CEP: ' + cep : ''}`.trim();
+  };
+
   return (
     <View style={styles.container}>
-      
       <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Objetivo */}
+
         <View style={styles.card}>
-          <Text style={styles.label}>Objetivo do Evento:</Text>
-          <Text style={styles.text}>{evento.objetivo || 'Um Evento muito legal! :D'}</Text>
+          <Text style={styles.label}>Título:</Text>
+          <Text style={styles.text}>{evento.titulo || 'Título não informado'}</Text>
         </View>
 
-        {/* Endereço */}
+        <View style={styles.card}>
+          <Text style={styles.label}>Objetivo:</Text>
+          <Text style={styles.text}>{evento.objetivo || 'Objetivo não informado'}</Text>
+        </View>
+
         <View style={styles.card}>
           <Text style={styles.label}>Endereço:</Text>
-          <Image source={require('../../img/PET.png')} style={styles.mapa} />
-          <Text style={styles.text}>Rua Fulano de Tall, 666</Text>
+          <Text style={styles.text}>{formatarEndereco(evento.endereco)}</Text>
+          <View style={styles.mapContainer}>
+            {evento.endereco ? (
+              <MapView enderecoAbrigo={evento.endereco} /> // Integrando o mapa
+            ) : (
+              <Text style={styles.text}>Endereço não disponível para exibir o mapa.</Text>
+            )}
+          </View>
         </View>
 
-        {/* Datas */}
         <View style={styles.card}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Data:</Text>
-          </View>
-          <View style={styles.row}>
-            <Text>Início: {evento.dataInicio || '12/05/2024'}</Text>
-            <Text>Fim: {evento.dataFim || '25/05/2024'}</Text>
-          </View>
+          <Text style={styles.label}>Datas:</Text>
+          <Text style={styles.text}>Início: {formatarData(evento.dataInicio)}</Text>
+          <Text style={styles.text}>Fim: {formatarData(evento.dataFim)}</Text>
         </View>
 
-        {/* Fotos */}
         <View style={styles.card}>
           <Text style={styles.label}>Fotos:</Text>
           <View style={styles.row}>
-            <Image source={require('../../img/Gato.png')} style={styles.foto} />
-            <Image source={require('../../img/Gato.png')} style={styles.foto} />
+            {evento.imagemUrl ? (
+              <Image source={{ uri: evento.imagemUrl }} style={styles.foto} />
+            ) : (
+              <Text style={styles.text}>Nenhuma foto disponível</Text>
+            )}
           </View>
         </View>
 
-        {/* Detalhes */}
         <View style={styles.card}>
           <Text style={styles.label}>Detalhes:</Text>
-          <Text style={styles.text}>{evento.detalhes || 'AAAAAAA'}</Text>
+          <Text style={styles.text}>{evento.detalhes || 'Nenhum detalhe adicional informado'}</Text>
         </View>
 
-        {/* Botões */}
-        <TouchableOpacity
-          style={styles.botao}
-          onPress={() => navigation.navigate('EditarEvento', { evento })}
-        >
-          <Text style={styles.textoBotao}>Editar Evento</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('EditarEvento', { evento })}
+          >
+            <Text style={styles.buttonText}>Editar Evento</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.botao}
-          onPress={() => navigation.navigate('VoluntariosEvento', { eventoId: evento.id })}
-        >
-          <Text style={styles.textoBotao}>Voluntários</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.volunteersButton]}
+            onPress={() => navigation.navigate('VoluntariosEvento', { eventoId: evento._id })}
+          >
+            <Text style={styles.buttonText}>Voluntários</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -86,8 +105,6 @@ export default function EventoDetalheAdm() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 20 },
   scroll: { paddingBottom: 120, paddingHorizontal: 16 },
-  backButton: { marginLeft: 16, marginBottom: 10 },
-  backText: { color: '#9333ea', fontSize: 16 },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -106,26 +123,34 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 20,
   },
-  mapa: {
-    width: '100%',
-    height: 150,
-    borderRadius: 10,
-    marginBottom: 8,
-  },
   foto: {
     width: 100,
     height: 100,
     borderRadius: 10,
     marginRight: 8,
   },
-  botao: {
+  mapContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#e0e0e0',
+  },
+  buttonsContainer: {
+    marginTop: 20,
+  },
+  button: {
+    width: '100%',
     backgroundColor: '#9333ea',
     paddingVertical: 12,
-    marginBottom: 12,
-    borderRadius: 6,
+    borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 10,
   },
-  textoBotao: {
+  volunteersButton: {
+    backgroundColor: '#9333ea', 
+  },
+  buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,

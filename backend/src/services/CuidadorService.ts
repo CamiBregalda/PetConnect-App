@@ -3,6 +3,7 @@ import CuidadorModel, { CuidadorFactory } from "../models/Cuidador";
 import { CuidadorResponse } from "../models/responses/CuidadorResponse";
 import * as UserService from './userService';
 
+
 export const createCuidador = async (data: any) => {
     try {
         UserService.updateUser(data.userId, data);
@@ -85,6 +86,14 @@ export const getCuidadoresByAbrigoId = async (abrigoId: string) => {
         return listCuidadores.map((cuidador) => CuidadorResponse.fromEntities(cuidador));
     } catch (error: any) {
         throw new Error("Erro ao buscar Cuidadores do abrigo: " + error.message);
+    }
+};
+
+export const getVoluntariosPorEvento = async (eventoId: string) => {
+    try {
+        return await CuidadorModel.find({ eventoId }).populate('userId');
+    } catch (error) {
+        throw new Error('Erro ao buscar voluntários por evento');
     }
 };
 
