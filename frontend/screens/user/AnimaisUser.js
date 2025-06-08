@@ -27,15 +27,9 @@ export default function AnimaisUser() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      setError(null);
       try {
         const respAdot = await fetch(`http://${urlIp}:3000/animais/usuario/${userId}`);
         const respVolt = await fetch(`http://${urlIp}:3000/abrigos/usuario/${userId}`);
-
-        const errorDetails = [];
-        if (!respAdot.ok) errorDetails.push(`Adotados: ${respAdot.status}`);
-        if (!respVolt.ok) errorDetails.push(`Voluntário: ${respVolt.status}`);
-        if (errorDetails.length > 0) throw new Error(errorDetails.join(', '));
 
         const [dataAdot, dataVolt] = await Promise.all([
           respAdot.json(),
@@ -64,9 +58,11 @@ export default function AnimaisUser() {
     return nomeOk && espOk && racOk && porOk;
   });
 
-  const filteredShelters = volunteerShelters.filter(abrigo =>
-    abrigo.nome?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredShelters = Array.isArray(volunteerShelters) && volunteerShelters.length > 0
+  ? volunteerShelters.filter(abrigo =>
+      abrigo.nome?.toLowerCase().includes(search.toLowerCase())
+    )
+  : [];
 
   // Handler de aplicação de filtros
   const handleApplyFilters = (filters) => {

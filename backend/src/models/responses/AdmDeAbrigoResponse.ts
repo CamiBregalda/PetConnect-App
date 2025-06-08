@@ -7,7 +7,7 @@ export class AdmDeAbrigoResponse {
     telefone?: string;
     endereco?: string;
     descricao?: string;
-    userid?: string;
+    userId?: string;
 
     constructor(props: {
         id?: string;

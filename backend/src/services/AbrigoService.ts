@@ -4,6 +4,7 @@ import { getCuidadoresByAbrigoId } from './cuidadorService';
 import * as AdmDeAbrigoService from '../services/admDeAbrigoService';
 import { AbrigoComAnimaisResponse } from "../models/responses/AbrigoComAnimaisResponse";
 import { AbrigoComCuidadoresResponse } from "../models/responses/AbrigoComCuidadoresResponse";
+import { AbrigoComUserIdResponse } from '../models/responses/AbrigoComUserIdResponse';
 
 
 export const createAbrigo = async (userId: string, abrigoData: any) => {
@@ -25,7 +26,22 @@ export const createAbrigo = async (userId: string, abrigoData: any) => {
 
 export const getAbrigos = async () => {
     try {
-        return await AbrigoModel.find({ ativo: true }).select('-image');
+        const abrigos = await AbrigoModel.find({ ativo: true }).select('-image');
+        
+        const abrigoComUserIds = await Promise.all(
+            abrigos.map(async (abrigo) => {
+                if (!abrigo.idAdmAbrigo) {
+                    throw new Error('Abrigo não possui administrador associado');
+                }
+                const admAbrigo = await AdmDeAbrigoService.getAdmDeAbrigoById(abrigo.idAdmAbrigo.toString());
+                if (!admAbrigo || !admAbrigo.userId) {
+                    throw new Error('Administrador de abrigo não encontrado');
+                }
+                return AbrigoComUserIdResponse.fromEntities(abrigo, admAbrigo.userId);
+            })
+        );
+
+        return abrigoComUserIds;
     } catch (error: any) {
         throw new Error('Erro ao buscar abrigos: ' + error.message);
     }
@@ -33,7 +49,22 @@ export const getAbrigos = async () => {
 
 export const getAbrigoById = async (id: string) => {
     try {
-        return await AbrigoModel.findOne({ _id: id, ativo: true }).select('-image');
+        const abrigo = await AbrigoModel.findOne({ _id: id, ativo: true }).select('-image');
+        
+        if (!abrigo) {
+            throw new Error('Abrigo não encontrado');
+        }
+
+        if (!abrigo.idAdmAbrigo) {
+            throw new Error('Abrigo não possui administrador associado');
+        }
+
+        const admAbrigo = await AdmDeAbrigoService.getAdmDeAbrigoById(abrigo.idAdmAbrigo.toString());
+        if (!admAbrigo || !admAbrigo.userId) {
+            throw new Error('Administrador de abrigo não encontrado');
+        }
+
+        return AbrigoComUserIdResponse.fromEntities(abrigo, admAbrigo.userId);
     } catch (error: any) {
         throw new Error('Erro ao buscar abrigo: ' + error.message);
     }
