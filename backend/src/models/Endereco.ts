@@ -20,3 +20,17 @@ export const EnderecoSchema = new Schema<Endereco>(
     },
     { _id: false }
 );
+export class Endereco {
+    constructor(
+        public rua: string,
+        public numero: string,
+        public bairro: string,
+        public cidade: string,
+        public estado: string,
+        public cep: string
+    ) {}
+
+    getEnderecoCompleto(): string {
+        return `${this.rua}, ${this.numero}, ${this.bairro}, ${this.cidade} - ${this.estado}, ${this.cep}`;
+    }
+}

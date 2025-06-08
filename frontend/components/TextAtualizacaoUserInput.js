@@ -65,6 +65,16 @@ const TextAtualizarUserInput = ({ nome, onChangeNome, cpf, onChangeCpf, telefone
           endereco={endereco}
           onChangeEndereco={onChangeEndereco}
         />
+
+          <Text style={styles.label}>Descrição:</Text>
+          <TextInput
+              style={styles.descricaoInput}
+              onChangeText={onChangeDescricao}
+              value={descricao}
+              placeholder="Descrição"
+              multiline
+              numberOfLines={4}
+          />
       </View>
     </>
   );
@@ -90,6 +100,17 @@ const styles = StyleSheet.create({
       marginTop: 10,
       marginBottom: 10,
   },
+    descricaoInput: {
+        width: 280,
+        margin: 10,
+        borderRadius: 30,
+        borderWidth: 0.2,
+        borderBottomWidth: 1,
+        paddingTop: 10,
+        padding: 15,
+        height: 150,
+        textAlignVertical: 'top',
+    }
 });
 
 export default TextAtualizarUserInput;

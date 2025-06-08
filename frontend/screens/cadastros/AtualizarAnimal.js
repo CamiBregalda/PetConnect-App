@@ -39,7 +39,7 @@ function AtualizarAnimalScreen() {
 
     const getAnimal = async () => {
         try {
-            const response = await fetch(`http://192.168.3.5:3000/animais/${animalId}`, {
+            const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -65,9 +65,9 @@ function AtualizarAnimalScreen() {
             onChangeIdDono(data.idDono);
             onChangeAdotado(data.adotado);
 
-            const responseImage = await fetch(`http://192.168.3.5:3000/animais/${animalId}/imagem`);
+            const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`);
             if (responseImage.ok) {
-                onChangeImageUri(`http://192.168.3.5:3000/animais/${animalId}/imagem`);
+                onChangeImageUri(`http://${urlIp}:3000/animais/${animalId}/imagem`);
             }
         } catch (error) {
             console.error('Erro ao buscar animal:', error);
@@ -104,7 +104,7 @@ function AtualizarAnimalScreen() {
         });
 
         try {
-            const response = await fetch(`http://192.168.3.5:3000/animais/${animalId}/imagem`, {
+            const response = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -150,7 +150,7 @@ function AtualizarAnimalScreen() {
 
     const handleUpdate = async () => {
                 try {
-            const response = await fetch(`http://192.168.3.5:3000/animais/${animalId}`, {
+            const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

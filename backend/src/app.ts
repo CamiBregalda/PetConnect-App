@@ -10,6 +10,7 @@ import abandonoRoutes from './routes/abandonoRoutes';
 import candidaturaRoutes from './routes/candidaturaRoutes';
 import especieRoutes from './routes/especieRoutes';
 import porteRoutes from './routes/porteRoutes';
+import enderecoRoutes from './routes/enderecoRoutes';
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/candidaturas', candidaturaRoutes);
 app.use('/especies', especieRoutes);
 app.use('/portes', porteRoutes);
 app.use('/geocode', enderecoRoutes);
+
 app.use('/animais', especieRoutes);
 app.use('/animais', porteRoutes);
 app.use('/animais', animaisRoutes); 

@@ -41,22 +41,15 @@ const Tab = createBottomTabNavigator();
 
 
 function MainTabs({ navigation, route }) {
-  // Adjust to correctly access nested params
   const routeParams = route.params || {};
-  const actualParams = routeParams.params || {}; // Access the nested 'params' object
-
+  const actualParams = routeParams.params || {};
   const userIdFromMainRoute = actualParams.userId;
   const abrigoIdFromMainRoute = actualParams.abrigoId;
 
-  // For debugging:
-  console.log('MainTabs - route.params (raw):', route.params);
-  console.log('MainTabs - actualParams (for userId/abrigoId):', actualParams);
-  console.log('MainTabs - userIdFromMainRoute:', userIdFromMainRoute);
-  console.log('MainTabs - abrigoIdFromMainRoute:', abrigoIdFromMainRoute);
+  console.log('MainTabs - Montado/Renderizado com userIdFromMainRoute:', userIdFromMainRoute, 'e abrigoIdFromMainRoute:', abrigoIdFromMainRoute);
 
   useEffect(() => {
     const backAction = () => {
-      console.log('MainTabs backAction - userIdFromMainRoute:', userIdFromMainRoute); // For debugging
       const parentState = navigation.getState();
       let currentTab = null;
       const mainTabsRouteObject = parentState.routes[parentState.index];
@@ -72,13 +65,12 @@ function MainTabs({ navigation, route }) {
       }
 
       if (currentTab === 'Home' || currentTab === 'Animais' || currentTab === 'Informações') {
-        if (userIdFromMainRoute) {
+        if (userIdFromMainRoute) { // Verifica se userIdFromMainRoute existe
           navigation.reset({
             index: 0,
-            routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }],
+            routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }], // Passa o userId
           });
         } else {
-          console.warn("MainTabs backAction: userIdFromMainRoute is undefined. Navigating to TelaPrincipal without userId.");
           navigation.reset({ index: 0, routes: [{ name: 'TelaPrincipal' }] });
         }
         return true;
@@ -94,7 +86,6 @@ function MainTabs({ navigation, route }) {
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route: tabRoute, navigation: tabNavigationProp }) => {
-        console.log('MainTabs screenOptions - userIdFromMainRoute:', userIdFromMainRoute); // For debugging
         return {
           headerShown: true,
           headerStyle: { backgroundColor: '#8A2BE2' },
@@ -102,16 +93,10 @@ function MainTabs({ navigation, route }) {
           headerTitleAlign: 'center',
           headerLeft: () => (
             <TouchableOpacity onPress={() => {
-              console.log('MainTabs headerLeft onPress - userIdFromMainRoute:', userIdFromMainRoute); // For debugging
-              if (userIdFromMainRoute) {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }],
-                });
-              } else {
-                console.warn("MainTabs headerLeft: userIdFromMainRoute is undefined. Navigating to TelaPrincipal without userId.");
-                navigation.reset({ index: 0, routes: [{ name: 'TelaPrincipal' }] });
-              }
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }], // Passa o userId
+              });
             }}>
               <Image source={require('../../img/seta.png')} style={styles.homeIcon} />
             </TouchableOpacity>
@@ -301,7 +286,7 @@ export default function AppNavigator() {
             headerShown: false
           }} />
 
-          <Stack.Screen
+        <Stack.Screen
           name="EventosAdm"
           component={EventosAdm}
           options={{ headerShown: true }}

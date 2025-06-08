@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation, useFocusEffect, useRoute } from "@react-navigation/native"; // Adicionado useRoute
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 
-function InfoAdm() {
-//  const { userId } = route.params;
-//  console.log('InfoAdm - userId:', userId);
-
+function InfoAdm() { // Removido route como prop, usaremos useRoute()
   const navigation = useNavigation();
+  const route = useRoute(); // Hook para acessar os parâmetros da rota
+  const { userId } = route.params || {}; // Acessa userId passado via initialParams
+  console.log('InfoAdm - userId from route.params:', userId);
+
   const { currentAbrigoId } = useContext(AbrigoContext);
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,6 +47,7 @@ function InfoAdm() {
 
   useFocusEffect(
     useCallback(() => {
+      console.log('InfoAdm useFocusEffect - currentAbrigoId:', currentAbrigoId, 'userId:', userId);
       if (currentAbrigoId) {
         buscarInfoAbrigo(currentAbrigoId);
       } else {
@@ -53,11 +55,12 @@ function InfoAdm() {
         setAbrigoInfo(null);
         navigation.setOptions({ title: 'Informações Gerais' });
       }
-    }, [currentAbrigoId, buscarInfoAbrigo, navigation])
+    }, [currentAbrigoId, buscarInfoAbrigo, navigation, userId])
   );
 
   const seVoluntariar = (abrigoId) => {
-    navigation.navigate('Voluntariarse', { abrigoId: abrigoId });
+    navigation.navigate('Voluntariarse', { abrigoId: abrigoId, userId: userId });
+    console.log('InfoAdm seVoluntariar - abrigoId:', abrigoId, 'userId:', userId);
   };
 
   if (loading) {
@@ -72,7 +75,7 @@ function InfoAdm() {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>{error}</Text>
-        <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm')}>
+         <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm', { userId: userId })}>
           <Text style={styles.textoBotao}>Voluntarios</Text>
         </Pressable>
         <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
@@ -132,7 +135,7 @@ function InfoAdm() {
         </TouchableOpacity>
       </View>
 
-      <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm')}>
+      <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm', { userId: userId })}>
         <Text style={styles.textoBotao}>Voluntarios</Text>
       </Pressable>
       <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>

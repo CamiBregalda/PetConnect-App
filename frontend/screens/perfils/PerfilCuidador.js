@@ -1,15 +1,20 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 function PerfilCuidador({ route }) {
-  const { userId } = route.params;
+  // Receber userId, abrigoId e userEmail dos parâmetros da rota
+  const { userId, abrigoId, userEmail } = route.params;
+  console.log('PerfilCuidador - userId:', userId, 'abrigoId:', abrigoId, 'userEmail:', userEmail);
   const [cuidadorDetalhes, setCuidadorDetalhes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const navigation = useNavigation();
+  const [abrigoEmail, setAbrigoEmail] = useState(null);
+  const [hasTriedLoading, setHasTriedLoading] = useState(false); // Novo estado
+  const [hasTriedLoadingCuidador, setHasTriedLoadingCuidador] = useState(false); // Novo estado para controlar o loading do cuidador
 
   useLayoutEffect(() => {
     if (cuidadorDetalhes) {
@@ -36,42 +41,54 @@ function PerfilCuidador({ route }) {
   }, [navigation, cuidadorDetalhes]);
 
   useEffect(() => {
+    const buscarEmailAbrigo = async () => {
+      try {
+        const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`);
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar abrigo: ${response.status}`);
+        }
+        const data = await response.json();
+        setAbrigoEmail(data.email); // Armazena o email do abrigo
+      } catch (err) {
+        console.error('Erro ao buscar email do abrigo:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false); // Garante que setLoading(false) seja chamado
+        setHasTriedLoading(true); // Garante que a busca não seja repetida indefinidamente
+      }
+    };
+
     const buscarDetalhesCuidador = async () => {
-      setLoading(true);
-      setError(null);
       try {
         const response = await fetch(`http://${urlIp}:3000/cuidadores/${userId}`);
         if (!response.ok) {
-          let errorMessage = `Erro ao buscar cuidador: ${response.status}`;
-          try {
-            const errorData = await response.json();
-            if (errorData && errorData.message) {
-              errorMessage += ` - ${errorData.message}`;
-            }
-          } catch (jsonError) {
-          }
-          throw new Error(errorMessage);
+          throw new Error(`Erro ao buscar cuidador: ${response.status}`);
         }
         const data = await response.json();
-        if (!data || !data.id) {
-          throw new Error('Dados do Cuidador inválidos recebidos da API');
-        }
-        setCuidadorDetalhes(data);
+        setCuidadorDetalhes(data); // Armazena os detalhes do cuidador
       } catch (err) {
         console.error('Erro ao buscar detalhes do cuidador:', err);
         setError(err.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // Garante que setLoading(false) seja chamado
+        setHasTriedLoadingCuidador(true); // Garante que a busca não seja repetida indefinidamente
       }
     };
 
-    if (userId) {
-      buscarDetalhesCuidador();
-    } else {
-      setError("ID do cuidador não fornecido.");
-      setLoading(false);
+    if (abrigoId && userEmail && !hasTriedLoading) { // Adiciona hasTriedLoading à condição
+      setLoading(true); // Garante que o loading seja ativado antes da busca
+      buscarEmailAbrigo();
+    } else if (hasTriedLoading) {
+      setLoading(false); // Se já tentou carregar, define loading como false
     }
-  }, [userId]);
+
+    if (userId && !hasTriedLoadingCuidador) { // Adiciona hasTriedLoadingCuidador à condição
+      setLoading(true); // Garante que o loading seja ativado antes da busca
+      buscarDetalhesCuidador();
+    } else if (hasTriedLoadingCuidador) {
+      setLoading(false); // Se já tentou carregar, define loading como false
+    }
+  }, [abrigoId, userEmail, hasTriedLoading, userId, hasTriedLoadingCuidador]); // Adiciona hasTriedLoading às dependências
 
   const handleDeleteCuidador = async () => {
     if (!cuidadorDetalhes || !cuidadorDetalhes.id) {
@@ -103,10 +120,10 @@ function PerfilCuidador({ route }) {
               } else {
                 let errorMsg = `Erro ao remover cuidador: ${response.status}`;
                 try {
-                    const errorData = await response.json();
-                    if (errorData && errorData.message) {
-                        errorMsg += ` - ${errorData.message}`;
-                    }
+                  const errorData = await response.json();
+                  if (errorData && errorData.message) {
+                    errorMsg += ` - ${errorData.message}`;
+                  }
                 } catch (e) {
                 }
                 throw new Error(errorMsg);
@@ -124,32 +141,7 @@ function PerfilCuidador({ route }) {
   };
 
   const refetchData = () => {
-    if (userId) {
-        setLoading(true);
-        setError(null);
-        setCuidadorDetalhes(null);
-        const buscarDetalhesCuidadorNovamente = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const response = await fetch(`http://${urlIp}:3000/cuidadores/${userId}`);
-                if (!response.ok) {
-                    let errorMessage = `Erro ao buscar cuidador: ${response.status}`;
-                    try { const errorData = await response.json(); if (errorData && errorData.message) errorMessage += ` - ${errorData.message}`; } catch (e) {}
-                    throw new Error(errorMessage);
-                }
-                const data = await response.json();
-                if (!data || !data.id) throw new Error('Dados do Cuidador inválidos');
-                setCuidadorDetalhes(data);
-            } catch (err) {
-                console.error('Erro ao buscar detalhes do cuidador (retry):', err);
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        buscarDetalhesCuidadorNovamente();
-    }
+    // Implemente a lógica para refetchData se necessário
   };
 
   if (loading) {
@@ -204,17 +196,20 @@ function PerfilCuidador({ route }) {
           <InfoRow label="E-mail" value={cuidadorDetalhes.email || 'Nenhum informado'} style={styles.infoGridItemWide} />
         </View>
 
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={handleDeleteCuidador}
-          disabled={isDeleting}
-        >
-          {isDeleting ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text style={styles.actionButtonText}>Remover Cuidador</Text>
-          )}
-        </TouchableOpacity>
+        {/* Renderiza o botão apenas se os emails forem iguais */}
+        {abrigoEmail === userEmail && (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.deleteButton]}
+            onPress={handleDeleteCuidador}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text style={styles.actionButtonText}>Remover Cuidador</Text>
+            )}
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );

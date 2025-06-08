@@ -46,7 +46,7 @@ function PerfilCandidato({ route, onAprovado }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ aprovacao: true }),
+        body: JSON.stringify({ aprovacao: true }), // Define aprovacao como true
       });
 
       if (!response.ok) {
@@ -60,10 +60,15 @@ function PerfilCandidato({ route, onAprovado }) {
             if (onAprovado) {
               onAprovado(candidaturaId);
             }
+            rejeitarCandidato(); // Exclui a candidatura após a aprovação
           }
         },
       ]);
       // Atualizar a interface para refletir a aprovação
+      setCandidatura(prevCandidatura => ({
+        ...prevCandidatura,
+        aprovacao: true,
+      }));
     } catch (err) {
       setError(`Erro ao aprovar candidato: ${err.message}`);
       Alert.alert('Erro', `Não foi possível aprovar o candidato: ${err.message}`);
@@ -83,10 +88,7 @@ function PerfilCandidato({ route, onAprovado }) {
         const errorData = await response.json();
         throw new Error(`Erro ao rejeitar candidato: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-
-      Alert.alert('Sucesso', 'Candidatura removida com sucesso!', [
-        { text: 'OK', onPress: () => { /* Atualizar a tela ou navegar de volta */ } },
-      ]);
+      
       // Atualizar a interface para refletir a rejeição
     } catch (err) {
       setError(`Erro ao rejeitar candidato: ${err.message}`);
@@ -275,4 +277,3 @@ const styles = StyleSheet.create({
 });
 
 export default PerfilCandidato;
-

@@ -18,11 +18,10 @@ function VoluntarioFormScreen() {
   const [loading, setLoading] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const [error, setError] = useState(null);
-  const [jaInscrito, setJaInscrito] = useState(false); // Novo estado
+  const [jaInscrito, setJaInscrito] = useState(false);
   const route = useRoute();
-  const { abrigoId } = route.params || {};
-
-  const userId = '681ea614e52f3511668cda67'; // Substitua pela forma real de obter o ID
+  // Obter abrigoId e userId dos parâmetros da rota
+  const { abrigoId, userId } = route.params || {};
 
   const verificarInscricao = async () => {
     try {

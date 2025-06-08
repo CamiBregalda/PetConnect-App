@@ -50,7 +50,7 @@ function AtualizarAbrigoScreen() {
 
     const getAbrigo = async () => {
         try {
-            const response = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}`, {
+            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,9 +80,9 @@ function AtualizarAbrigoScreen() {
                     }
             );
 
-            const responseImage = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}/imagem`);
+            const responseImage = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`);
             if (responseImage.ok) {
-                setImageUri(`http://192.168.3.5:3000/abrigos/${abrigoId}/imagem`);
+                setImageUri(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`);
             }
         } catch (error) {
             console.error('Erro ao buscar abrigo:', error);
@@ -106,7 +106,7 @@ function AtualizarAbrigoScreen() {
         });
 
         try {
-            const response = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}/imagem`, {
+            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -156,7 +156,7 @@ function AtualizarAbrigoScreen() {
 
     const handleUpdate = async () => {
         try {          
-            const response = await fetch(`http://192.168.3.5:3000/abrigos/${abrigoId}`, {
+            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

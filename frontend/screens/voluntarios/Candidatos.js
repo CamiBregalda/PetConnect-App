@@ -42,9 +42,8 @@ function ListaCandidatosScreen() {
     }, [buscarCandidatos])
   );
 
-  const exibirDetalhes = (userId, candidaturaId) => {
-    console.log(`ID da candidatura: ${candidaturaId}`);
-    navigation.navigate('PerfilCandidato', { userId: userId, candidaturaId: candidaturaId });
+  const exibirDetalhes = (userId, candidaturaId, abrigoId) => {
+    navigation.navigate('PerfilCandidato', { userId: userId, candidaturaId: candidaturaId, abrigoId: abrigoId });
   };
 
   if (loading) {

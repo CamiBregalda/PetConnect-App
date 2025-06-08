@@ -1,7 +1,10 @@
 import app from './app';
+import dotenv from 'dotenv';
 import { connectDatabase } from "./config/database";
 
-const PORT = 3000;
+dotenv.config();
+
+const PORT = process.env.PORT;
 
 connectDatabase();
 
