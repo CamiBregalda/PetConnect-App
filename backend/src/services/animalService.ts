@@ -37,6 +37,15 @@ export const getAnimaisByAbrigoId = async (abrigoId: string) => {
     }
 };
 
+export const getAnimaisAdotadosPorUsuario = async (userId: string) => {
+    try {
+        const animais = await AnimalModel.find({ idDono: userId, ativo: true }).select('-image');
+        return animais.map(animal => animal.toObject());
+    } catch (error: any) {
+        throw new Error("Erro ao buscar animais do abrigo: " + error.message);
+    }
+};
+
 export const updateAnimal = async (id: string, updatedData: any) => {
     try {
         if (updatedData.email && updatedData.adotado === true) {

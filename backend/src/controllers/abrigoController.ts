@@ -90,16 +90,16 @@ export const deleteAbrigo = async (req: Request, res: Response) => {
     }
 };
 
-export async function getAbrigosPorVoluntario(req: Request, res: Response) {
+export const getAbrigosPorUsuario = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
-        const abrigos = await Abrigo.find({ voluntarios: userId });
-        return res.json(abrigos);
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Erro interno' });
+        const userId = req.params.id;
+
+        const abrigos = await AbrigoService.getAbrigosPorUsuario(userId);
+        res.json(abrigos);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao buscar abrigos", error });
     }
-}
+};
 
 export const uploadImage = [
     upload.single('image'),

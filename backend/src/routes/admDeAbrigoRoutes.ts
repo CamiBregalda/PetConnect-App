@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { 
-    createAdmDeAbrigo, getAdmDeAbrigos, getAdmDeAbrigoById, updateAdmDeAbrigo, deleteAdmDeAbrigo, getAdmDeAbrigoWithAbrigo, uploadImage, getImage, deleteImage 
+    createAdmDeAbrigo, getAdmDeAbrigos, getAdmDeAbrigoById, updateAdmDeAbrigo, deleteAdmDeAbrigo, getAdmDeAbrigoByUserId, getAdmDeAbrigoWithAbrigo, uploadImage, getImage, deleteImage 
 } from '../controllers/admDeAbrigoController';
 
 const router = Router();
@@ -8,6 +8,7 @@ const router = Router();
 router.post('', createAdmDeAbrigo);
 router.get('', getAdmDeAbrigos);
 router.get('/:id', getAdmDeAbrigoById);
+router.get('/:id/user', getAdmDeAbrigoByUserId);
 router.get('/:id/abrigo', getAdmDeAbrigoWithAbrigo);
 router.put('/:id', updateAdmDeAbrigo);
 router.delete('/:id', deleteAdmDeAbrigo);

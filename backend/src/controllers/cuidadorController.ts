@@ -50,23 +50,11 @@ export const getCuidadorByUserId = async (req: Request, res: Response) => {
     }
 };
 
-export const getVoluntariosPorEvento = async (req: Request, res: Response) => {
+export const getCuidadoresByEventoId = async (req: Request, res: Response) => {
     try {
-        const { eventoId } = req.params;
-
-        if (!eventoId) {
-            return res.status(400).json({ message: 'ID do evento não fornecido' });
-        }
-
-        const voluntarios = await CuidadorService.getVoluntariosPorEvento(eventoId);
-
-        if (!voluntarios || voluntarios.length === 0) {
-            return res.status(404).json({ message: 'Nenhum voluntário encontrado para este evento' });
-        }
-
-        res.status(200).json(voluntarios);
+        const cuidadores = await CuidadorService.getCuidadoresByEventoId(req.params.eventoId);
+        res.status(200).json(cuidadores);
     } catch (error: any) {
-        console.error('Erro ao buscar voluntários por evento:', error);
         res.status(500).json({ message: error.message });
     }
 };

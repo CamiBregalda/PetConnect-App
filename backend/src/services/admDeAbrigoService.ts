@@ -46,6 +46,20 @@ export const getAdmDeAbrigoById = async (id: string) => {
     }
 };
 
+export const getAdmDeAbrigoByUserId = async (id: string) => {
+    try {
+        const admAbrigo = await AdmDeAbrigoModel.findOne({ userId: id, ativo: true }).populate('userId');
+
+        if (!admAbrigo || !admAbrigo.userId) {
+            throw new Error('Administrador de abrigo não encontrado');
+        }
+
+        return AdmDeAbrigoResponse.fromEntities(admAbrigo);
+    } catch (error: any) {
+        throw new Error('Erro ao buscar administrador de abrigo: ' + error.message);
+    }
+};
+
 export const getAdmDeAbrigoWithAbrigo = async (admId: string) => {
     try {
         const admDeAbrigo = await AdmDeAbrigoModel.findOne({ _id: admId, ativo: true }).populate('userId');
