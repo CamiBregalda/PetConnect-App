@@ -26,7 +26,7 @@ function AtualizarAbrigoScreen() {
     const [imageUri, setImageUri] = useState(null);
 
     useEffect(() => {
-            getAbrigo();
+        getAbrigo();
     }, []);
 
     const pickImage = async () => {
@@ -126,11 +126,11 @@ function AtualizarAbrigoScreen() {
     };
 
     const bodyData = {
-        nome: nome.trim(),
-        cnpj: cnpj.trim(),
-        email: email.trim(),
-        telefone: telefone.trim(),
-        descricao: descricao.trim(),
+        nome: (nome || '').trim(),
+        cnpj: (cnpj || '').trim(),
+        email: (email || '').trim(),
+        telefone: (telefone || '').trim(),
+        descricao: (descricao || '').trim(),
         endereco: {
             rua: (endereco.rua || '').trim(),
             numero: (endereco.numero || '').trim(),
@@ -156,7 +156,7 @@ function AtualizarAbrigoScreen() {
     }
 
     const handleUpdate = async () => {
-        try {          
+        try {
             const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`, {
                 method: 'PUT',
                 headers: {
@@ -184,40 +184,40 @@ function AtualizarAbrigoScreen() {
 
     return (
         <ScrollView>
-        <View style={styles.divCadastro} edges={['top']}>
-        <Text style={styles.title}>Atualizar Abrigo</Text>
-        <TextAtualizacaoAbrigoInput
-            nome={nome}
-            onChangeNome={onChangeNome}
-            cnpj={cnpj}
-            onChangeCnpj={onChangeCnpj}
-            email={email}
-            onChangeEmail={onChangeEmail}
-            telefone={telefone}
-            onChangeTelefone={onChangeTelefone}
-            endereco={endereco}
-            onChangeEndereco={handleEnderecoChange}
-            descricao={descricao}
-            onChangeDescricao={onChangeDescricao}
-        />
+            <View style={styles.divCadastro} edges={['top']}>
+                <Text style={styles.title}>Atualizar Abrigo</Text>
+                <TextAtualizacaoAbrigoInput
+                    nome={nome}
+                    onChangeNome={onChangeNome}
+                    cnpj={cnpj}
+                    onChangeCnpj={onChangeCnpj}
+                    email={email}
+                    onChangeEmail={onChangeEmail}
+                    telefone={telefone}
+                    onChangeTelefone={onChangeTelefone}
+                    endereco={endereco}
+                    onChangeEndereco={handleEnderecoChange}
+                    descricao={descricao}
+                    onChangeDescricao={onChangeDescricao}
+                />
 
-        <Pressable onPress={pickImage}>
-            {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
-            ) : (
-                <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
-                </View>
-            )}
-        </Pressable>
+                <Pressable onPress={pickImage}>
+                    {imageUri ? (
+                        <Image source={{ uri: imageUri }} style={styles.image} />
+                    ) : (
+                        <View style={styles.imagePlaceholder}>
+                            <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+                        </View>
+                    )}
+                </Pressable>
 
-        <Pressable
-            style={styles.botao}
-            onPress={handleUpdate}
-        >
-            <Text style={styles.textoBotao}>Atualizar</Text>
-        </Pressable>
-        </View>
+                <Pressable
+                    style={styles.botao}
+                    onPress={handleUpdate}
+                >
+                    <Text style={styles.textoBotao}>Atualizar</Text>
+                </Pressable>
+            </View>
         </ScrollView>
     );
 }
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
-        padding: 50, 
+        padding: 50,
     },
     title: {
         fontSize: 18,

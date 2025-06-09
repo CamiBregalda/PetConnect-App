@@ -3,57 +3,77 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } fr
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
-import MapView from './../../components/MapView'; 
+import MapView from './../../components/MapView';
 
 export default function InicialUser() {
-  const route = useRoute();
-  const { userId } = route.params;
-  const [userInfo, setUserInfo] = useState(null);
   const navigation = useNavigation();
+  const route = useRoute();
+  const userId = route.params?.userId;
 
+  const [userInfo, setUserInfo] = useState(null);
 
-  const handleAdminAbrigo = async () => {
+  const getUserInfo = async () => {
     try {
-      const response = await fetch(`http://${urlIp}:3000/admAbrigo/${userId}/user`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao buscar abrigo');
-      }
-
+      if (!userId) throw new Error('ID do usuário não fornecido.');
+      const response = await fetch(`http://${urlIp}:3000/users/${userId}`);
+      if (!response.ok) throw new Error('Erro ao buscar informações do usuário.');
       const data = await response.json();
-
-      fetch(`http://${urlIp}:3000/admAbrigo/${data.id}/abrigo`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });;
-      if (resAdmin.status === 404) {
-        navigation.navigate('CadastroAbrigo');
-        return;
-      }
-      if (!resAdmin.ok) {
-        throw new Error('Não foi possível verificar dados do abrigo.');
-      }
-      const adminData = await resAdmin.json();
-      console.log('🏠 handleAdminAbrigo adminData =', adminData);
-      const abrigoId = adminData.abrigoId || adminData.idAbrigo || adminData.id;
-      if (!abrigoId) {
-        throw new Error('Campo abrigoId não retornado pela API de admAbrigo.');
-      }
-      navigation.navigate('AtualizarAbrigo', { userId, abrigoId });
-    } catch (err) {
-      console.error('Erro ao buscar adminAbrigo:', err);
-      Alert.alert('Erro', err.message.includes('abrigoId') ? err.message : 'Falha na conexão ao servidor.');
+      setUserInfo(data);
+    } catch (error) {
+      console.error('Erro ao buscar informações do usuário:', error);
+      Alert.alert('Erro', error.message || 'Falha na conexão ao servidor.');
     }
   };
 
-  // Configura header com saudação e botão de casa
+  useEffect(() => {
+    getUserInfo();
+  }, [userId]);
+
+  const handleAdminAbrigo = async () => {
+    try {
+      if (!userId) throw new Error('ID do usuário não fornecido.');
+      // 1) Buscar registro de adminAbrigo para o user
+      const resAdminRecord = await fetch(`http://${urlIp}:3000/admAbrigo/${userId}/user`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (resAdminRecord.status === 404) {
+        // Sem registro, navegar para cadastro
+        navigation.navigate('CadastroAbrigo', { userId });
+        return;
+      }
+      if (!resAdminRecord.ok) throw new Error('Erro ao buscar registro de adminAbrigo.');
+      const adminRecord = await resAdminRecord.json();
+      const adminAbrigoId = adminRecord.id || adminRecord.adminAbrigoId;
+      if (!adminAbrigoId) throw new Error('Campo id (adminAbrigo) não retornado pela API.');
+
+      // 2) Buscar dados do abrigo vinculado
+      const resAbrigo = await fetch(`http://${urlIp}:3000/admAbrigo/${adminAbrigoId}/abrigo`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (resAbrigo.status === 404) {
+        navigation.navigate('CadastroAbrigo', { userId });
+        return;
+      }
+      if (!resAbrigo.ok) throw new Error('Erro ao buscar dados do abrigo.');
+      const abrigoData = await resAbrigo.json();
+      console.log('>> abrigoData:', abrigoData);
+      const abrigoId =
+        abrigoData.abrigo?.id ??
+        abrigoData.abrigoId ??
+        abrigoData.id ??
+        abrigoData.idAbrigo;
+      if (!abrigoId) throw new Error('Campo abrigoId não retornado pela API.');
+
+      // Navegar para AtualizarAbrigo
+      navigation.navigate('AtualizarAbrigo', { userId, abrigoId });
+    } catch (err) {
+      console.error('Erro ao buscar adminAbrigo:', err);
+      Alert.alert('Erro', err.message || 'Falha na conexão ao servidor.');
+    }
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
       title: userInfo ? `${userInfo.nome}` : 'Usuário',
@@ -69,21 +89,6 @@ export default function InicialUser() {
     });
   }, [navigation, userInfo]);
 
-  // Busca informações do usuário
-  const getUserInfo = async () => {
-    try {
-      const response = await fetch(`http://${urlIp}:3000/users/${userId}`);
-      const data = await response.json();
-      setUserInfo(data);
-    } catch (error) {
-      console.error('Erro ao buscar informações do usuário:', error);
-    }
-  };
-
-  useEffect(() => {
-    getUserInfo();
-  }, []);
-
   if (!userInfo) {
     return (
       <View style={styles.loadingContainer}>
@@ -94,18 +99,10 @@ export default function InicialUser() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Foto de perfil */}
       <Image
-        source={{
-          uri:
-            userInfo.imagemUrl ||
-            userInfo.avatarUrl ||
-            'https://via.placeholder.com/150'
-        }}
+        source={{ uri: userInfo.imagemUrl || userInfo.avatarUrl || 'https://via.placeholder.com/150' }}
         style={styles.profileImage}
       />
-
-      {/* Card com nome, descrição e botão de editar */}
       <View style={styles.infoBox}>
         <View style={styles.headerRow}>
           <Text style={styles.label}>{userInfo.nome}</Text>
@@ -116,23 +113,17 @@ export default function InicialUser() {
             <Ionicons name="create-outline" size={20} color="#9333ea" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.description}>
-          {userInfo.descricao || 'Sem descrição cadastrada.'}
-        </Text>
+        <Text style={styles.description}>{userInfo.descricao || 'Sem descrição cadastrada.'}</Text>
       </View>
-
-      {/* Endereço e Mapa */}
       <View style={styles.infoBox}>
         <Text style={styles.label}>Endereço:</Text>
         <Text style={styles.addressText}>
           {userInfo.endereco
-            ? `${userInfo.endereco.rua}, ${userInfo.endereco.numero} - ${userInfo.endereco.bairro}, ${userInfo.endereco.cidade} - ${userInfo.endereco.estado}, ${userInfo.endereco.cep}`
+            ? `${userInfo.endereco.rua}, ${userInfo.endereco.cidade} - ${userInfo.endereco.estado}, ${userInfo.endereco.cep}`
             : 'Sem endereço.'}
         </Text>
         <View style={styles.mapContainer}>
-          {userInfo.endereco && (
-            <MapView enderecoAbrigo={userInfo.endereco} />
-          )}
+          {userInfo.endereco && <MapView enderecoAbrigo={userInfo.endereco} />}
         </View>
       </View>
     </ScrollView>
@@ -141,66 +132,31 @@ export default function InicialUser() {
 
 const styles = StyleSheet.create({
   loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1, justifyContent: 'center', alignItems: 'center'
   },
   container: {
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
+    alignItems: 'center', padding: 16, backgroundColor: '#f5f5f5'
   },
   profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    marginVertical: 20,
+    width: 150, height: 150, borderRadius: 75, marginVertical: 20
   },
   infoBox: {
-    width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    width: '90%', backgroundColor: '#fff', borderRadius: 10, padding: 16,
+    marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1, shadowRadius: 2, elevation: 2
   },
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8
   },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  description: {
-    fontSize: 14,
-    color: '#555',
-  },
-  editProfileButton: {
-    padding: 4,
-  },
-  homeButton: {
-    marginRight: 16,
-  },
+  label: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  description: { fontSize: 14, color: '#555' },
+  editProfileButton: { padding: 4 },
+  homeButton: { marginRight: 16 },
   addressText: {
-    marginTop: 8,
-    textAlign: 'center',
-    color: '#333',
-    fontSize: 14,
+    marginTop: 8, textAlign: 'center', color: '#333', fontSize: 14
   },
   mapContainer: {
-    marginTop: 8,
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: '#e0e0e0',
+    marginTop: 8, width: '100%', height: 200, borderRadius: 10,
+    overflow: 'hidden', backgroundColor: '#e0e0e0'
   },
 });
