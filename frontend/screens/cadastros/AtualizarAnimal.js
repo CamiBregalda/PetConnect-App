@@ -23,8 +23,6 @@ function AtualizarAnimalScreen() {
     const [deficiencias, onChangeDeficiencias] = useState(['']);
     const [vacinas, onChangeVacinas] = useState(['']);
     const [informacoes, onChangeInformacoes] = useState('');
-    const [idDono, onChangeIdDono] = useState(userId);
-    const [adotado, onChangeAdotado] = useState(false);
     const [imageUri, onChangeImageUri] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -118,8 +116,6 @@ function AtualizarAnimalScreen() {
             onChangeDeficiencias(data.deficiencias);
             onChangeVacinas(data.vacinas);
             onChangeInformacoes(data.informacoes);
-            onChangeIdDono(data.idDono);
-            onChangeAdotado(data.adotado);
 
             const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`);
             if (responseImage.ok) {
@@ -193,9 +189,7 @@ function AtualizarAnimalScreen() {
         doencas: clearList(doencas),
         deficiencias: clearList(deficiencias),
         vacinas: clearList(vacinas),
-        informacoes: informacoes?.trim(),
-        idDono: idDono,
-        adotado: adotado,
+        informacoes: informacoes?.trim()
     };
 
     for (const key in bodyData) {
@@ -258,10 +252,6 @@ function AtualizarAnimalScreen() {
                     onChangeVacinas={onChangeVacinas}
                     informacoesAdicionais={informacoes}
                     onChangeInformacoesAdicionais={onChangeInformacoes}
-                    adotado={adotado}
-                    onChangeAdotado={onChangeAdotado}
-                    idDono={idDono}
-                    onChangeIdDono={onChangeIdDono}
                 />
 
                 <Pressable onPress={pickImage}>

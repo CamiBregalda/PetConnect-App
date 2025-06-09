@@ -57,39 +57,39 @@ export default function CriarEvento() {
     }
   };
 
-  const getImageMimeType = uri => {
-    if (uri.endsWith('.png')) return 'image/png';
-    if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
-    return 'image/jpeg';
-  };
+  const getImageMimeType = (uri) => {
+          if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
+          if (uri.endsWith('.png')) return 'image/png';
+          return 'image/jpeg';
+      };
+  
+  const handleImageUpdate = async (eventoId) => {
+    const mimeType = getImageMimeType(imageUri);
 
-  const handleImageUpload = async (eventoId) => {
-    try {
-      const form = new FormData();
-      const mime = getImageMimeType(imageUri);
-      const ext = mime.split('/')[1];
-      form.append('image', {
+      const formData = new FormData();
+      formData.append('image', {
         uri: imageUri,
-        name: `evento.${ext}`,
-        type: mime,
+        name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
+        type: mimeType,
       });
 
-      const res = await fetch(
-        `http://${urlIp}:3000/eventos/${eventoId}/imagem`,
-        {
+      try {
+        const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
           method: 'POST',
-          headers: { 'Content-Type': 'multipart/form-data' },
-          body: form,
-        }
-      );
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Erro ao enviar imagem');
-      }
-    } catch (err) {
-      console.error('Erro ao enviar imagem:', err);
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        });
 
-    }
+        if (!response.ok) {
+          throw new Error('Falha ao enviar a imagem');
+        }
+
+        console.log('Imagem enviada com sucesso');
+      } catch (error) {
+        console.error('Erro ao enviar imagem:', error);
+      }
   };
 
   const handleCriar = async () => {
@@ -134,22 +134,22 @@ export default function CriarEvento() {
         },
       };
 
-      const resp = await fetch(`http://${urlIp}:3000/eventos/${evento.id}`, {
+      const response = await fetch(`http://${urlIp}:3000/eventos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-      if (!resp.ok) {
-        const errText = await resp.text();
-        throw new Error(errText || `Status ${resp.status}`);
-      }
-      const novo = await resp.json(); 
-
-      if (imageUri && novo.id) {
-        await handleImageUpload(novo.id);
+      
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar animal');
       }
 
-      Alert.alert('Sucesso', 'Evento criado!');
+      const data = await response.json();
+
+      if (imageUri) {
+        await handleImageUpdate(data.id);
+      }
+
       navigation.navigate('EventosAdm', { userId, abrigoId });
     } catch (err) {
       console.error('Erro ao criar evento:', err);
@@ -224,7 +224,7 @@ export default function CriarEvento() {
             <Text>{dataFim || 'Selecionar data'}</Text>
           </TouchableOpacity>
           {showFim && (
-            <DatePicker
+            <DateTimePicker
               value={dataFim ? new Date(dataFim) : new Date()}
               mode="date"
               display="default"
