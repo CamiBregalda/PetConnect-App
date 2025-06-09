@@ -91,7 +91,7 @@ function HomeAdm({ route }) {
                     style={{ marginRight: 20 }}
                     onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId, userId })}
                 >
-                    <Ionicons name="add-circle-outline" size={30} color="white" />
+                    <Ionicons name="create-outline" size={30} color="white" />
                 </TouchableOpacity>
             ),
         });

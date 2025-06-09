@@ -25,18 +25,30 @@ function AnimaisAdm() { // Removido route como prop
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useLayoutEffect(() => {
-  navigation.setOptions({
-    headerRight: () => (
-      <TouchableOpacity
-        style={{ marginRight: 20 }}
-        onPress={() => navigation.navigate('CadastroAnimal', { abrigoId: currentAbrigoId, userId })}
-      >
-        <Ionicons name="add-circle-outline" size={30} color="white" />
-      </TouchableOpacity>
-    ),
-  });
-}, [navigation, currentAbrigoId, userId]);
+useLayoutEffect(() => {
+    // Só mostra o botão se userId do abrigo (abrigoInfo.userId) for igual ao userId do parâmetro
+    if (
+        abrigoInfo &&
+        abrigoInfo.userId &&
+        userId &&
+        String(abrigoInfo.userId) === String(userId)
+    ) {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity
+                    style={{ marginRight: 20 }}
+                    onPress={() => navigation.navigate('CadastroAnimal', { abrigoId: currentAbrigoId, userId })}
+                >
+                    <Ionicons name="add-circle-outline" size={30} color="white" />
+                </TouchableOpacity>
+            ),
+        });
+    } else {
+        navigation.setOptions({
+            headerRight: () => null,
+        });
+    }
+}, [navigation, currentAbrigoId, userId, abrigoInfo]);
 
   const buscarDados = useCallback(async () => {
     console.log('AnimaisAdm buscarDados - currentAbrigoId:', currentAbrigoId, 'userId:', userId);

@@ -213,7 +213,7 @@ function InfoAdm() {
     <View style={styles.listContainer}>
       {cuidadores.map((cuidador) => (
         <View key={cuidador.id} style={styles.itemContainer}>
-          <TouchableOpacity style={styles.listItem} onPress={() => exibirDetalhesVoluntario(cuidador)}>
+          <TouchableOpacity  onPress={() => exibirDetalhesVoluntario(cuidador)}>
             <Image
               source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
               style={styles.listImage}
@@ -393,20 +393,7 @@ const styles = StyleSheet.create({
     width: '50%',
     alignItems: 'center',
   },
-  listItem: {
-    marginRight: 12,
-    alignItems: 'center',
-    width: 160,
-    backgroundColor: 'white',
-    padding: 10,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 2,
-    elevation: 2,
-    borderRadius: 8,
-    justifyContent: 'center',
-    minHeight: 150,
-  },
+
   listImage: {
     width: 100,
     height: 100,
