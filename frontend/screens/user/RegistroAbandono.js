@@ -19,6 +19,7 @@ import { urlIp } from '@env';
 export default function RegistroAbandono() {
   const navigation = useNavigation();
   const { userId } = useRoute().params;
+  console.log('abandono - userId from route.params:', userId);
 
   // Estado para descrição e endereço
   const [descricao, onChangeDescricao] = useState('');

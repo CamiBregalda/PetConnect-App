@@ -37,6 +37,19 @@ const ChamadoAbandono = () => {
         fetchAbandonos();
     }, []);
 
+    useLayoutEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            style={{ marginRight: 20 }}
+            onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId: currentAbrigoId, userId })}
+          >
+            <Ionicons name="add-circle-outline" size={30} color="white" />
+          </TouchableOpacity>
+        ),
+      });
+    }, [navigation, currentAbrigoId, userId]);
+
     const handleResgatarAnimal = async (abandonoId) => {
         try {
             const response = await fetch(`http://${urlIp}:3000/abandonos/${abandonoId}`, { // Endpoint para marcar como resgatado

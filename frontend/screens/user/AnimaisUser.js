@@ -9,6 +9,7 @@ export default function AnimaisUser() {
   const navigation = useNavigation();
   const route = useRoute();
   const { userId } = route.params;
+  console.log('AnimaisUser - userId from route.params:', userId);
 
   // Estado de busca e filtros
   const [search, setSearch] = useState('');

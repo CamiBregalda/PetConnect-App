@@ -26,7 +26,6 @@ function InfoAdm() {
       setAbrigoInfo(null);
       return;
     }
-    console.log(`[InfoAdm buscarInfoAbrigo] Buscando informações para o abrigo ID: ${abrigoId}`);
     try {
       const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
       const response = await fetch(apiUrl);
@@ -34,12 +33,10 @@ function InfoAdm() {
         const errorData = await response.json();
         throw new Error(`Erro ao buscar informações do abrigo: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-      const data = await response.json();
-      console.log('[InfoAdm buscarInfoAbrigo] Informações do abrigo recebidas:', data);
+      const data = await response.json();;
       setAbrigoInfo(data);
       navigation.setOptions({ title: data.nome || 'Informações do Abrigo' });
     } catch (err) {
-      console.error('InfoAdm: Erro ao buscar informações do abrigo:', err);
       setError(prevError => prevError ? `${prevError}\n${err.message}` : err.message);
       setAbrigoInfo(null);
       navigation.setOptions({ title: 'Erro ao Carregar Abrigo' });
@@ -66,7 +63,6 @@ function InfoAdm() {
 
       const data = await response.json();
       setCuidadores(data.cuidadores || []);
-      console.log('InfoAdm: Voluntários do abrigo carregados:', data.cuidadores);
     } catch (err) {
       console.error('InfoAdm: Erro ao buscar voluntários:', err);
       setError(err.message);
@@ -78,7 +74,6 @@ function InfoAdm() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('[InfoAdm useFocusEffect] Iniciando. currentAbrigoId:', currentAbrigoId);
       if (currentAbrigoId) {
         setLoading(true);
         setError(null);
@@ -91,11 +86,9 @@ function InfoAdm() {
         ]).catch((promiseAllError) => {
           console.error('[InfoAdm useFocusEffect] Erro geral no Promise.all (erros individuais já devem ter sido logados e tratados):', promiseAllError);
         }).finally(() => {
-          console.log('[InfoAdm useFocusEffect] Buscas (Promise.all) finalizadas. Definindo loading para false.');
           setLoading(false);
         });
       } else {
-        console.log('[InfoAdm useFocusEffect] currentAbrigoId é nulo/undefined. Limpando estados e definindo loading para false.');
         setLoading(false);
         setAbrigoInfo(null);
         setCuidadores([]);
@@ -103,7 +96,7 @@ function InfoAdm() {
         navigation.setOptions({ title: 'Informações Gerais' });
       }
       return () => {
-        console.log('[InfoAdm useFocusEffect] Limpeza (tela perdeu foco ou desmontou). currentAbrigoId era:', currentAbrigoId);
+        
       };
     }, [currentAbrigoId, buscarInfoAbrigo, buscarCuidadores, navigation])
   );
@@ -125,14 +118,11 @@ function InfoAdm() {
       return;
     }
     navigation.navigate('Voluntariarse', { abrigoId: abrigoId, userId: userId });
-    console.log('InfoAdm seVoluntariar - abrigoId:', abrigoId, 'userId:', userId);
   };
 
   const exibirDetalhesVoluntario = (cuidador) => {
     navigation.navigate('PerfilCuidador', { cuidadoresId: cuidador.id, userId: userId });
   };
-
-  console.log(`[InfoAdm Render] Loading: ${loading}, Error: ${error}, Cuidadores: ${cuidadores.length}`);
 
   if (loading) {
     return (

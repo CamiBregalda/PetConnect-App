@@ -36,6 +36,7 @@ import CriarEvento from '../../screens/eventos/CriarEvento';
 import UsuarioInfo from '../../screens/user/InicialUser';
 import ChamadoAbandono from '../../screens/adm/ChamadoAbandono';
 import AdocaoAnimal from '../../screens/cadastros/AdocaoAnimal';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 
@@ -43,147 +44,94 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 
-function MainTabs({ navigation, route }) {
-  const routeParams = route.params || {};
-  const actualParams = routeParams.params || {};
-  const userIdFromMainRoute = actualParams.userId;
-  const abrigoIdFromMainRoute = actualParams.abrigoId;
-
-  console.log('MainTabs - Montado/Renderizado com userIdFromMainRoute:', userIdFromMainRoute, 'e abrigoIdFromMainRoute:', abrigoIdFromMainRoute);
-
-  useEffect(() => {
-    const backAction = () => {
-      const parentState = navigation.getState();
-      let currentTab = null;
-      const mainTabsRouteObject = parentState.routes[parentState.index];
-
-      if (mainTabsRouteObject && mainTabsRouteObject.state && mainTabsRouteObject.state.routeNames) {
-        const tabState = mainTabsRouteObject.state;
-        const tabIndex = tabState.index ?? 0;
-        currentTab = tabState.routeNames[tabIndex];
-      } else if (mainTabsRouteObject && mainTabsRouteObject.params && mainTabsRouteObject.params.screen) {
-        currentTab = mainTabsRouteObject.params.screen;
-      } else if (mainTabsRouteObject && mainTabsRouteObject.name === 'Home') {
-        currentTab = mainTabsRouteObject.name;
-      }
-
-      if (currentTab === 'Home' || currentTab === 'Animais' || currentTab === 'Informações') {
-        if (userIdFromMainRoute) { // Verifica se userIdFromMainRoute existe
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }], // Passa o userId
-          });
-        } else {
-          navigation.reset({ index: 0, routes: [{ name: 'TelaPrincipal' }] });
-        }
-        return true;
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-    return () => backHandler.remove();
-  }, [navigation, userIdFromMainRoute]);
+function MainTabs({ route }) {
+  const userId = route?.params?.userId;
+  const abrigoId = route?.params?.abrigoId;
+  console.log('MainTabs userId:', userId, 'abrigoId:', abrigoId);
+  
 
   return (
     <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={({ route: tabRoute, navigation: tabNavigationProp }) => {
-        return {
-          headerShown: true,
-          headerStyle: { backgroundColor: '#8A2BE2' },
-          headerTintColor: 'white',
-          headerTitleAlign: 'center',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => {
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'TelaPrincipal', params: { userId: userIdFromMainRoute } }], // Passa o userId
-              });
-            }}>
-              <Image source={require('../../img/seta.png')} style={styles.homeIcon} />
-            </TouchableOpacity>
-          ),
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            if (tabRoute.name === 'Home') {
-              iconName = focused ? require('../../img/Home_Active.png') : require('../../img/Home_Inactive.png');
-            } else if (tabRoute.name === 'Animais') {
-              iconName = focused ? require('../../img/Animais_Active.png') : require('../../img/Animais_Inactive.png');
-            } else if (tabRoute.name === 'Informações') {
-              iconName = focused ? require('../../img/Profile_Active.png') : require('../../img/Profile_Inactive.png');
-            }
-            return <Image source={iconName} style={{ width: size, height: size, tintColor: color }} />;
-          },
-          tabBarActiveTintColor: '#8A2BE2',
-          tabBarInactiveTintColor: 'gray',
-          tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 100, paddingBottom: 5, paddingTop: 5 },
-          tabBarLabelStyle: { fontSize: 12 },
-        };
-      }}
+      initialRouteName="HomeAdm"
+      screenOptions={({ route, navigation: tabNavigationProp }) => ({
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: '#8A2BE2',
+        },
+        headerTintColor: 'white',
+        headerTitleAlign: 'center',
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => {
+            tabNavigationProp.reset({
+              index: 0,
+              routes: [{ name: 'TelaPrincipal', params: { userId } }],
+            });
+          }}>
+            <Image
+              source={require('../../img/seta.png')}
+              style={styles.homeIcon}
+            />
+          </TouchableOpacity>
+        ),
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === 'HomeAdm') {
+            iconName = focused
+              ? require('../../img/Home_Active.png')
+              : require('../../img/Home_Inactive.png');
+          } else if (route.name === 'AnimaisAdm') {
+            iconName = focused
+              ? require('../../img/Animais_Active.png')
+              : require('../../img/Animais_Inactive.png');
+          } else if (route.name === 'InfoAdm') {
+            iconName = focused
+              ? require('../../img/Profile_Active.png')
+              : require('../../img/Profile_Inactive.png');
+          }
+          return <Image source={iconName} style={{ width: size, height: size, tintColor: color }} />;
+        },
+        tabBarActiveTintColor: '#8A2BE2',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: { backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#E7E3E3', height: 100, paddingBottom: 5, paddingTop: 5 },
+        tabBarLabelStyle: { fontSize: 12 },
+      })}
     >
       <Tab.Screen
-        name="Animais"
-        component={AnimaisAdm}
-        initialParams={{ userId: userIdFromMainRoute }}
-        options={{ title: 'Animais', tabBarShowLabel: false }}
-      />
-      <Tab.Screen
-        name="Home"
+        name="HomeAdm"
         component={HomeAdm}
-        initialParams={{ userId: userIdFromMainRoute, abrigoId: abrigoIdFromMainRoute }}
-        options={{ title: 'Abrigo', tabBarShowLabel: false }}
+        initialParams={{ userId, abrigoId }}
+       options={{
+          title: 'Inicio',
+          tabBarShowLabel: false,
+        }}
       />
       <Tab.Screen
-        name="Informações"
+        name="AnimaisAdm"
+        component={AnimaisAdm}
+        initialParams={{ userId, abrigoId }}
+        options={{
+          title: 'Animais',
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tab.Screen
+        name="InfoAdm"
         component={InfoAdm}
-        initialParams={{ userId: userIdFromMainRoute }}
-        options={{ title: 'Informações', tabBarShowLabel: false }}
+        initialParams={{ userId, abrigoId }}
+        options={{
+          title: 'Informações',
+          tabBarShowLabel: false,
+        }}
       />
     </Tab.Navigator>
   );
 }
 
-function UserTabs({ navigation, route }) {
-  const { userId } = route.params;
-
-  useEffect(() => {
-    const backAction = () => {
-      const parentState = navigation.getState();
-      let currentTab = null;
-      const mainTabsRouteObject = parentState.routes[parentState.index];
-
-      if (mainTabsRouteObject && mainTabsRouteObject.state && mainTabsRouteObject.state.routeNames) {
-        const tabState = mainTabsRouteObject.state;
-        const tabIndex = tabState.index ?? 0;
-        currentTab = tabState.routeNames[tabIndex];
-      } else if (mainTabsRouteObject && mainTabsRouteObject.params && mainTabsRouteObject.params.screen) {
-        currentTab = mainTabsRouteObject.params.screen;
-      } else if (mainTabsRouteObject && mainTabsRouteObject.name === 'Home') {
-        currentTab = mainTabsRouteObject.name;
-      }
-
-      if (
-        currentTab === 'Home' ||
-        currentTab === 'Animais' ||
-        currentTab === 'Informações'
-      ) {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'InicialUser', params: { userId } }],
-        });
-        return true;
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction
-    );
-
-    return () => backHandler.remove();
-  }, [navigation, userId]);
+function UserTabs({ route }) {
+  const userId = route?.params?.userId;
+  const abrigoId = route?.params?.abrigoId;
+  console.log('MainTabs userId:', userId, 'abrigoId:', abrigoId);
+  
 
   return (
     <Tab.Navigator
@@ -197,7 +145,7 @@ function UserTabs({ navigation, route }) {
         headerTitleAlign: 'center',
         headerLeft: () => (
           <TouchableOpacity onPress={() => {
-            navigation.reset({
+            tabNavigationProp.reset({
               index: 0,
               routes: [{ name: 'TelaPrincipal', params: { userId } }],
             });
@@ -214,11 +162,11 @@ function UserTabs({ navigation, route }) {
             iconName = focused
               ? require('../../img/Home_Active.png')
               : require('../../img/Home_Inactive.png');
-          } else if (route.name === 'Animais') {
+          } else if (route.name === 'AnimaisUser') {
             iconName = focused
               ? require('../../img/Animais_Active.png')
               : require('../../img/Animais_Inactive.png');
-          } else if (route.name === 'Informações') {
+          } else if (route.name === 'RegistroAbandono') {
             iconName = focused
               ? require('../../img/Profile_Active.png')
               : require('../../img/Profile_Inactive.png');
@@ -232,29 +180,29 @@ function UserTabs({ navigation, route }) {
       })}
     >
       <Tab.Screen
-        name="Animais"
+        name="Home"
+        component={InicialUser}
+        initialParams={{ userId, abrigoId }}
+       options={{
+          title: 'Inicio',
+          tabBarShowLabel: false,
+        }}
+      />
+      <Tab.Screen
+        name="AnimaisUser"
         component={AnimaisUser}
-        initialParams={{ userId }}
+        initialParams={{ userId, abrigoId }}
         options={{
           title: 'Animais',
           tabBarShowLabel: false,
         }}
       />
       <Tab.Screen
-        name="Home"
-        component={InicialUser}
-        initialParams={{ userId }}
-        options={{
-          title: 'Usuario',
-          tabBarShowLabel: false,
-        }}
-      />
-      <Tab.Screen
-        name="Informações"
+        name="RegistroAbandono"
         component={RegistroAbandono}
-        initialParams={{ userId }}
+        initialParams={{ userId, abrigoId }}
         options={{
-          title: 'Registrar Abandono',
+          title: 'Informações',
           tabBarShowLabel: false,
         }}
       />

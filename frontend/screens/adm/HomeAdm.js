@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState, useEffect,useLayoutEffect, useContext } from 'react';
+import { View, Image, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 // Removido WebView daqui, pois será usado no AbrigoMapView
 import { useNavigation } from '@react-navigation/native';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 import MapView from './../../components/MapView'; 
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 function HomeAdm({ route }) {
-  const { userId, abrigoId } = route.params || {};
+  const userId = route?.params?.userId;
+  const abrigoId = route?.params?.abrigoId;
   console.log('HomeAdm userId:', userId, 'abrigoId:', abrigoId);
-
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
   const { setCurrentAbrigoId } = useContext(AbrigoContext);
+
 
   useEffect(() => {
 
@@ -38,8 +40,6 @@ function HomeAdm({ route }) {
           setCurrentAbrigoId(data.id);
           navigation.setOptions({ title: data.nome });
 
-          // A lógica de geocodificação e mapa será tratada pelo AbrigoMapView
-          // que receberá data.endereco como prop.
 
           if (data.idAdmAbrigo) {
             await buscarInfoAdmin(data.idAdmAbrigo);
@@ -81,6 +81,26 @@ function HomeAdm({ route }) {
 
     buscarInfoAbrigo();
   }, [navigation, abrigoId, setCurrentAbrigoId, urlIp]);
+
+  useLayoutEffect(() => {
+    // Só mostra o botão se userId do abrigo (abrigoInfo.userId) for igual ao userId do parâmetro
+    if (abrigoInfo && abrigoInfo.userId && abrigoInfo.userId === userId) {
+        navigation.setOptions({
+            headerRight: () => (
+                <TouchableOpacity
+                    style={{ marginRight: 20 }}
+                    onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId, userId })}
+                >
+                    <Ionicons name="add-circle-outline" size={30} color="white" />
+                </TouchableOpacity>
+            ),
+        });
+    } else {
+        navigation.setOptions({
+            headerRight: () => null,
+        });
+    }
+}, [navigation, abrigoInfo, userId, abrigoId]);
 
   if (loading) {
     return (

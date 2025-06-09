@@ -9,9 +9,10 @@ import TelaFiltro from '../../components/TelaFiltro'; // Importa o componente do
 
 function HomeScreen() {
   const route = useRoute();
-  const telaPrincipalUserId = route.params?.userId;
+  // Pega o userId passado por parâmetro da tela anterior
+  const userId = route.params?.userId;
   const navigation = useNavigation();
-  const userId = telaPrincipalUserId;
+  console.log('TelaPrincipal - userId:', userId); // Log para verificar se o userId está sendo passado corretamente
 
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
@@ -45,7 +46,7 @@ function HomeScreen() {
         </TouchableOpacity>
       ),
       headerRight: () => (
-        <TouchableOpacity onPress={() => exibirDetalhesUsuario(telaPrincipalUserId)}>
+        <TouchableOpacity onPress={() => exibirDetalhesUsuario(userId)}>
           <Image
             source={require('../../img/Profile_Active.png')} // Certifique-se que o caminho está correto
             style={styles.headerProfileIcon}
@@ -53,7 +54,7 @@ function HomeScreen() {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, telaPrincipalUserId]);
+  }, [navigation, userId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,16 +94,13 @@ function HomeScreen() {
   }, []);
 
   const exibirDetalhesAnimal = (animal) => {
-    navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal, userId: telaPrincipalUserId });
+    navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal, userId: userId });
   };
 
-  const exibirDetalhesAbrigo = (idDoAbrigo) => {
-    console.log('TelaPrincipal - Saindo com userId:', telaPrincipalUserId, 'para abrigoId:', idDoAbrigo); // Modifiquei o log para clareza
-    navigation.navigate('Main', {
-      screen: 'Home', 
-      params: { abrigoId: idDoAbrigo, userId: telaPrincipalUserId }
-    });
-  };
+ const exibirDetalhesAbrigo = (idDoAbrigo, userId) => {
+  console.log('TelaPrincipal - Saindo com userId:', userId, 'para abrigoId:', idDoAbrigo);
+  navigation.navigate('Main', { abrigoId: idDoAbrigo, userId: userId });
+};
 
   const exibirDetalhesUsuario = (userId) => {
     navigation.navigate('InicialUser', { userId: userId });
@@ -110,7 +108,7 @@ function HomeScreen() {
 
   const exibirDetalhesEvento = (evento) => {
     console.log('buscando abrigoId do evento:', evento.idAbrigo);
-    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento, userId: telaPrincipalUserId, abrigoId: evento.idAbrigo });
+    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento, userId: userId, abrigoId: evento.idAbrigo });
   };
 
   const handleSearch = (text) => {
@@ -166,7 +164,7 @@ function HomeScreen() {
 
        <TouchableOpacity
         style={styles.botaoEventosAdm}
-        onPress={() => navigation.navigate('EventosAdm', { userId: telaPrincipalUserId, abrigoId: "682a3ea6bc939ba819b39e79" })} // Passa abrigoId como null para eventos administrativos
+        onPress={() => navigation.navigate('EventosAdm', { userId: userId, abrigoId: "682a3ea6bc939ba819b39e79" })} // Passa abrigoId como null para eventos administrativos
       >
         <Text style={styles.botaoEventosAdmTexto}>Gerenciar Eventos (Admin)</Text>
       </TouchableOpacity>
@@ -191,7 +189,7 @@ function HomeScreen() {
         <Text style={styles.sectionTitle}>Abrigos</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {abrigosFiltrados.length > 0 ? abrigosFiltrados.map((abrigo) => (
-            <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id)}>
+            <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id, userId)}>
               <Image
                 source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
                 style={styles.listImage}
