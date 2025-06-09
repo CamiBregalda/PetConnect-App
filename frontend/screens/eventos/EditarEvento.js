@@ -15,6 +15,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import TextAtualizacaoEnderecoInput from '../../components/TextAtualizacaoEnderecoInput';
 import { urlIp } from '@env';
 
 export default function EditarEvento() {
@@ -24,10 +25,8 @@ export default function EditarEvento() {
   const [titulo, setTitulo] = useState(evento.titulo);
   const [descricao, setDescricao] = useState(evento.descricao);
   const [objetivo, setObjetivo] = useState(evento.objetivo);
-  const formatDate = isoString =>
-  isoString ? isoString.split('T')[0] : '';
-  const [dataInicio, setDataInicio] = useState(formatDate(evento.dataInicio));
-  const [dataFim, setDataFim] = useState(formatDate(evento.dataFim));
+  const [dataInicio, setDataInicio] = useState(new Date());
+  const [dataFim, setDataFim] = useState(new Date());
   const [endereco, setEndereco] = useState({
     rua: evento.endereco.rua || '',
     numero: evento.endereco.numero || '',
@@ -36,11 +35,21 @@ export default function EditarEvento() {
     estado: evento.endereco.estado || '',
     cep: evento.endereco.cep || '',
   });
-
   const [imageUri, setImageUri] = useState(evento.imagemUrl || null);
   const [loading, setLoading] = useState(false);
   const [showInicio, setShowInicio] = useState(false);
   const [showFim, setShowFim] = useState(false);
+
+  React.useEffect(() => {
+  if (evento.dataInicio) {
+    setDataInicio(new Date(evento.dataInicio));
+  }
+
+  if (evento.dataFim) {
+    setDataFim(new Date(evento.dataFim));
+  }
+}, [evento]);
+
 
   const handleEnderecoChange = (campo, valor) => {
     setEndereco(prev => ({ ...prev, [campo]: valor }));
@@ -196,11 +205,13 @@ export default function EditarEvento() {
 
           <Text style={styles.label}>Data de Início</Text>
           <TouchableOpacity style={styles.input} onPress={() => setShowInicio(true)}>
-            <Text>{dataInicio || 'Selecionar data'}</Text>
+            <Text>
+              {dataInicio ? dataInicio.toLocaleDateString() : 'Selecionar data'}
+            </Text>
           </TouchableOpacity>
           {showInicio && (
             <DateTimePicker
-              value={dataInicio ? dataInicio.toLocaleDateString() : new Date()}
+              value={dataInicio ? dataInicio : new Date()}
               mode="date"
               display="default"
               onChange={(_, d) => {
@@ -212,11 +223,13 @@ export default function EditarEvento() {
 
           <Text style={styles.label}>Data de Término</Text>
           <TouchableOpacity style={styles.input} onPress={() => setShowFim(true)}>
-            <Text>{dataFim || 'Selecionar data'}</Text>
+            <Text>
+              {dataFim ? dataFim.toLocaleDateString() : 'Selecionar data'}
+            </Text>
           </TouchableOpacity>
           {showFim && (
             <DateTimePicker
-              value={dataFim ? parseDate(dataFim).toLocaleDateString() : new Date()}
+              value={dataFim ? dataFim : new Date()}
               mode="date"
               display="default"
               onChange={(_, d) => {

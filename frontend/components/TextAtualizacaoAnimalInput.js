@@ -17,9 +17,7 @@ const TextAtualizacaoAnimalInput = (
         doencas, onChangeDoencas, 
         deficiencias, onChangeDeficiencias,
         vacinas, onChangeVacinas,
-        informacoesAdicionais, onChangeInformacoesAdicionais,
-        adotado, onChangeAdotado,
-        idDono, onChangeIdDono
+        informacoesAdicionais, onChangeInformacoesAdicionais
     }) => {
 
     const [listaEspecies, setListaEspecies] = React.useState([]);
