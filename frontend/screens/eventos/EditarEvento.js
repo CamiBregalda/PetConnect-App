@@ -9,7 +9,8 @@ import {
   Image,
   Alert,
   ActivityIndicator,
-  Platform
+  Platform,
+  Pressable
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -251,13 +252,15 @@ export default function EditarEvento() {
             />
           ))}
 
-          <Text style={styles.label}>Foto do Evento</Text>
-          <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
-            {imageUri
-              ? <Image source={{ uri: imageUri }} style={styles.image} />
-              : <Text style={styles.plus}>+</Text>
-            }
-          </TouchableOpacity>
+          <Pressable onPress={pickImage} style={{ alignSelf: 'center', marginVertical: 20 }}>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.image} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+              <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+              </View>
+            )}
+          </Pressable>
 
           <TouchableOpacity
             style={styles.button}
@@ -306,7 +309,6 @@ const styles = StyleSheet.create({
     marginTop: 8, marginBottom: 16,
     overflow: 'hidden'
   },
-  image: { width: 80, height: 80 },
   plus: { fontSize: 32, color: '#888' },
   button: {
     backgroundColor: '#8A2BE2',
@@ -315,5 +317,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20
   },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 }
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  imagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  imagePlaceholderText: {
+    color: '#888',
+    textAlign: 'center',
+  },
 });
