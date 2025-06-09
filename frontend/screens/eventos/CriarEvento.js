@@ -27,19 +27,18 @@ export default function CriarEvento() {
   const [objetivo, onChangeObjetivo] = useState('');
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
-  const [endereco, onChangeEndereco] = useState({
+  const [endereco, setEndereco] = useState({
     rua: '', numero: '', bairro: '',
     cidade: '', estado: '', cep: ''
   });
 
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const [showInicio, setShowInicio] = useState(false);
   const [showFim, setShowFim] = useState(false);
 
   const handleEnderecoChange = (campo, valor) => {
-    onChangeEndereco(prev => ({ ...prev, [campo]: valor }));
+    setEndereco(prev => ({ ...prev, [campo]: valor }));
   };
 
   const pickImage = async () => {
@@ -59,39 +58,39 @@ export default function CriarEvento() {
   };
 
   const getImageMimeType = (uri) => {
-          if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
-          if (uri.endsWith('.png')) return 'image/png';
+      if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
+        if (uri.endsWith('.png')) return 'image/png';
           return 'image/jpeg';
-      };
+        };
   
-  const handleImageUpdate = async (eventoId) => {
-    const mimeType = getImageMimeType(imageUri);
-
-      const formData = new FormData();
-      formData.append('image', {
-        uri: imageUri,
-        name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
-        type: mimeType,
-      });
-
-      try {
-        const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
+        const handleImageUpdate = async (eventoId) => {
+        const mimeType = getImageMimeType(imageUri);
+    
+        const formData = new FormData();
+        formData.append('image', {
+          uri: imageUri,
+          name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
+          type: mimeType,
         });
-
-        if (!response.ok) {
-          throw new Error('Falha ao enviar a imagem');
+    
+        try {
+          const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            body: formData,
+          });
+  
+          if (!response.ok) {
+            throw new Error('Falha ao enviar a imagem');
+          }
+  
+          console.log('Imagem enviada com sucesso');
+        } catch (error) {
+          console.error('Erro ao enviar imagem:', error);
         }
-
-        console.log('Imagem enviada com sucesso');
-      } catch (error) {
-        console.error('Erro ao enviar imagem:', error);
-      }
-  };
+    };
 
   const handleCriar = async () => {
     if (!abrigoId) {
@@ -142,9 +141,8 @@ export default function CriarEvento() {
       });
       
       if (!response.ok) {
-        throw new Error('Erro ao atualizar animal');
+        throw new Error('Erro ao atualizar evento');
       }
-
       const data = await response.json();
 
       if (imageUri) {
@@ -163,10 +161,7 @@ export default function CriarEvento() {
   return (
     <>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Crie um Evento</Text>
@@ -199,10 +194,7 @@ export default function CriarEvento() {
           />
 
           <Text style={styles.label}>Data de Início</Text>
-          <TouchableOpacity
-            style={styles.input}
-            onPress={() => setShowInicio(true)}
-          >
+          <TouchableOpacity style={styles.input} onPress={() => setShowInicio(true)}>
             <Text>{dataInicio || 'Selecionar data'}</Text>
           </TouchableOpacity>
           {showInicio && (
@@ -218,10 +210,7 @@ export default function CriarEvento() {
           )}
 
           <Text style={styles.label}>Data de Término</Text>
-          <TouchableOpacity
-            style={styles.input}
-            onPress={() => setShowFim(true)}
-          >
+          <TouchableOpacity style={styles.input} onPress={() => setShowFim(true)}>
             <Text>{dataFim || 'Selecionar data'}</Text>
           </TouchableOpacity>
           {showFim && (
@@ -236,17 +225,50 @@ export default function CriarEvento() {
             />
           )}
 
-          <Text style={styles.label}>Endereço</Text>
-          {['rua', 'numero', 'bairro', 'cidade', 'estado', 'cep'].map(campo => (
-            <TextInput
-              key={campo}
-              placeholder={campo.charAt(0).toUpperCase() + campo.slice(1)}
-              style={styles.input}
-              value={endereco[campo]}
-              onChangeText={val => handleEnderecoChange(campo, val)}
-              keyboardType={campo === 'numero' || campo === 'cep' ? 'number-pad' : 'default'}
-            />
-          ))}
+          {/* Campo Endereço com labels separados */}
+          <Text style={styles.label}>Rua</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.rua}
+            onChangeText={val => handleEnderecoChange('rua', val)}
+          />
+
+          <Text style={styles.label}>Número</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.numero}
+            onChangeText={val => handleEnderecoChange('numero', val)}
+            keyboardType="number-pad"
+          />
+
+          <Text style={styles.label}>Bairro</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.bairro}
+            onChangeText={val => handleEnderecoChange('bairro', val)}
+          />
+
+          <Text style={styles.label}>Cidade</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.cidade}
+            onChangeText={val => handleEnderecoChange('cidade', val)}
+          />
+
+          <Text style={styles.label}>Estado</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.estado}
+            onChangeText={val => handleEnderecoChange('estado', val)}
+          />
+
+          <Text style={styles.label}>CEP</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.cep}
+            onChangeText={val => handleEnderecoChange('cep', val)}
+            keyboardType="number-pad"
+          />
 
           <Pressable onPress={pickImage} style={{ alignSelf: 'center', marginVertical: 20 }}>
             {imageUri ? (

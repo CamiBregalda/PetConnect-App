@@ -53,13 +53,13 @@ export const getAdmDeAbrigoWithAbrigo = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
-        const admDeAbrigo = await AdmDeAbrigoModel.findOne({ userId: id }).populate('abrigo');
+        const admDeAbrigo = await AdmDeAbrigoService.getAdmDeAbrigoWithAbrigo(id);
 
         if (!admDeAbrigo) {
         return res.status(404).json({ error: 'Administrador de abrigo não encontrado' });
         }
 
-        return res.json({ abrigo: admDeAbrigo.abrigo });
+        return res.json(admDeAbrigo);
     } catch (error) {
         console.error('Erro ao buscar administrador e abrigo:', error);
         return res.status(500).json({ error: 'Erro ao buscar administrador e abrigo' });

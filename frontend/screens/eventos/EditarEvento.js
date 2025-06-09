@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import TextAtualizacaoEnderecoInput from '../../components/TextAtualizacaoEnderecoInput';
 import { urlIp } from '@env';
 
 export default function EditarEvento() {
@@ -26,8 +25,8 @@ export default function EditarEvento() {
   const [titulo, setTitulo] = useState(evento.titulo);
   const [descricao, setDescricao] = useState(evento.descricao);
   const [objetivo, setObjetivo] = useState(evento.objetivo);
-  const [dataInicio, setDataInicio] = useState(new Date());
-  const [dataFim, setDataFim] = useState(new Date());
+  const [dataInicio, setDataInicio] = useState(new Date(evento.dataInicio));
+  const [dataFim, setDataFim] = useState(new Date(evento.dataFim));
   const [endereco, setEndereco] = useState({
     rua: evento.endereco.rua || '',
     numero: evento.endereco.numero || '',
@@ -40,17 +39,6 @@ export default function EditarEvento() {
   const [loading, setLoading] = useState(false);
   const [showInicio, setShowInicio] = useState(false);
   const [showFim, setShowFim] = useState(false);
-
-  React.useEffect(() => {
-  if (evento.dataInicio) {
-    setDataInicio(new Date(evento.dataInicio));
-  }
-
-  if (evento.dataFim) {
-    setDataFim(new Date(evento.dataFim));
-  }
-}, [evento]);
-
 
   const handleEnderecoChange = (campo, valor) => {
     setEndereco(prev => ({ ...prev, [campo]: valor }));
@@ -72,50 +60,46 @@ export default function EditarEvento() {
     }
   };
 
-  const getImageMimeType = uri => {
-    if (uri.endsWith('.png')) return 'image/png';
-    if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
-    return 'image/jpeg';
-  };
+  const getImageMimeType = (uri) => {
+    if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
+      if (uri.endsWith('.png')) return 'image/png';
+        return 'image/jpeg';
+      };
 
-  const handleImageUpload = async (eventoId) => {
-    if (!imageUri || imageUri === evento.imagemUrl) return;
-    try {
-      const form = new FormData();
-      const mime = getImageMimeType(imageUri);
-      const ext = mime.split('/')[1];
-      form.append('image', {
+      const handleImageUpload = async (eventoId) => {
+      const mimeType = getImageMimeType(imageUri);
+  
+      const formData = new FormData();
+      formData.append('image', {
         uri: imageUri,
-        name: `evento.${ext}`,
-        type: mime,
+        name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
+        type: mimeType,
       });
+  
+      try {
+        const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        });
 
-      const res = await fetch(
-        `http://${urlIp}:3000/eventos/${eventoId}/imagem`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'multipart/form-data' },
-          body: form,
-        },
-      );
-      if (!res.ok) {
-        const txt = await res.text();
-        console.error('Resposta de erro completa:', errText);
-        throw new Error(txt || 'Erro ao enviar imagem');
+        if (!response.ok) {
+          throw new Error('Falha ao enviar a imagem');
+        }
+
+        console.log('Imagem enviada com sucesso');
+      } catch (error) {
+        console.error('Erro ao enviar imagem:', error);
       }
-    } catch (err) {
-      console.error('Erro ao enviar imagem:', err);
-    }
   };
 
   const handleSalvar = async () => {
-
     if (
       !titulo.trim() ||
       !descricao.trim() ||
       !objetivo.trim() ||
-      !dataInicio.trim() ||
-      !dataFim.trim() ||
       !endereco.rua.trim() ||
       !endereco.numero.trim() ||
       !endereco.bairro.trim() ||
@@ -133,8 +117,8 @@ export default function EditarEvento() {
         titulo: titulo.trim(),
         descricao: descricao.trim(),
         objetivo: objetivo.trim(),
-        dataInicio: dataInicio.trim(),
-        dataFim: dataFim.trim(),
+        dataInicio: dataInicio.toISOString().split('T')[0],
+        dataFim: dataFim.toISOString().split('T')[0],
         idAbrigo: evento.abrigoId,
         endereco: {
           rua: endereco.rua.trim(),
@@ -170,7 +154,6 @@ export default function EditarEvento() {
 
   return (
     <>
-
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#333" />
@@ -206,51 +189,80 @@ export default function EditarEvento() {
 
           <Text style={styles.label}>Data de Início</Text>
           <TouchableOpacity style={styles.input} onPress={() => setShowInicio(true)}>
-            <Text>
-              {dataInicio ? dataInicio.toLocaleDateString() : 'Selecionar data'}
-            </Text>
+            <Text>{dataInicio.toLocaleDateString()}</Text>
           </TouchableOpacity>
           {showInicio && (
             <DateTimePicker
-              value={dataInicio ? dataInicio : new Date()}
+              value={dataInicio}
               mode="date"
               display="default"
               onChange={(_, d) => {
                 setShowInicio(Platform.OS === 'ios');
-                if (d) setDataInicio(d.toISOString().split('T')[0]);
+                if (d) setDataInicio(d);
               }}
             />
           )}
 
           <Text style={styles.label}>Data de Término</Text>
           <TouchableOpacity style={styles.input} onPress={() => setShowFim(true)}>
-            <Text>
-              {dataFim ? dataFim.toLocaleDateString() : 'Selecionar data'}
-            </Text>
+            <Text>{dataFim.toLocaleDateString()}</Text>
           </TouchableOpacity>
           {showFim && (
             <DateTimePicker
-              value={dataFim ? dataFim : new Date()}
+              value={dataFim}
               mode="date"
               display="default"
               onChange={(_, d) => {
                 setShowFim(Platform.OS === 'ios');
-                if (d) setDataFim(d.toISOString().split('T')[0]);
+                if (d) setDataFim(d);
               }}
             />
           )}
 
-          <Text style={styles.label}>Endereço</Text>
-          {['rua', 'numero', 'bairro', 'cidade', 'estado', 'cep'].map(campo => (
-            <TextInput
-              key={campo}
-              placeholder={campo[0].toUpperCase() + campo.slice(1)}
-              style={styles.input}
-              value={endereco[campo]}
-              onChangeText={val => handleEnderecoChange(campo, val)}
-              keyboardType={campo === 'numero' || campo === 'cep' ? 'number-pad' : 'default'}
-            />
-          ))}
+          {/* Campos de Endereço com labels acima */}
+          <Text style={styles.label}>Rua</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.rua}
+            onChangeText={val => handleEnderecoChange('rua', val)}
+          />
+
+          <Text style={styles.label}>Número</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.numero}
+            onChangeText={val => handleEnderecoChange('numero', val)}
+            keyboardType="number-pad"
+          />
+
+          <Text style={styles.label}>Bairro</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.bairro}
+            onChangeText={val => handleEnderecoChange('bairro', val)}
+          />
+
+          <Text style={styles.label}>Cidade</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.cidade}
+            onChangeText={val => handleEnderecoChange('cidade', val)}
+          />
+
+          <Text style={styles.label}>Estado</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.estado}
+            onChangeText={val => handleEnderecoChange('estado', val)}
+          />
+
+          <Text style={styles.label}>CEP</Text>
+          <TextInput
+            style={styles.input}
+            value={endereco.cep}
+            onChangeText={val => handleEnderecoChange('cep', val)}
+            keyboardType="number-pad"
+          />
 
           <Pressable onPress={pickImage} style={{ alignSelf: 'center', marginVertical: 20 }}>
             {imageUri ? (
@@ -297,17 +309,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     borderRadius: 6,
     padding: 10,
-    marginTop: 6
+    marginTop: 6,
   },
   textArea: { height: 80, textAlignVertical: 'top' },
   imageBox: {
-    width: 80, height: 80,
+    width: 80,
+    height: 80,
     alignSelf: 'center',
     borderRadius: 6,
-    borderWidth: 1, borderColor: '#ccc',
-    justifyContent: 'center', alignItems: 'center',
-    marginTop: 8, marginBottom: 16,
-    overflow: 'hidden'
+    borderWidth: 1,
+    borderColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+    overflow: 'hidden',
   },
   plus: { fontSize: 32, color: '#888' },
   button: {
@@ -315,7 +331,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 6,
     alignItems: 'center',
-    marginTop: 20
+    marginTop: 20,
   },
   buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
   image: {

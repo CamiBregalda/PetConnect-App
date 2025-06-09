@@ -72,7 +72,7 @@ export const getAbrigoById = async (id: string) => {
 
 export const getAbrigoByAdmId = async (abrigoId: string) => {
     try {
-        const abrigo = await AbrigoModel.findOne({ idAdmAbrigo: abrigoId, ativo: true });
+        const abrigo = await AbrigoModel.findOne({ idAdmAbrigo: abrigoId, ativo: true }).select('-image');
         if (!abrigo) {
             throw new Error('Abrigo não encontrado');
         }
