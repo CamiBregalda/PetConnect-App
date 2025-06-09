@@ -1,201 +1,334 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useNavigation, useFocusEffect, useRoute } from "@react-navigation/native"; // Adicionado useRoute
-import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useContext } from 'react';
+import { useNavigation, useFocusEffect, useRoute } from "@react-navigation/native";
+import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 
-function InfoAdm() { // Removido route como prop, usaremos useRoute()
+function InfoAdm() {
   const navigation = useNavigation();
-  const route = useRoute(); // Hook para acessar os parâmetros da rota
-  const { userId } = route.params || {}; // Acessa userId passado via initialParams
-  console.log('InfoAdm - userId from route.params:', userId);
+  const route = useRoute();
+  const { userId } = route.params || {};
 
   const { currentAbrigoId } = useContext(AbrigoContext);
+
+  console.log('InfoAdm - userId from route.params:', userId);
+  console.log('[InfoAdm Render Start] currentAbrigoId:', currentAbrigoId);
+
   const [abrigoInfo, setAbrigoInfo] = useState(null);
+  const [cuidadores, setCuidadores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingCuidadores, setLoadingCuidadores] = useState(true);
   const [error, setError] = useState(null);
 
   const buscarInfoAbrigo = useCallback(async (abrigoId) => {
     if (!abrigoId) {
-      setLoading(false);
+      console.log('[InfoAdm buscarInfoAbrigo] ID do abrigo não fornecido.');
       setAbrigoInfo(null);
       return;
     }
-
-    setLoading(true);
-    setError(null);
+    console.log(`[InfoAdm buscarInfoAbrigo] Buscando informações para o abrigo ID: ${abrigoId}`);
     try {
       const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
       const response = await fetch(apiUrl);
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Erro ao buscar informações do abrigo: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-
       const data = await response.json();
+      console.log('[InfoAdm buscarInfoAbrigo] Informações do abrigo recebidas:', data);
       setAbrigoInfo(data);
-      setLoading(false);
       navigation.setOptions({ title: data.nome || 'Informações do Abrigo' });
     } catch (err) {
       console.error('InfoAdm: Erro ao buscar informações do abrigo:', err);
-      setError(err.message);
-      setLoading(false);
-      navigation.setOptions({ title: 'Erro ao Carregar' });
+      setError(prevError => prevError ? `${prevError}\n${err.message}` : err.message);
+      setAbrigoInfo(null);
+      navigation.setOptions({ title: 'Erro ao Carregar Abrigo' });
     }
   }, [navigation]);
 
+  const buscarCuidadores = useCallback(async (abrigoId) => {
+    if (!abrigoId) {
+      setLoadingCuidadores(false);
+      setCuidadores([]);
+      return;
+    }
+
+    setLoadingCuidadores(true);
+    setError(null);
+    try {
+      const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}/Cuidadores`;
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Erro ao buscar voluntários: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+      }
+
+      const data = await response.json();
+      setCuidadores(data.cuidadores || []);
+      console.log('InfoAdm: Voluntários do abrigo carregados:', data.cuidadores);
+    } catch (err) {
+      console.error('InfoAdm: Erro ao buscar voluntários:', err);
+      setError(err.message);
+      setCuidadores([]);
+    } finally {
+      setLoadingCuidadores(false);
+    }
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      console.log('InfoAdm useFocusEffect - currentAbrigoId:', currentAbrigoId, 'userId:', userId);
+      console.log('[InfoAdm useFocusEffect] Iniciando. currentAbrigoId:', currentAbrigoId);
       if (currentAbrigoId) {
-        buscarInfoAbrigo(currentAbrigoId);
+        setLoading(true);
+        setError(null);
+        setAbrigoInfo(null);
+        setCuidadores([]);
+
+        Promise.all([
+          buscarInfoAbrigo(currentAbrigoId),
+          buscarCuidadores(currentAbrigoId)
+        ]).catch((promiseAllError) => {
+          console.error('[InfoAdm useFocusEffect] Erro geral no Promise.all (erros individuais já devem ter sido logados e tratados):', promiseAllError);
+        }).finally(() => {
+          console.log('[InfoAdm useFocusEffect] Buscas (Promise.all) finalizadas. Definindo loading para false.');
+          setLoading(false);
+        });
       } else {
+        console.log('[InfoAdm useFocusEffect] currentAbrigoId é nulo/undefined. Limpando estados e definindo loading para false.');
         setLoading(false);
         setAbrigoInfo(null);
+        setCuidadores([]);
+        setError(null);
         navigation.setOptions({ title: 'Informações Gerais' });
       }
-    }, [currentAbrigoId, buscarInfoAbrigo, navigation, userId])
+      return () => {
+        console.log('[InfoAdm useFocusEffect] Limpeza (tela perdeu foco ou desmontou). currentAbrigoId era:', currentAbrigoId);
+      };
+    }, [currentAbrigoId, buscarInfoAbrigo, buscarCuidadores, navigation])
   );
 
+  const verChamadosAbandono = (abrigoId) => {
+    if (!abrigoId) {
+      console.warn('InfoAdm: Tentativa de ver chamados sem abrigoId');
+      setError('ID do abrigo não disponível para ver chamados.');
+      return;
+    }
+    console.log('InfoAdm verChamadosAbandono - abrigoId:', abrigoId);
+    navigation.navigate('ChamadoAbandono', { abrigoId: abrigoId });
+  };
+
   const seVoluntariar = (abrigoId) => {
+    if (!abrigoId) {
+      console.warn('InfoAdm: Tentativa de se voluntariar sem abrigoId');
+      setError('ID do abrigo não disponível para se voluntariar.');
+      return;
+    }
     navigation.navigate('Voluntariarse', { abrigoId: abrigoId, userId: userId });
     console.log('InfoAdm seVoluntariar - abrigoId:', abrigoId, 'userId:', userId);
   };
 
+  const exibirDetalhesVoluntario = (cuidador) => {
+    navigation.navigate('PerfilCuidador', { cuidadoresId: cuidador.id, userId: userId });
+  };
+
+  console.log(`[InfoAdm Render] Loading: ${loading}, Error: ${error}, Cuidadores: ${cuidadores.length}`);
+
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.containerActivity}>
         <ActivityIndicator size="large" color="#8A2BE2" />
+        <Text>Carregando informações...</Text>
       </View>
     );
   }
 
-  if (error) {
+  if (error && !abrigoInfo && (!cuidadores || cuidadores.length === 0)) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
-         <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm', { userId: userId })}>
-          <Text style={styles.textoBotao}>Voluntarios</Text>
-        </Pressable>
-        <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
-          <Text style={styles.textoBotao}>Voluntariar-se</Text>
-        </Pressable>
+      <View style={styles.containerError}>
+        <Text style={styles.errorText}>Erro ao carregar dados: {error}</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {abrigoInfo && (
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoTitle}>Informações do Abrigo</Text>
-          {abrigoInfo.telefone && <Text>Telefone: {abrigoInfo.telefone}</Text>}
-          {abrigoInfo.email && <Text>Email: {abrigoInfo.email}</Text>}
+    <ScrollView
+      style={styles.scrollViewContainer}
+      contentContainerStyle={styles.scrollViewContentContainer}
+    >
+      <View style={styles.mainContentContainer}>
+        {abrigoInfo ? (
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoTitle}>Informações do Abrigo</Text>
+            <Text>Nome: {abrigoInfo.nome || 'Não disponível'}</Text>
+            {abrigoInfo.telefone && <Text>Telefone: {abrigoInfo.telefone}</Text>}
+            {abrigoInfo.email && <Text>Email: {abrigoInfo.email}</Text>}
+          </View>
+        ) : (
+          !loading && !(error && !cuidadores.length) &&
+          <Text style={styles.notFoundText}>Informações do abrigo não disponíveis.</Text>
+        )}
+
+        {error && (abrigoInfo || (cuidadores && cuidadores.length > 0) || !loading) && (
+          <View style={styles.partialErrorContainer}>
+            <Text style={styles.errorText}>Aviso: {error}</Text>
+          </View>
+        )}
+
+        <View style={styles.eventosContainer}>
+          <TouchableOpacity
+            style={styles.eventosHeader}
+            onPress={() => navigation.navigate('ListaEventos', { abrigoId: currentAbrigoId })}
+          >
+            <Text style={styles.eventosTitle}>Nossos Eventos:</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.eventItem}
+            onPress={() => navigation.navigate('EventoDetalhe', {
+              evento: {
+                titulo: '15/05 Limpeza do Canil',
+                objetivo: 'Limpar e organizar o espaço dos animais.',
+                dataInicio: '15/05/2024',
+                dataFim: '15/05/2024',
+                detalhes: 'Levar luvas e materiais de limpeza.',
+              }
+            })}
+          >
+            <Text style={styles.eventText}>15/05 Limpeza do Canil</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.eventItem}
+            onPress={() => navigation.navigate('EventoDetalhe', {
+              evento: {
+                titulo: '26/05 Adoção na Praça',
+                objetivo: 'Evento de adoção pública.',
+                dataInicio: '26/05/2024',
+                dataFim: '26/05/2024',
+                detalhes: 'Traga coleiras e plaquinhas.',
+              }
+            })}
+          >
+            <Text style={styles.eventText}>26/05 Adoção na Praça</Text>
+          </TouchableOpacity>
         </View>
-      )}
 
-      {/* BLOCO DE EVENTOS COM DOIS TOQUES DIFERENTES */}
-      <View style={styles.eventosContainer}>
-        <TouchableOpacity
-          style={styles.eventosHeader}
-          onPress={() => navigation.navigate('ListaEventos', { abrigoId: currentAbrigoId })}
-        >
-          <Text style={styles.eventosTitle}>Nossos Eventos:</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.eventItem}
-          onPress={() => navigation.navigate('EventoDetalhe', {
-            evento: {
-              titulo: '15/05 Limpeza do Canil',
-              objetivo: 'Limpar e organizar o espaço dos animais.',
-              dataInicio: '15/05/2024',
-              dataFim: '15/05/2024',
-              detalhes: 'Levar luvas e materiais de limpeza.',
-            }
-          })}
-        >
-          <Text style={styles.eventText}>15/05 Limpeza do Canil</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.eventItem}
-          onPress={() => navigation.navigate('EventoDetalhe', {
-            evento: {
-              titulo: '26/05 Adoção na Praça',
-              objetivo: 'Evento de adoção pública.',
-              dataInicio: '26/05/2024',
-              dataFim: '26/05/2024',
-              detalhes: 'Traga coleiras e plaquinhas.',
-            }
-          })}
-        >
-          <Text style={styles.eventText}>26/05 Adoção na Praça</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Pressable style={styles.botao} onPress={() => navigation.navigate('VoluntariosAdm', { userId: userId })}>
-        <Text style={styles.textoBotao}>Voluntarios</Text>
-      </Pressable>
-      <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
-        <Text style={styles.textoBotao}>Voluntariar-se</Text>
-      </Pressable>
+       <View style={styles.whiteContainer}>
+  <View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>Voluntários</Text>
+    <TouchableOpacity onPress={() => navigation.navigate('VoluntariosAdm', { userId })}>
+      <Text style={styles.verTodosText}>Ver todos</Text>
+    </TouchableOpacity>
+  </View>
+  {cuidadores.length > 0 ? (
+    <View style={styles.listContainer}>
+      {cuidadores.map((cuidador) => (
+        <View key={cuidador.id} style={styles.itemContainer}>
+          <TouchableOpacity style={styles.listItem} onPress={() => exibirDetalhesVoluntario(cuidador)}>
+            <Image
+              source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
+              style={styles.listImage}
+              onError={(e) => console.log('Erro img cuidador:', e.nativeEvent.error)}
+            />
+          </TouchableOpacity>
+          <Text style={styles.listItemText}>{cuidador.nome}</Text>
+        </View>
+      ))}
     </View>
+  ) : (
+    <Text>Nenhum voluntário associado a este abrigo.</Text>
+  )}
+</View>
+        <View style={styles.buttonsContainer}>
+          <Pressable style={styles.botao} onPress={() => verChamadosAbandono(currentAbrigoId)}>
+            <Text style={styles.textoBotao}>Chamados de Abandono</Text>
+          </Pressable>
+          <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
+            <Text style={styles.textoBotao}>Voluntariar-se</Text>
+          </Pressable>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollViewContainer: {
     flex: 1,
+    backgroundColor: '#f0f0f0',
+  },
+  scrollViewContentContainer: {
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    paddingVertical: 20,
+    paddingBottom: 40,
+  },
+  mainContentContainer: {
+    width: '100%',
+    maxWidth: 600,
+    alignItems: 'center',
+  },
+  containerActivity: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
     padding: 20,
   },
+  containerError: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f0f0f0',
+  },
+  partialErrorContainer: {
+    width: '90%',
+    padding: 10,
+    backgroundColor: '#ffe0e0',
+    borderColor: '#d00000',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  errorText: {
+    color: '#d00000',
+    fontSize: 16,
+    textAlign: 'center',
+  },
   infoContainer: {
+    width: '90%',
     marginBottom: 20,
     padding: 15,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    alignItems: 'flex-start',
-    width: '90%',
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   infoTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
-  },
-  botao: {
-    width: 200,
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 50,
-    backgroundColor: '#8A2BE2',
-    borderRadius: 5,
-    elevation: 3,
-    marginTop: 20,
-  },
-  textoBotao: {
-    color: 'white',
-    fontSize: 16,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
+    color: '#333',
   },
   eventosContainer: {
     width: '90%',
-    backgroundColor: '#9333ea',
+    backgroundColor: '#8A2BE2',
     borderRadius: 10,
     paddingBottom: 12,
     marginBottom: 20,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   eventosHeader: {
-    backgroundColor: '#9333ea',
     padding: 12,
   },
   eventosTitle: {
@@ -204,8 +337,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   eventItem: {
-    backgroundColor: '#e5e5e5',
-    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     marginHorizontal: 12,
     borderRadius: 8,
     marginTop: 10,
@@ -213,6 +347,123 @@ const styles = StyleSheet.create({
   eventText: {
     color: '#333',
     fontSize: 14,
+  },
+  section: {
+    width: '90%',
+    marginBottom: 25,
+    backgroundColor: "white",
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    paddingTop: 15,
+    paddingBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+    width: '100%', 
+  },
+  sectionTitle: {
+
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  verTodosText: {
+    color: '#8A2BE2',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  listScrollViewContentContainer: {
+    paddingRight: 10,
+    minHeight: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyListContainerScrollView: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  listContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  itemContainer: {
+    padding: 10,
+    marginBottom: 15,
+    marginTop: 15,
+    width: '50%',
+    alignItems: 'center',
+  },
+  listItem: {
+    marginRight: 12,
+    alignItems: 'center',
+    width: 160,
+    backgroundColor: 'white',
+    padding: 10,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 2,
+    elevation: 2,
+    borderRadius: 8,
+    justifyContent: 'center',
+    minHeight: 150,
+  },
+  listImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+    backgroundColor: '#e0e0e0',
+  },
+  listItemText: {
+    fontSize: 15,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: "#333",
+  },
+  notFoundText: {
+    marginTop: 10,
+    color: '#666',
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  whiteContainer: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    width: '90%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  buttonsContainer: {
+    alignItems: 'center',
+    width: '90%',
+    marginTop: 10,
+  },
+  botao: {
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    paddingVertical: 14,
+    backgroundColor: '#8A2BE2',
+    borderRadius: 8,
+    elevation: 2,
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  textoBotao: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

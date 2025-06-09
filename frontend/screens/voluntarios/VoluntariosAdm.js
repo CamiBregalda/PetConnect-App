@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native'; // Certifique-se de que Image está importado
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { AbrigoContext } from '../../AppContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
@@ -17,32 +17,7 @@ function Voluntarios() {
   console.log('VoluntariosAdm - loggedInUserId from route.params:', loggedInUserId);
   console.log('VoluntariosAdm - currentAbrigoId from AbrigoContext:', currentAbrigoId);
 
-  const [loggedInUserEmail, setLoggedInUserEmail] = useState(null); // Estado para armazenar o email do usuário logado
-
-  // Efeito para buscar o email do usuário logado
-  useEffect(() => {
-    const fetchLoggedInUserEmail = async () => {
-      if (!loggedInUserId) {
-        console.warn("VoluntariosAdm: loggedInUserId não fornecido.");
-        return;
-      }
-      try {
-        const response = await fetch(`http://${urlIp}:3000/users/${loggedInUserId}`);
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Falha ao buscar email do usuário: ${response.status} - ${errorText}`);
-        }
-        const userData = await response.json();
-        setLoggedInUserEmail(userData.email); // Armazena o email do usuário
-        console.log('VoluntariosAdm - Email do usuário logado:', userData.email);
-      } catch (error) {
-        console.error("VoluntariosAdm: Erro ao buscar email do usuário:", error);
-        setError(error.message);
-      }
-    };
-    fetchLoggedInUserEmail();
-  }, [loggedInUserId]);
-
+  // Buscar detalhes do abrigo (inclui userId do admin)
   useEffect(() => {
     const fetchAbrigoDetails = async () => {
       if (!currentAbrigoId) {
@@ -71,40 +46,7 @@ function Voluntarios() {
     fetchAbrigoDetails();
   }, [currentAbrigoId]);
 
-  useLayoutEffect(() => {
-    // Garante que loggedInUserEmail esteja carregado antes de prosseguir
-    if (!loadingAbrigoDetails && loggedInUserId && abrigoDetails && loggedInUserEmail) {
-      // Ajuste o caminho para o email do administrador do abrigo
-      const adminDoAbrigoEmail = abrigoDetails.email; // Assumindo que o email do admin está diretamente em abrigoDetails
-      // Se estiver dentro de um objeto aninhado, ajuste o caminho adequadamente
-      // Ex: abrigoDetails.admAbrigo.email ou abrigoDetails.adminInfo.email
-
-      console.log('VoluntariosAdm - Comparando loggedInUserEmail:', loggedInUserEmail, 'com adminDoAbrigoEmail:', adminDoAbrigoEmail);
-
-      if (loggedInUserEmail === adminDoAbrigoEmail) {
-        navigation.setOptions({
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Candidatos', { abrigoId: currentAbrigoId, userId: loggedInUserId })}
-              style={{ marginRight: 15 }}
-            >
-              {/* Substitua o Text pela sua logo */}
-              <Image
-                source={require('../../img/candidatos.png')} // Ajuste o caminho para a sua logo
-                style={{ width: 30, height: 30, resizeMode: 'contain' }} // Ajuste o estilo conforme necessário
-              />
-            </TouchableOpacity>
-          ),
-        });
-      } else {
-        navigation.setOptions({ headerRight: null });
-      }
-    } else {
-      navigation.setOptions({ headerRight: null });
-    }
-  }, [navigation, loggedInUserId, abrigoDetails, loadingAbrigoDetails, currentAbrigoId, loggedInUserEmail]); // Adicionado loggedInUserEmail como dependência
-
-  // Efeito para buscar cuidadores (voluntários)
+  // Buscar cuidadores (voluntários)
   useEffect(() => {
     const buscarCuidadoresDoAbrigo = async () => {
       if (!currentAbrigoId) {
@@ -125,8 +67,7 @@ function Voluntarios() {
         }
 
         const data = await response.json();
-        // A API parece retornar { cuidadores: [...] }
-        setCuidadores(data.cuidadores || []); // Garante que seja um array
+        setCuidadores(data.cuidadores || []);
         console.log('VoluntariosAdm: Voluntários do abrigo carregados:', data.cuidadores);
       } catch (err) {
         console.error('VoluntariosAdm: Erro ao buscar voluntários:', err);
@@ -140,15 +81,44 @@ function Voluntarios() {
     buscarCuidadoresDoAbrigo();
   }, [currentAbrigoId]);
 
+  // HeaderRight só aparece se userId do usuário for igual ao userId do admin do abrigo
+  useLayoutEffect(() => {
+    if (
+      !loadingAbrigoDetails &&
+      loggedInUserId &&
+      abrigoDetails &&
+      abrigoDetails.userId // userid do admin do abrigo
+    ) {
+      console.log('VoluntariosAdm - Comparando loggedInUserId:', loggedInUserId, 'com adminUserId:', abrigoDetails.userid);
+
+      if (String(loggedInUserId) === String(abrigoDetails.userId)) {
+        navigation.setOptions({
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Candidatos', { abrigoId: currentAbrigoId, userId: loggedInUserId })}
+              style={{ marginRight: 15 }}
+            >
+              <Image
+                source={require('../../img/candidatos.png')}
+                style={{ width: 30, height: 30, resizeMode: 'contain' }}
+              />
+            </TouchableOpacity>
+          ),
+        });
+      } else {
+        navigation.setOptions({ headerRight: null });
+      }
+    } else {
+      navigation.setOptions({ headerRight: null });
+    }
+  }, [navigation, loggedInUserId, abrigoDetails, loadingAbrigoDetails, currentAbrigoId]);
+
   const exibirPerfil = (cuidador) => {
-  console.log('VoluntariosAdm - abrigoId antes de navegar:', currentAbrigoId);
-  console.log('VoluntariosAdm - loggedInUserEmail antes de navegar:', loggedInUserEmail);
-  navigation.navigate('PerfilCuidador', {
-    userId: cuidador.id,
-    abrigoId: currentAbrigoId,
-    userEmail: loggedInUserEmail,
-  });
-};
+    navigation.navigate('PerfilCuidador', {
+      userId: cuidador.id,
+      abrigoId: currentAbrigoId,
+    });
+  };
 
   if (loadingCuidadores || loadingAbrigoDetails) {
     return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
@@ -161,9 +131,9 @@ function Voluntarios() {
   return (
     <ScrollView style={styles.scrollView}>
       <View style={styles.whiteContainer}>
-        {cuidadores.length > 0 ? ( // Usando 'cuidadores' com 'c' minúsculo como definido no useState
+        {cuidadores.length > 0 ? (
           <View style={styles.listContainer}>
-            {cuidadores.map((cuidador) => ( // Usando 'cuidadores' com 'c' minúsculo
+            {cuidadores.map((cuidador) => (
               <View key={cuidador.id} style={styles.itemContainer}>
                 <TouchableOpacity style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
                   <Image
@@ -211,18 +181,18 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     marginTop: 15,
-    width: '50%', // Para duas colunas
+    width: '50%',
     alignItems: 'center',
   },
   listImage: {
     width: 100,
     height: 100,
-    borderRadius: 50, // Para imagem redonda
-    marginBottom: 8, // Espaço entre imagem e nome
+    borderRadius: 50,
+    marginBottom: 8,
     resizeMode: 'cover',
-    backgroundColor: '#ccc', // Placeholder color
+    backgroundColor: '#ccc',
   },
-  listItem: { // O TouchableOpacity em si
+  listItem: {
     alignItems: 'center',
     justifyContent: 'center',
   },

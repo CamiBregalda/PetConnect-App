@@ -34,6 +34,9 @@ import VoluntariosEvento from '../../screens/eventos/VoluntariosEvento';
 import EditarEvento from '../../screens/eventos/EditarEvento';
 import CriarEvento from '../../screens/eventos/CriarEvento';
 import UsuarioInfo from '../../screens/user/InicialUser';
+import ChamadoAbandono from '../../screens/adm/ChamadoAbandono';
+import AdocaoAnimal from '../../screens/cadastros/AdocaoAnimal';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -280,6 +283,8 @@ export default function AppNavigator() {
         <Stack.Screen name="VoluntariosEvento" component={VoluntariosEvento} />
         <Stack.Screen name="EditarEvento" component={EditarEvento} />
         <Stack.Screen name="CriarEvento" component={CriarEvento} />
+        <Stack.Screen name="ChamadoAbandono" component={ChamadoAbandono} />
+        <Stack.Screen name="AdocaoAnimal" component={AdocaoAnimal} />
         <Stack.Screen name="InicialUser"
           component={UserTabs}
           options={{

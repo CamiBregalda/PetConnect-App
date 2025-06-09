@@ -123,14 +123,15 @@ function HomeScreen() {
   };
 
   const animaisFiltrados = animais.filter(animal => {
-    const nomeMatch = animal.nome ? animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-    const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
-    const racaMatch = activeFilters.raca ? animal.raca === activeFilters.raca : true;
-    const porteMatch = activeFilters.porte ? animal.porte === activeFilters.porte : true;
-    const disponivelMatch = animal.disponivelAdocao === true || animal.disponivelAdocao === undefined;
+      const nomeMatch = animal.nome ? animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+  const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
+  const racaMatch = activeFilters.raca ? animal.raca === activeFilters.raca : true;
+  const porteMatch = activeFilters.porte ? animal.porte === activeFilters.porte : true;
+  const adotadoMatch = animal.adotado === false; // <-- Apenas não adotados
 
-    return nomeMatch && especieMatch && racaMatch && porteMatch && disponivelMatch;
-  });
+ 
+  return nomeMatch && especieMatch && racaMatch && porteMatch && adotadoMatch;
+});
 
   const abrigosFiltrados = abrigos.filter(abrigo =>
     abrigo.nome ? abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true

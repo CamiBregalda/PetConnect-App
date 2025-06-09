@@ -58,13 +58,19 @@ function ListaCandidatosScreen() {
     if (Array.isArray(candidatos) && candidatos.length > 0) {
       return (
         <View style={styles.container}>
-          {candidatos.map((candidato, idx) => (
-            <TouchableOpacity key={idx} style={styles.box} onPress={() => exibirDetalhes(candidato.userId, candidato.id)}>
-              <Text style={styles.text}>Nome: {candidato.nome}</Text>
-              <Text style={styles.text}>Idade: {candidato.idade}</Text>
-              <Text style={styles.text}>Contato: {candidato.telefone}</Text>
-              <Text style={styles.text}>Email: {candidato.email}</Text>
-            </TouchableOpacity>
+          {candidatos?.map((candidato, idx) => (
+            candidato && candidato.nome ? (
+              <TouchableOpacity
+                key={idx}
+                style={styles.box}
+                onPress={() => exibirDetalhes(candidato.userId, candidato.id, candidato.abrigoId)}
+              >
+                <Text style={styles.text}>Nome: {candidato.nome}</Text>
+                <Text style={styles.text}>Idade: {candidato.idade ?? 'Não informado'}</Text>
+                <Text style={styles.text}>Contato: {candidato.telefone ?? 'Não informado'}</Text>
+                <Text style={styles.text}>Email: {candidato.email ?? 'Não informado'}</Text>
+              </TouchableOpacity>
+            ) : null
           ))}
         </View>
       );

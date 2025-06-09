@@ -7,7 +7,8 @@ import { urlIp } from '@env';
 
 function CadastroAnimalScreen() {
     const route = useRoute();
-    const idDono = route.params.userId;
+    const idDono = route.params.abrigoId;
+    console.log('CadastroAnimalScreen - idDono:', idDono);
     const navigation = useNavigation();
 
     const [nome, onChangeNome] = React.useState('');
@@ -144,7 +145,7 @@ function CadastroAnimalScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('Login');
+            navigation.navigate('AnimaisAdm', { abrigoId: idDono });
         } catch (error) {
             console.error('Erro ao fazer cadastro:', error);
             Alert.alert('Erro', 'Cadastro inválido');

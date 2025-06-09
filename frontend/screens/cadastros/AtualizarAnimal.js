@@ -1,32 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView, Alert, Modal, modalVisible } from 'react-native';
 import TextAtualizacaoAnimalInput from '../../components/TextAtualizacaoAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
 import { urlIp } from '@env';
 
 function AtualizarAnimalScreen() {
     const route = useRoute();
-    const userId = route.params.userId;
-    const { animalId } = route.params;
     const navigation = useNavigation();
+    const userId = route.params.userId;
+    const abrigoId = route.params.abrigoId;
+    const { animalId } = route.params;
 
-    const [nome, onChangeNome] = React.useState('');
-    const [sexo, onChangeSexo] = React.useState('');
-    const [dataNascimento, onChangeDataNascimento] = React.useState(new Date());
-    const [especie, onChangeEspecie] = React.useState('');
-    const [raca, onChangeRaca] = React.useState('');
-    const [porte, onChangePorte] = React.useState('');
-    const [castrado, onChangeCastrado] = React.useState(null);
-    const [doencas, onChangeDoencas] = React.useState(['']);
-    const [deficiencias, onChangeDeficiencias] = React.useState(['']);
-    const [vacinas, onChangeVacinas] = React.useState(['']);
-    const [informacoes, onChangeInformacoes] = React.useState('');
-    const [imageUri, onChangeImageUri] = React.useState(null);
+    const [nome, onChangeNome] = useState('');
+    const [sexo, onChangeSexo] = useState('');
+    const [dataNascimento, onChangeDataNascimento] = useState(new Date());
+    const [especie, onChangeEspecie] = useState('');
+    const [raca, onChangeRaca] = useState('');
+    const [porte, onChangePorte] = useState('');
+    const [castrado, onChangeCastrado] = useState(null);
+    const [doencas, onChangeDoencas] = useState(['']);
+    const [deficiencias, onChangeDeficiencias] = useState(['']);
+    const [vacinas, onChangeVacinas] = useState(['']);
+    const [informacoes, onChangeInformacoes] = useState('');
+    const [idDono, onChangeIdDono] = useState(userId);
+    const [adotado, onChangeAdotado] = useState(false);
+    const [imageUri, onChangeImageUri] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+
+    // Novo: userId do dono do abrigo
+    const [abrigoUserId, setAbrigoUserId] = useState(null);
 
     useEffect(() => {
-            getAnimal();
+        getAnimal();
+        getAbrigo();
     }, []);
+
+    const getAbrigo = async () => {
+        try {
+            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`);
+            if (!response.ok) throw new Error('Erro ao buscar abrigo');
+            const data = await response.json();
+            setAbrigoUserId(data.userId);
+        } catch (error) {
+            console.error('Erro ao buscar abrigo:', error);
+        }
+    };
 
     const parseDate = (dateString) => {
         if (!dateString) return null;
@@ -34,6 +53,44 @@ function AtualizarAnimalScreen() {
         const date = new Date(year, month - 1, day);
         date.setHours(12);
         return date;
+    };
+
+    const handleDelete = async () => {
+        if (userId !== abrigoUserId) {
+            Alert.alert('Acesso negado', 'Você não tem permissão para deletar este animal.');
+            return;
+        }
+        Alert.alert(
+            'Confirmar exclusão',
+            'Tem certeza que deseja deletar este animal?',
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Deletar',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`, {
+                                method: 'DELETE',
+                            });
+                            if (!response.ok) throw new Error('Erro ao deletar animal');
+                            Alert.alert('Sucesso', 'Animal deletado com sucesso!');
+                            navigation.navigate('TelaPrincipal', { userId });
+                        } catch (error) {
+                            Alert.alert('Erro', 'Erro ao deletar animal');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    const handleAdocao = () => {
+        if (userId !== abrigoUserId) {
+            Alert.alert('Acesso negado', 'Você não tem permissão para realizar adoção.');
+            return;
+        }
+        navigation.navigate('AdocaoAnimal', { animalId });
     };
 
     const getAnimal = async () => {
@@ -61,6 +118,8 @@ function AtualizarAnimalScreen() {
             onChangeDeficiencias(data.deficiencias);
             onChangeVacinas(data.vacinas);
             onChangeInformacoes(data.informacoes);
+            onChangeIdDono(data.idDono);
+            onChangeAdotado(data.adotado);
 
             const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`);
             if (responseImage.ok) {
@@ -69,7 +128,7 @@ function AtualizarAnimalScreen() {
         } catch (error) {
             console.error('Erro ao buscar animal:', error);
         }
-    }
+    };
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -124,17 +183,19 @@ function AtualizarAnimalScreen() {
     };
 
     const bodyData = {
-        nome: nome.trim(),
-        sexo: sexo.trim(),
-        dataNascimento: dataNascimento.toISOString(),
-        especie: especie.trim(),
-        raca: raca.trim(),
-        porte: porte.trim(),
+        nome: nome?.trim(),
+        sexo: sexo?.trim(),
+        dataNascimento: dataNascimento instanceof Date ? dataNascimento.toISOString() : '',
+        especie: especie?.trim(),
+        raca: raca?.trim(),
+        porte: porte?.trim(),
         castrado: castrado !== null ? castrado : false,
         doencas: clearList(doencas),
         deficiencias: clearList(deficiencias),
         vacinas: clearList(vacinas),
-        informacoes: informacoes.trim()
+        informacoes: informacoes?.trim(),
+        idDono: idDono,
+        adotado: adotado,
     };
 
     for (const key in bodyData) {
@@ -144,7 +205,7 @@ function AtualizarAnimalScreen() {
     }
 
     const handleUpdate = async () => {
-                try {
+        try {
             const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`, {
                 method: 'PUT',
                 headers: {
@@ -163,7 +224,7 @@ function AtualizarAnimalScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('AnimaisUser', { userId: userId });
+            navigation.navigate('TelaPrincipal', { userId: userId });
         } catch (error) {
             console.error('Erro ao fazer update:', error);
             Alert.alert('Erro', 'Atualização inválida');
@@ -172,50 +233,94 @@ function AtualizarAnimalScreen() {
 
     return (
         <ScrollView>
-        <View style={styles.divCadastro} edges={['top']}>
-            <Text style={styles.title}>Atualizar Animal</Text>
-            <TextAtualizacaoAnimalInput 
-                nome={nome}
-                onChangeNome={onChangeNome}
-                sexo={sexo}
-                onChangeSexo={onChangeSexo}
-                dataNascimento={dataNascimento}
-                onChangeDataNascimento={onChangeDataNascimento}
-                especie={especie}
-                onChangeEspecie={onChangeEspecie}
-                raca={raca}
-                onChangeRaca={onChangeRaca}
-                porte={porte}
-                onChangePorte={onChangePorte}
-                castrado={castrado}
-                onChangeCastrado={onChangeCastrado}
-                doencas={doencas}
-                onChangeDoencas={onChangeDoencas}
-                deficiencias={deficiencias}
-                onChangeDeficiencias={onChangeDeficiencias}
-                vacinas={vacinas}
-                onChangeVacinas={onChangeVacinas}
-                informacoesAdicionais={informacoes}
-                onChangeInformacoesAdicionais={onChangeInformacoes}
-            />
+            <View style={styles.divCadastro} edges={['top']}>
+                <Text style={styles.title}>Atualizar Animal</Text>
+                <TextAtualizacaoAnimalInput 
+                    nome={nome}
+                    onChangeNome={onChangeNome}
+                    sexo={sexo}
+                    onChangeSexo={onChangeSexo}
+                    dataNascimento={dataNascimento}
+                    onChangeDataNascimento={onChangeDataNascimento}
+                    especie={especie}
+                    onChangeEspecie={onChangeEspecie}
+                    raca={raca}
+                    onChangeRaca={onChangeRaca}
+                    porte={porte}
+                    onChangePorte={onChangePorte}
+                    castrado={castrado}
+                    onChangeCastrado={onChangeCastrado}
+                    doencas={doencas}
+                    onChangeDoencas={onChangeDoencas}
+                    deficiencias={deficiencias}
+                    onChangeDeficiencias={onChangeDeficiencias}
+                    vacinas={vacinas}
+                    onChangeVacinas={onChangeVacinas}
+                    informacoesAdicionais={informacoes}
+                    onChangeInformacoesAdicionais={onChangeInformacoes}
+                    adotado={adotado}
+                    onChangeAdotado={onChangeAdotado}
+                    idDono={idDono}
+                    onChangeIdDono={onChangeIdDono}
+                />
 
-            <Pressable onPress={pickImage}>
-                {imageUri ? (
-                    <Image source={{ uri: imageUri }} style={styles.image} />
-                ) : (
-                    <View style={styles.imagePlaceholder}>
-                        <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
-                    </View>
+                <Pressable onPress={pickImage}>
+                    {imageUri ? (
+                        <Image source={{ uri: imageUri }} style={styles.image} />
+                    ) : (
+                        <View style={styles.imagePlaceholder}>
+                            <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+                        </View>
+                    )}
+                </Pressable>
+                <View style={styles.buttonContainer}>
+                                <Pressable style={styles.updateButton} onPress={handleUpdate}>
+                                    <Text style={styles.textoBotao}>Atualizar</Text>
+                                </Pressable>
+                
+                                <Pressable style={styles.deleteButton} onPress={() => setModalVisible(true)}>
+                                    <Text style={styles.textoBotao}>Deletar</Text>
+                                </Pressable>
+                            </View>
+                
+                            <Modal
+                            animationType="fade"
+                            transparent={true}
+                            visible={modalVisible}
+                            onRequestClose={() => setModalVisible(false)}
+                            >
+                            <View style={styles.modalOverlay}>
+                                <View style={styles.modalContent}>
+                                <Text style={styles.modalText}>Tem certeza que deseja deletar conta de usuário?</Text>
+                                <View style={styles.modalButtons}>
+                                    <Pressable
+                                    style={styles.modalCancelButton}
+                                    onPress={() => setModalVisible(false)}
+                                    >
+                                    <Text style={styles.textoBotao}>Cancelar</Text>
+                                    </Pressable>
+                                    <Pressable
+                                    style={styles.modalConfirmButton}
+                                    onPress={() => {
+                                        setModalVisible(false);
+                                        handleDelete();
+                                    }}
+                                    >
+                                    <Text style={styles.textoBotao}>Confirmar</Text>
+                                    </Pressable>
+                                </View>
+                                </View>
+                            </View>
+                            </Modal>
+                {userId === abrigoUserId && (
+                    <Pressable
+                        style={[styles.botao, styles.adocaoButton]}
+                        onPress={handleAdocao}
+                    >
+                        <Text style={styles.textoBotao}>Realizar Adoção</Text>
+                    </Pressable>
                 )}
-            </Pressable>
-
-            <Pressable
-                style={styles.botao}
-                onPress={handleUpdate}
-            >
-                <Text style={styles.textoBotao}>Atualizar</Text>
-            </Pressable>
-        </View>
+            </View>
         </ScrollView>
     );
 }
@@ -260,21 +365,76 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     botao: {
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        elevation: 3,
+        marginTop: 50,
+    },
+    adocaoButton: {
+        backgroundColor: '#8A2BE2', 
+        marginTop: 20,
+    },
+    updateButton: {
         backgroundColor: '#8A2BE2',
         borderRadius: 5,
         paddingVertical: 10,
-        paddingHorizontal: 80,
-        elevation: 3,
-        marginTop: 50,
+        paddingHorizontal: 30,
+        marginHorizontal: 5,
+    },
+    deleteButton: {
+        backgroundColor: '#B22222',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 40,
+        marginHorizontal: 5,
     },
     textoBotao: {
         color: 'white',
         fontSize: 16,
+        textAlign: 'center',
     },
-    errorText: {
-        color: 'red',
-        marginTop: 8,
-        fontSize: 14,
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 30,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalCancelButton: {
+        backgroundColor: '#888',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 10,
+    },
+    modalConfirmButton: {
+        backgroundColor: '#B22222',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 10,
     },
 });
 

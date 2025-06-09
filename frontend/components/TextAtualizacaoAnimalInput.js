@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet, Text, Pressable, TouchableOpacity, Platfor
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GenericListInput } from './GenericListInput';
+import { urlIp } from '@env';
 
 const TextAtualizacaoAnimalInput = (
     { 
@@ -43,7 +44,7 @@ const TextAtualizacaoAnimalInput = (
     React.useEffect(() => {
         const fetchEspecies = async () => {
             try {
-                const response = await fetch('http://${urlIp}:3000/especies');
+                const response = await fetch(`http://${urlIp}:3000/especies`);
                 if (!response.ok) throw new Error('Erro ao buscar espécies');
                 const data = await response.json();
                 setListaEspecies(data);
@@ -54,7 +55,7 @@ const TextAtualizacaoAnimalInput = (
 
         const fetchPorte = async () => {
             try {
-                const response = await fetch('http://${urlIp}:3000/portes');
+                const response = await fetch(`http://${urlIp}:3000/portes`);
                 if (!response.ok) throw new Error('Erro ao buscar portes');
                 const data = await response.json();
                 setListaPorte(data);
