@@ -6,8 +6,8 @@ export interface EventoAttributes {
     titulo: string;
   descricao: string;
   objetivo: string;
-  dataInicio: string;
-  dataFim: string;
+  dataInicio: Date;
+  dataFim: Date;
   endereco: Endereco;
   idAbrigo: mongoose.Schema.Types.ObjectId;
   image?: Buffer;
@@ -23,7 +23,7 @@ const EventoSchema = new Schema<EventoAttributes>(
       endereco:   { type: EnderecoSchema, required: true },
       idAbrigo:   { type: mongoose.Schema.Types.ObjectId, ref: 'Abrigo', required: true },
       image:      { type: Buffer, required: false },
-      ativo:      { type: Boolean, default: true },
+      ativo:      { type: Boolean, required: false, default: true },
     },
     {
       collection: "eventos",

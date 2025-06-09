@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView, Modal, modalVisible } from 'react-native';
 import TextAtualizarUserInput from '../../components/TextAtualizacaoUserInput';
 import { urlIp } from '@env';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,6 +26,7 @@ function AtualizarUserScreen() {
         cep: '',
     });
     const [imageUri, onChangeImageUri] = React.useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         getUser();
@@ -182,6 +183,26 @@ function AtualizarUserScreen() {
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro ao deletar usuário');
+            }
+
+            navigation.navigate('Login');
+        } catch (error) {
+            console.error('Erro ao deletar usuário:', error);
+            Alert.alert('Erro', 'Não foi possível deletar o usuário');
+        }
+    }
+
     return (
         <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
@@ -216,12 +237,45 @@ function AtualizarUserScreen() {
                 )}
             </Pressable>
 
-            <Pressable
-                style={styles.botao}
-                onPress={handleUpdate}
+            <View style={styles.buttonContainer}>
+                <Pressable style={styles.updateButton} onPress={handleUpdate}>
+                    <Text style={styles.textoBotao}>Atualizar</Text>
+                </Pressable>
+
+                <Pressable style={styles.deleteButton} onPress={() => setModalVisible(true)}>
+                    <Text style={styles.textoBotao}>Deletar</Text>
+                </Pressable>
+            </View>
+
+            <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
             >
-                <Text style={styles.textoBotao}>Atualizar</Text>
-            </Pressable>
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                <Text style={styles.modalText}>Tem certeza que deseja deletar conta de usuário?</Text>
+                <View style={styles.modalButtons}>
+                    <Pressable
+                    style={styles.modalCancelButton}
+                    onPress={() => setModalVisible(false)}
+                    >
+                    <Text style={styles.textoBotao}>Cancelar</Text>
+                    </Pressable>
+                    <Pressable
+                    style={styles.modalConfirmButton}
+                    onPress={() => {
+                        setModalVisible(false);
+                        handleDelete();
+                    }}
+                    >
+                    <Text style={styles.textoBotao}>Confirmar</Text>
+                    </Pressable>
+                </View>
+                </View>
+            </View>
+            </Modal>
         </View>
         </ScrollView>
     );
@@ -239,18 +293,6 @@ const styles = StyleSheet.create({
         width: 150,
         height: 150,
         marginBottom: 40,
-    },
-    botao: {
-        backgroundColor: '#8A2BE2',
-        borderRadius: 5,
-        paddingVertical: 10,
-        paddingHorizontal: 80,
-        elevation: 3,
-        marginTop: 50,
-    },
-    textoBotao: {
-        color: 'white',
-        fontSize: 16,
     },
     image: {
         width: 120,
@@ -270,6 +312,75 @@ const styles = StyleSheet.create({
     imagePlaceholderText: {
         color: '#888',
         textAlign: 'center',
+    },
+    
+    botao: {
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        elevation: 3,
+        marginTop: 50,
+    },
+    updateButton: {
+        backgroundColor: '#8A2BE2',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        marginHorizontal: 5,
+    },
+    deleteButton: {
+        backgroundColor: '#B22222',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 40,
+        marginHorizontal: 5,
+    },
+    textoBotao: {
+        color: 'white',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 30,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalCancelButton: {
+        backgroundColor: '#888',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 10,
+    },
+    modalConfirmButton: {
+        backgroundColor: '#B22222',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 10,
     },
 });
 
