@@ -1,28 +1,35 @@
 import React, { useLayoutEffect, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  ActivityIndicator
+} from 'react-native';
+import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { urlIp } from '@env';
-
 
 const BACKEND_URL = `http://${urlIp}:3000/eventos/`;
 
 export default function EventosAdm() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+  const route = useRoute();
+
+  const { userId, abrigoId } = route.params || {};
+
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerStyle: {
-        backgroundColor: '#9333ea',
-      },
+      headerStyle: { backgroundColor: '#9333ea' },
       headerTintColor: '#fff',
-      headerTitleStyle: {
-        fontWeight: 'bold',
-      },
+      headerTitleStyle: { fontWeight: 'bold' },
       headerTitleAlign: 'center',
       title: 'Eventos',
     });
@@ -44,9 +51,7 @@ export default function EventosAdm() {
       }
     };
 
-    if (isFocused) {
-      fetchEventos();
-    }
+    if (isFocused) fetchEventos();
   }, [isFocused]);
 
   if (loading) {
@@ -68,9 +73,10 @@ export default function EventosAdm() {
 
   return (
     <View style={styles.container}>
+
       <TouchableOpacity
         style={styles.botaoCriar}
-        onPress={() => navigation.navigate('CriarEvento')}
+        onPress={() => navigation.navigate('CriarEvento', { userId, abrigoId })}
       >
         <Text style={styles.textoBotao}>Criar Evento</Text>
       </TouchableOpacity>
@@ -81,27 +87,28 @@ export default function EventosAdm() {
             Nenhum evento cadastrado.
           </Text>
         ) : (
-          eventos.map((evento) => (
-            <View key={evento._id} style={styles.cardContainer}>
+          eventos.map(evento => (
+            <View key={evento.id} style={styles.cardContainer}>
               <TouchableOpacity
                 style={styles.editIcon}
                 onPress={() =>
-
-                  navigation.navigate('EditarEvento', { evento })}
+                  navigation.navigate('EditarEvento', { evento, userId, abrigoId })
+                }
               >
                 <Ionicons name="create-outline" size={20} color="#555" />
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate('EventoDetalheAdm', { evento })}
+                onPress={() =>
+                  navigation.navigate('EventoDetalheAdm', { evento, userId, abrigoId })
+                }
               >
                 <Text style={styles.titulo}>{evento.titulo}</Text>
                 <Text style={styles.descricao}>{evento.descricao}</Text>
 
-                {evento.imagemUrl ? (
+                {/* Apenas exibe a imagem se existir */}
+                {evento.imagemUrl && (
                   <Image source={{ uri: evento.imagemUrl }} style={styles.imagem} />
-                ) : (
-                  <Image source={require('../../img/teste.png')} style={styles.imagem} />
                 )}
               </TouchableOpacity>
             </View>
@@ -121,14 +128,6 @@ const styles = StyleSheet.create({
   scroll: {
     paddingBottom: 120,
     paddingHorizontal: 16,
-  },
-  voltar: {
-    marginLeft: 16,
-    marginBottom: 10,
-  },
-  voltarTexto: {
-    color: '#9333ea',
-    fontSize: 16,
   },
   botaoCriar: {
     backgroundColor: '#9333ea',
@@ -165,16 +164,12 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 8,
     resizeMode: 'cover',
+    marginTop: 8,
   },
   editIcon: {
     position: 'absolute',
     top: 8,
     right: 8,
     zIndex: 2,
-  },
-  editImage: {
-    width: 20,
-    height: 20,
-    tintColor: '#555',
   },
 });

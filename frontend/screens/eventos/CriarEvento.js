@@ -1,316 +1,324 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Alert,
+  ActivityIndicator,
+  Platform
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { urlIp } from '@env';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CriarEvento() {
   const navigation = useNavigation();
+  const { userId, abrigoId } = useRoute().params;
 
-  const [titulo, setTitulo] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [objetivo, setObjetivo] = useState('');
+  const [titulo, onChangeTitulo] = useState('');
+  const [descricao, onChangeDescricao] = useState('');
+  const [objetivo, onChangeObjetivo] = useState('');
   const [dataInicio, setDataInicio] = useState('');
   const [dataFim, setDataFim] = useState('');
-  const [rua, setRua] = useState('');
-  const [numero, setNumero] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('');
-  const [cep, setCep] = useState('');
+  const [endereco, onChangeEndereco] = useState({
+    rua: '', numero: '', bairro: '',
+    cidade: '', estado: '', cep: ''
+  });
+
   const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const [showInicio, setShowInicio] = useState(false);
   const [showFim, setShowFim] = useState(false);
-  const [idUsuario, setIdUsuario] = useState('');
-  const [idAbrigo, setIdAbrigo] = useState('');
 
-  useEffect(() => {
-    AsyncStorage.getItem('userId').then(id => {
-      if (id) setIdUsuario(id);
-      else Alert.alert('Erro', 'Usuário não identificado!');
-    });
-  }, []);
-
-  useEffect(() => {
-    const fetchAbrigo = async () => {
-      if (idUsuario) {
-        try {
-          const response = await fetch(`http://${urlIp}:3000/admAbrigo/${idUsuario}/abrigo`);
-          const data = await response.json();
-          if (data && data.abrigo && data.abrigo.id) {
-            setIdAbrigo(data.abrigo.id);
-          } else {
-            Alert.alert('Erro', 'Não foi possível encontrar o abrigo do usuário.');
-          }
-        } catch (err) {
-          Alert.alert('Erro', 'Erro ao buscar abrigo do usuário.');
-        }
-      }
-    };
-    fetchAbrigo();
-  }, [idUsuario]);
+  const handleEnderecoChange = (campo, valor) => {
+    onChangeEndereco(prev => ({ ...prev, [campo]: valor }));
+  };
 
   const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permissão negada', 'Precisamos de acesso à galeria.');
+      return;
+    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      quality: 0.7,
     });
-
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
     }
   };
 
-  const getImageMimeType = (uri) => {
-    if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
+  const getImageMimeType = uri => {
     if (uri.endsWith('.png')) return 'image/png';
+    if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
     return 'image/jpeg';
   };
 
   const handleImageUpload = async (eventoId) => {
-  if (!imageUri) return;
+    try {
+      const form = new FormData();
+      const mime = getImageMimeType(imageUri);
+      const ext = mime.split('/')[1];
+      form.append('image', {
+        uri: imageUri,
+        name: `evento.${ext}`,
+        type: mime,
+      });
 
-  try {
-    const mimeType = getImageMimeType(imageUri);
+      const res = await fetch(
+        `http://${urlIp}:3000/eventos/${eventoId}/imagem`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'multipart/form-data' },
+          body: form,
+        }
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Erro ao enviar imagem');
+      }
+    } catch (err) {
+      console.error('Erro ao enviar imagem:', err);
 
-    const formData = new FormData();
-    formData.append('image', {
-      uri: imageUri,
-      name: `evento.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
-      type: mimeType,
-    });
-
-    const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
-      method: 'POST',
-      body: formData, 
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || 'Erro ao enviar a imagem');
     }
-
-    console.log('Imagem enviada com sucesso!');
-  } catch (error) {
-    console.error('Erro ao enviar a imagem:', error);
-    throw new Error('Falha ao enviar a imagem');
-  }
-};
+  };
 
   const handleCriar = async () => {
-    if (!idAbrigo) {
-      Alert.alert('Erro', 'Não foi possível identificar o abrigo do usuário.');
+    if (!abrigoId) {
+      Alert.alert('Erro', 'Abrigo não identificado.');
+      return;
+    }
+
+    if (
+      !titulo.trim() ||
+      !descricao.trim() ||
+      !objetivo.trim() ||
+      !dataInicio.trim() ||
+      !dataFim.trim() ||
+      !endereco.rua.trim() ||
+      !endereco.numero.trim() ||
+      !endereco.bairro.trim() ||
+      !endereco.cidade.trim() ||
+      !endereco.estado.trim() ||
+      !endereco.cep.trim()
+    ) {
+      Alert.alert('Erro', 'Preencha todos os campos.');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(`http://${urlIp}:3000/eventos/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const bodyData = {
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        objetivo: objetivo.trim(),
+        dataInicio: dataInicio.trim(),
+        dataFim: dataFim.trim(),
+        idAbrigo: abrigoId,
+        endereco: {
+          rua: endereco.rua.trim(),
+          numero: endereco.numero.trim(),
+          bairro: endereco.bairro.trim(),
+          cidade: endereco.cidade.trim(),
+          estado: endereco.estado.trim(),
+          cep: endereco.cep.trim(),
         },
-        body: JSON.stringify({
-          titulo: titulo.trim(),
-          descricao: descricao.trim(),
-          objetivo: objetivo.trim(),
-          dataInicio: dataInicio.trim(),
-          dataFim: dataFim.trim(),
-          idAbrigo: idAbrigo,
-          endereco: {
-            rua: rua.trim(),
-            numero: numero.trim(),
-            bairro: bairro.trim(),
-            cidade: cidade.trim(),
-            estado: estado.trim(),
-            cep: cep.trim(),
-          },
-        }),
+      };
+
+      const resp = await fetch(`http://${urlIp}:3000/eventos/${evento.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
       });
+      if (!resp.ok) {
+        const errText = await resp.text();
+        throw new Error(errText || `Status ${resp.status}`);
+      }
+      const novo = await resp.json(); 
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Erro ao criar evento');
+      if (imageUri && novo.id) {
+        await handleImageUpload(novo.id);
       }
 
-      const data = await response.json();
-
-      if (imageUri) {
-        await handleImageUpload(novoEventoId);
-      }
-
-      Alert.alert('Sucesso', 'Evento criado com sucesso!');
-      navigation.navigate('EventosAdm'); 
-    } catch (error) {
-      Alert.alert('Erro', error.message || 'Erro ao criar evento');
+      Alert.alert('Sucesso', 'Evento criado!');
+      navigation.navigate('EventosAdm', { userId, abrigoId });
+    } catch (err) {
+      console.error('Erro ao criar evento:', err);
+      Alert.alert('Erro', err.message || 'Não foi possível criar.');
     } finally {
       setLoading(false);
     }
   };
 
-  const onChangeInicio = (event, selectedDate) => {
-    setShowInicio(Platform.OS === 'ios');
-    if (selectedDate) {
-      const dataFormatada = selectedDate.toISOString().split('T')[0];
-      setDataInicio(dataFormatada);
-    }
-  };
-
-  const onChangeFim = (event, selectedDate) => {
-    setShowFim(Platform.OS === 'ios');
-    if (selectedDate) {
-      const dataFormatada = selectedDate.toISOString().split('T')[0];
-      setDataFim(dataFormatada);
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
-        <Ionicons name="arrow-back" size={28} color="#222" />
-      </TouchableOpacity>
-
-      <Text style={styles.titulo}>Crie um Evento</Text>
-
-      <ScrollView contentContainerStyle={styles.form}>
-        <TextInput placeholder="Título" style={styles.input} value={titulo} onChangeText={setTitulo} />
-
-
-        <TextInput
-          placeholder="Descrição"
-          style={[styles.input, styles.textArea]}
-          value={descricao}
-          onChangeText={setDescricao}
-          multiline
-          numberOfLines={5}
-        />
-
-        <TextInput placeholder="Objetivo" style={styles.input} value={objetivo} onChangeText={setObjetivo} />
-
-        <TouchableOpacity onPress={() => setShowInicio(true)} style={styles.input}>
-          <Text style={{ color: dataInicio ? '#222' : '#888' }}>
-            {dataInicio ? dataInicio.split('-').reverse().join('/') : 'Data de Início'}
-          </Text>
+    <>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        {showInicio && (
-          <DateTimePicker
-            value={dataInicio ? new Date(dataInicio) : new Date()}
-            mode="date"
-            display="default"
-            onChange={onChangeInicio}
+        <Text style={styles.headerTitle}>Crie um Evento</Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.container}>
+
+          <Text style={styles.label}>Título</Text>
+          <TextInput
+            style={styles.input}
+            value={titulo}
+            onChangeText={onChangeTitulo}
           />
-        )}
 
-        <TouchableOpacity onPress={() => setShowFim(true)} style={styles.input}>
-          <Text style={{ color: dataFim ? '#222' : '#888' }}>
-            {dataFim ? dataFim.split('-').reverse().join('/') : 'Data Final'}
-          </Text>
-        </TouchableOpacity>
-        {showFim && (
-          <DateTimePicker
-            value={dataFim ? new Date(dataFim) : new Date()}
-            mode="date"
-            display="default"
-            onChange={onChangeFim}
+          <Text style={styles.label}>Descrição</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={descricao}
+            onChangeText={onChangeDescricao}
+            multiline
           />
-        )}
 
-        <Text style={styles.label}>Endereço</Text>
-        <TextInput placeholder="Rua" style={styles.input} value={rua} onChangeText={setRua} />
-        <TextInput placeholder="Número" style={styles.input} value={numero} onChangeText={setNumero} />
-        <TextInput placeholder="Bairro" style={styles.input} value={bairro} onChangeText={setBairro} />
-        <TextInput placeholder="Cidade" style={styles.input} value={cidade} onChangeText={setCidade} />
-        <TextInput placeholder="Estado" style={styles.input} value={estado} onChangeText={setEstado} />
-        <TextInput placeholder="CEP" style={styles.input} value={cep} onChangeText={setCep} />
+          <Text style={styles.label}>Objetivo</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={objetivo}
+            onChangeText={onChangeObjetivo}
+            multiline
+          />
 
-        <View style={styles.imageUpload}>
-          <Text style={styles.imageLabel}>Adicionar Foto</Text>
+          <Text style={styles.label}>Data de Início</Text>
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setShowInicio(true)}
+          >
+            <Text>{dataInicio || 'Selecionar data'}</Text>
+          </TouchableOpacity>
+          {showInicio && (
+            <DateTimePicker
+              value={dataInicio ? new Date(dataInicio) : new Date()}
+              mode="date"
+              display="default"
+              onChange={(_, d) => {
+                setShowInicio(Platform.OS === 'ios');
+                if (d) setDataInicio(d.toISOString().split('T')[0]);
+              }}
+            />
+          )}
+
+          <Text style={styles.label}>Data de Término</Text>
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setShowFim(true)}
+          >
+            <Text>{dataFim || 'Selecionar data'}</Text>
+          </TouchableOpacity>
+          {showFim && (
+            <DatePicker
+              value={dataFim ? new Date(dataFim) : new Date()}
+              mode="date"
+              display="default"
+              onChange={(_, d) => {
+                setShowFim(Platform.OS === 'ios');
+                if (d) setDataFim(d.toISOString().split('T')[0]);
+              }}
+            />
+          )}
+
+          <Text style={styles.label}>Endereço</Text>
+          {['rua', 'numero', 'bairro', 'cidade', 'estado', 'cep'].map(campo => (
+            <TextInput
+              key={campo}
+              placeholder={campo.charAt(0).toUpperCase() + campo.slice(1)}
+              style={styles.input}
+              value={endereco[campo]}
+              onChangeText={val => handleEnderecoChange(campo, val)}
+              keyboardType={campo === 'numero' || campo === 'cep' ? 'number-pad' : 'default'}
+            />
+          ))}
+
+          <Text style={styles.label}>Foto do Evento</Text>
           <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} style={{ width: 80, height: 80, borderRadius: 8 }} />
-            ) : (
-              <Text style={styles.plus}>+</Text>
-            )}
+            {imageUri
+              ? <Image source={{ uri: imageUri }} style={styles.image} />
+              : <Text style={styles.plus}>+</Text>
+            }
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleCriar}
+            disabled={loading}
+          >
+            {loading
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.buttonText}>Criar Evento</Text>
+            }
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.botao} onPress={handleCriar} disabled={loading}>
-          <Text style={styles.textoBotao}>{loading ? 'Criando...' : 'Criar Evento'}</Text>
-        </TouchableOpacity>
       </ScrollView>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 50 },
-  voltar: { marginLeft: 16, marginBottom: 10 },
-  voltarTexto: { color: '#9333ea', fontSize: 16 },
-  titulo: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 8,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    marginRight: 12,
+  },
+  headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
     color: '#333',
   },
-  form: {
-    paddingHorizontal: 16,
-    paddingBottom: 50,
-  },
-  label: {
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 4,
-    color: '#333',
-  },
+  scroll: { padding: 16, paddingBottom: 80 },
+  container: { backgroundColor: '#fff', borderRadius: 8, padding: 16 },
+  label: { fontWeight: 'bold', marginTop: 12, color: '#333' },
   input: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 12,
-    fontSize: 14,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    padding: 10,
+    marginTop: 6,
   },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  imageUpload: {
-    marginBottom: 20,
-  },
-  imageLabel: {
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
+  textArea: { height: 80, textAlignVertical: 'top' },
   imageBox: {
     width: 80,
     height: 80,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 16,
+    alignSelf: 'center',
     overflow: 'hidden',
   },
-  plus: {
-    fontSize: 24,
-    color: '#333',
-  },
-  botao: {
-    backgroundColor: '#9333ea',
-    paddingVertical: 12,
+  image: { width: 80, height: 80 },
+  plus: { fontSize: 32, color: '#888' },
+  button: {
+    backgroundColor: '#8A2BE2',
+    paddingVertical: 14,
     borderRadius: 6,
     alignItems: 'center',
+    marginTop: 20,
   },
-  textoBotao: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
 });

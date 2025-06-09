@@ -49,7 +49,7 @@ export default function AnimaisUser() {
     fetchData();
   }, [userId]);
 
-  // Aplicando busca por texto e filtros
+
   const filteredAdopted = adoptedAnimals.filter(animal => {
     const nomeOk = animal.nome?.toLowerCase().includes(search.toLowerCase());
     const espOk = activeFilters.especie ? animal.especie === activeFilters.especie : true;
@@ -64,13 +64,13 @@ export default function AnimaisUser() {
     )
   : [];
 
-  // Handler de aplicação de filtros
+
   const handleApplyFilters = (filters) => {
     setActiveFilters(filters);
     setFilterModalVisible(false);
   };
 
-  // Loading e erro
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -89,7 +89,6 @@ export default function AnimaisUser() {
 
   return (
     <View style={styles.container}>
-      {/* Barra de busca e filtro */}
       <View style={styles.searchContainer}>
         <TouchableOpacity onPress={() => setFilterModalVisible(true)}>
           <Image source={require('../../img/Filtro.png')} style={styles.filterIcon} />
@@ -106,7 +105,6 @@ export default function AnimaisUser() {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Seção Animais Adotados */}
         <View style={styles.sectionBox}>
           <Text style={styles.sectionTitle}>Animais Adotados:</Text>
           <View style={styles.gridRow}>
@@ -133,7 +131,7 @@ export default function AnimaisUser() {
           </View>
         </View>
 
-        {/* Seção Abrigos de Voluntariado */}
+
         <View style={styles.sectionBox}>
           <Text style={styles.sectionTitle}>Abrigos em que voluntaria:</Text>
           <View style={styles.gridRow}>
@@ -161,7 +159,6 @@ export default function AnimaisUser() {
         </View>
       </ScrollView>
 
-      {/* Modal de filtros */}
       <TelaFiltro
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}

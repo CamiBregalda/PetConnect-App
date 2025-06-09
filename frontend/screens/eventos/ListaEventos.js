@@ -56,7 +56,7 @@ export default function ListaEventos() {
       <ScrollView contentContainerStyle={styles.scroll}>
         {eventos.map((evento) => (
           <TouchableOpacity
-            key={evento._id}
+            key={evento.id}
             style={styles.eventoBox}
             onPress={() => navigation.navigate('EventoDetalhe', { evento })}
           >

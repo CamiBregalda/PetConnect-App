@@ -1,128 +1,247 @@
+// frontend/screens/RegistroAbandono.js
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  Alert
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
+import { urlIp } from '@env';
 
 export default function RegistroAbandono() {
   const navigation = useNavigation();
-  const [descricao, setDescricao] = useState('');
+  const { userId } = useRoute().params;
+
+  // Estado para descrição e endereço
+  const [descricao, onChangeDescricao] = useState('');
+  const [endereco, onChangeEndereco] = useState({
+    rua: '',
+    numero: '',
+    bairro: '',
+    cidade: '',
+    estado: '',
+    cep: '',
+  });
+
+  // Estado para imagem e loading
+  const [imageUri, onChangeImageUri] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Função unificada para atualizar campos de endereço
+  const handleEnderecoChange = (campo, valor) => {
+    onChangeEndereco(prev => ({ ...prev, [campo]: valor }));
+  };
+
+  // Escolher foto da galeria
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permissão negada', 'Precisamos de acesso à galeria.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+    });
+    if (!result.canceled) {
+      onChangeImageUri(result.assets[0].uri);
+    }
+  };
+
+  // Detectar mime type pela extensão
+  const getImageMimeType = uri => {
+    if (uri.endsWith('.png')) return 'image/png';
+    if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
+    return 'image/jpeg';
+  };
+
+  // Função para enviar imagem após criar o abandono
+  const handleImageUpload = async (abandonoId) => {
+    try {
+      const form = new FormData();
+      const mime = getImageMimeType(imageUri);
+      const ext = mime.split('/')[1];
+      form.append('image', {
+        uri: imageUri,
+        name: `abandono.${ext}`,
+        type: mime,
+      });
+
+      const res = await fetch(`http://${urlIp}:3000/abandonos/${abandonoId}/imagem`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/form-data' },
+        body: form,
+      });
+      if (!res.ok) throw new Error(`Status ${res.status}`);
+    } catch (err) {
+      console.error('Erro ao enviar imagem:', err);
+      // não bloqueia a navegação; apenas log
+    }
+  };
+
+  // Monta o JSON e faz o POST para /abandonos
+  const handleRegister = async () => {
+    // Validação mínima
+    if (!descricao.trim() ||
+        !endereco.rua.trim() ||
+        !endereco.numero.trim() ||
+        !endereco.bairro.trim() ||
+        !endereco.cidade.trim() ||
+        !endereco.estado.trim() ||
+        !endereco.cep.trim()
+    ) {
+      Alert.alert('Preencha todos os campos');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 1) Monta o objeto igual ao service espera
+      const bodyData = {
+        emailUser: userId,            // o campo que o model exige
+        descricao: descricao.trim(),
+        local: {
+          rua: endereco.rua.trim(),
+          numero: endereco.numero.trim(),
+          bairro: endereco.bairro.trim(),
+          cidade: endereco.cidade.trim(),
+          estado: endereco.estado.trim(),
+          cep: endereco.cep.trim(),
+        },
+        animalResgatado: false,       // flag default
+        ativo: true,                  // flag default
+        images: [],                   // será preenchido depois
+      };
+
+      // 2) POST JSON
+      const response = await fetch(`http://${urlIp}:3000/abandonos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
+      });
+      if (!response.ok) {
+        throw new Error(`Status ${response.status}`);
+      }
+
+      const novoAbandono = await response.json(); // deve conter .id
+
+      // 3) Se houver foto, envie-a após criar o registro
+      if (imageUri && novoAbandono.id) {
+        await handleImageUpload(novoAbandono.id);
+      }
+
+      Alert.alert('Sucesso', 'Abandono registrado!');
+      navigation.navigate('InicialUser', { userId });
+    } catch (err) {
+      console.error('Erro ao registrar abandono:', err);
+      Alert.alert('Erro', 'Não foi possível salvar. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <View style={styles.container}>
-
-      <ScrollView >
-        
+    <ScrollView contentContainerStyle={styles.scroll}>
+      <View style={styles.container}>
+        {/* Descrição */}
+        <Text style={styles.label}>Descrição do animal</Text>
         <TextInput
-          placeholder="Informações sobre animal"
           style={styles.textArea}
           multiline
           numberOfLines={4}
           value={descricao}
-          onChangeText={setDescricao}
+          onChangeText={onChangeDescricao}
         />
 
         {/* Endereço */}
-        <View style={styles.infoBox}>
-          <View style={styles.headerRow}>
-            <Text style={styles.label}>Endereço:</Text>
-            <Image source={require('../../img/Profile_Active.png')} style={styles.editIcon} />
-          </View>
-          <Image
-            source={require('../../img/PET.png')}
-            style={styles.mapImage}
-            resizeMode="cover"
+        <Text style={styles.label}>Endereço onde encontrou</Text>
+        {['rua','numero','bairro','cidade','estado','cep'].map(campo => (
+          <TextInput
+            key={campo}
+            placeholder={campo.charAt(0).toUpperCase() + campo.slice(1)}
+            style={styles.input}
+            value={endereco[campo]}
+            onChangeText={val => handleEnderecoChange(campo, val)}
+            keyboardType={campo==='numero'||campo==='cep'?'number-pad':'default'}
           />
-          <Text style={styles.addressText}>Rua Fulano de Tall, 666</Text>
-        </View>
+        ))}
 
-        {/* Fotos */}
-        <View style={styles.fotoRow}>
-          <Image source={require('../../img/Gato.png')} style={styles.animalFoto} />
-          <TouchableOpacity style={styles.addFotoBox}>
-            <Text style={styles.addFotoText}>+</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Foto */}
+        <Text style={styles.label}>Foto do animal (opcional)</Text>
+        <TouchableOpacity onPress={pickImage}>
+          {imageUri
+            ? <Image source={{ uri: imageUri }} style={styles.photo} />
+            : <View style={styles.photoPlaceholder}><Text style={styles.plus}>+</Text></View>
+          }
+        </TouchableOpacity>
 
         {/* Botão Registrar */}
-        <TouchableOpacity style={styles.registrarButton}>
-          <Text style={styles.registrarText}>Registrar</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleRegister}
+          disabled={loading}
+        >
+          {loading
+            ? <ActivityIndicator color="#fff" />
+            : <Text style={styles.buttonText}>Registrar</Text>
+          }
         </TouchableOpacity>
-      </ScrollView>
-
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 20 },
-  backButton: { marginLeft: 16 },
-  backIcon: { width: 24, height: 24, resizeMode: 'contain' },
-  title: { textAlign: 'center', fontSize: 16, marginVertical: 20, color: '#333' },
+  scroll: { paddingVertical: 20, paddingHorizontal: 16 },
+  container: { backgroundColor: '#f1f1f1', borderRadius: 10, padding: 16 },
+  label: { fontWeight: 'bold', marginTop: 12, marginBottom: 6, color: '#333' },
   textArea: {
     backgroundColor: '#fff',
-    marginHorizontal: 16,
-    borderRadius: 10,
+    borderRadius: 8,
     padding: 10,
     height: 100,
     textAlignVertical: 'top',
-    fontSize: 14,
   },
-  infoBox: {
+  input: {
     backgroundColor: '#fff',
-    margin: 16,
-    padding: 12,
-    borderRadius: 10,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     marginBottom: 8,
   },
-  label: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  editIcon: { width: 20, height: 20, tintColor: '#555' },
-  mapImage: { width: '100%', height: 150, borderRadius: 10 },
-  addressText: { textAlign: 'center', color: '#333', fontSize: 14, marginTop: 6 },
-  fotoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginHorizontal: 16,
-    marginVertical: 20,
+  photo: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginVertical: 12,
   },
-  animalFoto: { width: 90, height: 90, borderRadius: 10 },
-  addFotoBox: {
-    width: 90,
-    height: 90,
-    backgroundColor: '#fff',
-    borderRadius: 10,
+  photoPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+    backgroundColor: '#ddd',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    alignSelf: 'center',
+    marginVertical: 12,
   },
-  addFotoText: { fontSize: 28, color: '#888' },
-  registrarButton: {
+  plus: { fontSize: 36, color: '#888' },
+  button: {
     backgroundColor: '#9333ea',
-    marginHorizontal: 100,
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 14,
+    borderRadius: 8,
     alignItems: 'center',
+    marginTop: 20,
   },
-  registrarText: { color: '#fff', fontSize: 16 },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 12,
-    paddingBottom: 55,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
-  },
-  navIcon: { width: 28, height: 28, resizeMode: 'contain' },
-  navIconCenter: { width: 32, height: 32, resizeMode: 'contain' },
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
 });

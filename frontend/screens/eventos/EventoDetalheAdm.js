@@ -6,7 +6,7 @@ import MapView from './../../components/MapView';
 export default function EventoDetalheAdm() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { evento } = route.params;
+  const { evento, userId, abrigoId } = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -25,7 +25,7 @@ export default function EventoDetalheAdm() {
   const formatarData = (data) => {
     if (!data) return 'Data não informada';
     const dataObj = new Date(data);
-    return dataObj.toLocaleDateString('pt-BR'); 
+    return dataObj.toLocaleDateString('pt-BR');
   };
 
   const formatarEndereco = (endereco) => {
@@ -53,7 +53,7 @@ export default function EventoDetalheAdm() {
           <Text style={styles.text}>{formatarEndereco(evento.endereco)}</Text>
           <View style={styles.mapContainer}>
             {evento.endereco ? (
-              <MapView enderecoAbrigo={evento.endereco} /> // Integrando o mapa
+              <MapView enderecoAbrigo={evento.endereco} /> 
             ) : (
               <Text style={styles.text}>Endereço não disponível para exibir o mapa.</Text>
             )}
@@ -85,14 +85,14 @@ export default function EventoDetalheAdm() {
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('EditarEvento', { evento })}
+            onPress={() => navigation.navigate('EditarEvento', { evento, userId, abrigoId })}
           >
             <Text style={styles.buttonText}>Editar Evento</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.volunteersButton]}
-            onPress={() => navigation.navigate('VoluntariosEvento', { eventoId: evento._id })}
+            onPress={() => navigation.navigate('VoluntariosEvento', { eventoId: evento.id })}
           >
             <Text style={styles.buttonText}>Voluntários</Text>
           </TouchableOpacity>
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   volunteersButton: {
-    backgroundColor: '#9333ea', 
+    backgroundColor: '#9333ea',
   },
   buttonText: {
     color: '#fff',

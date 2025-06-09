@@ -85,7 +85,7 @@ export default function EventoDetalheUsuario() {
 
         <View style={styles.card}>
           <Text style={styles.label}>Detalhes:</Text>
-          <Text style={styles.text}>{evento.detalhes || 'Nenhum detalhe adicional informado'}</Text>
+          <Text style={styles.text}>{evento.descricao || 'Nenhum detalhe adicional informado'}</Text>
         </View>
 
       </ScrollView>

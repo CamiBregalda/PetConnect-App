@@ -110,7 +110,8 @@ function HomeScreen() {
   };
 
   const exibirDetalhesEvento = (evento) => {
-    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento, userId: telaPrincipalUserId });
+    console.log('buscando abrigoId do evento:', evento.idAbrigo);
+    navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento, userId: telaPrincipalUserId, abrigoId: evento.idAbrigo });
   };
 
   const handleSearch = (text) => {
@@ -119,7 +120,6 @@ function HomeScreen() {
 
   const handleApplyAdvancedFilters = (filtersFromModal) => {
     setActiveFilters(filtersFromModal);
-    // A filtragem da lista de animais ocorrerá automaticamente pois `animaisFiltrados` depende de `activeFilters`
   };
 
   const animaisFiltrados = animais.filter(animal => {
@@ -152,14 +152,6 @@ function HomeScreen() {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>O que você procura hoje?</Text>
 
-      {/* Botão de Gerenciar Eventos (Admin) - Mantenha se necessário */}
-      <TouchableOpacity
-        style={styles.botaoEventosAdm}
-        onPress={() => navigation.navigate('EventosAdm', { userId: telaPrincipalUserId })}
-      >
-        <Text style={styles.botaoEventosAdmTexto}>Gerenciar Eventos (Admin)</Text>
-      </TouchableOpacity>
-
       <View style={styles.searchAndFilterContainer}>
         <TextInput
           style={styles.searchInput}
@@ -171,6 +163,13 @@ function HomeScreen() {
            <Image source={require('../../img/Filtro.png')} style={styles.filterIcon} />
         </TouchableOpacity>
       </View>
+
+       <TouchableOpacity
+        style={styles.botaoEventosAdm}
+        onPress={() => navigation.navigate('EventosAdm', { userId: telaPrincipalUserId, abrigoId: "682a3ea6bc939ba819b39e79" })} // Passa abrigoId como null para eventos administrativos
+      >
+        <Text style={styles.botaoEventosAdmTexto}>Gerenciar Eventos (Admin)</Text>
+      </TouchableOpacity>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Animais para Adoção</Text>
@@ -214,7 +213,7 @@ function HomeScreen() {
                 style={styles.listImage}
                 onError={(e) => console.log('Erro img evento:', e.nativeEvent.error)}
               />
-              <Text style={styles.listItemText}>{evento.nome}</Text>
+              <Text style={styles.listItemText}>{evento.titulo}</Text>
             </TouchableOpacity>
           )) : <Text style={styles.notFoundText}>Nenhum evento encontrado.</Text>}
         </ScrollView>

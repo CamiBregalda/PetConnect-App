@@ -38,6 +38,7 @@ export const getEventoById = async (req: Request, res: Response) => {
 };
 
 export const updateEvento = async (req: Request, res: Response) => {
+    console.log('PUT /eventos/:id recebendo →', req.body);
     try {
         const eventoId = req.params.id;
 
@@ -54,7 +55,7 @@ export const updateEvento = async (req: Request, res: Response) => {
 
         res.status(200).json(evento);
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao atualizar evento.' });
+        return res.status(500).json({ error: error.message });
     }
 };
 

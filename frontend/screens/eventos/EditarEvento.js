@@ -1,224 +1,306 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  Image,
+  Alert,
+  ActivityIndicator,
+  Platform
+} from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { urlIp } from '@env';
 
 export default function EditarEvento() {
   const navigation = useNavigation();
-  const route = useRoute();
-  const { evento } = route.params || {};
-  console.log('Evento recebido na tela de edição:', evento);
+  const { evento, userId, abrigoId } = useRoute().params;
 
-  const [titulo, setTitulo] = useState(evento?.titulo || '');
-  const [descricao, setDescricao] = useState(evento?.descricao || '');
-  const [objetivo, setObjetivo] = useState(evento?.objetivo || '');
-  const [dataInicio, setDataInicio] = useState(evento?.dataInicio || '');
-  const [dataFim, setDataFim] = useState(evento?.dataFim || '');
-  const [rua, setRua] = useState(evento?.endereco?.rua || '');
-  const [numero, setNumero] = useState(evento?.endereco?.numero || '');
-  const [bairro, setBairro] = useState(evento?.endereco?.bairro || '');
-  const [cidade, setCidade] = useState(evento?.endereco?.cidade || '');
-  const [estado, setEstado] = useState(evento?.endereco?.estado || '');
-  const [cep, setCep] = useState(evento?.endereco?.cep || '');
-  const [imageUri, setImageUri] = useState(evento?.imagemUrl || null);
+  const [titulo, setTitulo] = useState(evento.titulo);
+  const [descricao, setDescricao] = useState(evento.descricao);
+  const [objetivo, setObjetivo] = useState(evento.objetivo);
+  const formatDate = isoString =>
+  isoString ? isoString.split('T')[0] : '';
+  const [dataInicio, setDataInicio] = useState(formatDate(evento.dataInicio));
+  const [dataFim, setDataFim] = useState(formatDate(evento.dataFim));
+  const [endereco, setEndereco] = useState({
+    rua: evento.endereco.rua || '',
+    numero: evento.endereco.numero || '',
+    bairro: evento.endereco.bairro || '',
+    cidade: evento.endereco.cidade || '',
+    estado: evento.endereco.estado || '',
+    cep: evento.endereco.cep || '',
+  });
+
+  const [imageUri, setImageUri] = useState(evento.imagemUrl || null);
   const [loading, setLoading] = useState(false);
   const [showInicio, setShowInicio] = useState(false);
   const [showFim, setShowFim] = useState(false);
 
+  const handleEnderecoChange = (campo, valor) => {
+    setEndereco(prev => ({ ...prev, [campo]: valor }));
+  };
+
   const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permissão negada', 'Precisamos de acesso à galeria.');
+      return;
+    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+      quality: 0.7,
     });
-
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);
     }
   };
 
-  const handleSalvar = async () => {
-    setLoading(true);
-    try {
+  const getImageMimeType = uri => {
+    if (uri.endsWith('.png')) return 'image/png';
+    if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
+    return 'image/jpeg';
+  };
 
-      const response = await fetch(`http://${urlIp}:3000/eventos/${evento._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          titulo: titulo.trim(),
-          descricao: descricao.trim(),
-          objetivo: objetivo.trim(),
-          dataInicio: dataInicio.trim(),
-          dataFim: dataFim.trim(),
-          endereco: {
-            rua: rua.trim(),
-            numero: numero.trim(),
-            bairro: bairro.trim(),
-            cidade: cidade.trim(),
-            estado: estado.trim(),
-            cep: cep.trim(),
-          },
-        }),
+  const handleImageUpload = async (eventoId) => {
+    if (!imageUri || imageUri === evento.imagemUrl) return;
+    try {
+      const form = new FormData();
+      const mime = getImageMimeType(imageUri);
+      const ext = mime.split('/')[1];
+      form.append('image', {
+        uri: imageUri,
+        name: `evento.${ext}`,
+        type: mime,
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Erro ao atualizar evento');
+      const res = await fetch(
+        `http://${urlIp}:3000/eventos/${eventoId}/imagem`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'multipart/form-data' },
+          body: form,
+        },
+      );
+      if (!res.ok) {
+        const txt = await res.text();
+        console.error('Resposta de erro completa:', errText);
+        throw new Error(txt || 'Erro ao enviar imagem');
+      }
+    } catch (err) {
+      console.error('Erro ao enviar imagem:', err);
+    }
+  };
+
+  const handleSalvar = async () => {
+
+    if (
+      !titulo.trim() ||
+      !descricao.trim() ||
+      !objetivo.trim() ||
+      !dataInicio.trim() ||
+      !dataFim.trim() ||
+      !endereco.rua.trim() ||
+      !endereco.numero.trim() ||
+      !endereco.bairro.trim() ||
+      !endereco.cidade.trim() ||
+      !endereco.estado.trim() ||
+      !endereco.cep.trim()
+    ) {
+      Alert.alert('Erro', 'Preencha todos os campos.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const bodyData = {
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        objetivo: objetivo.trim(),
+        dataInicio: dataInicio.trim(),
+        dataFim: dataFim.trim(),
+        idAbrigo: evento.abrigoId,
+        endereco: {
+          rua: endereco.rua.trim(),
+          numero: endereco.numero.trim(),
+          bairro: endereco.bairro.trim(),
+          cidade: endereco.cidade.trim(),
+          estado: endereco.estado.trim(),
+          cep: endereco.cep.trim(),
+        },
+      };
+
+      const resp = await fetch(`http://${urlIp}:3000/eventos/${evento.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
+      });
+      if (!resp.ok) {
+        const errText = await resp.text();
+        throw new Error(errText || `Status ${resp.status}`);
       }
 
-      const data = await response.json();
+      await handleImageUpload(evento.id);
 
-      if (imageUri && imageUri !== evento.imagemUrl) {
-        await handleImageUpload(evento._id);
-      }
-
-      Alert.alert('Sucesso', 'Evento atualizado com sucesso!');
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert('Erro', error.message || 'Erro ao atualizar evento');
+      Alert.alert('Sucesso', 'Evento atualizado!');
+      navigation.navigate('EventosAdm', { userId, abrigoId });
+    } catch (err) {
+      console.error('Erro ao salvar evento:', err);
+      Alert.alert('Erro', err.message || 'Não foi possível salvar.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleImageUpload = async (eventoId) => {
-    if (!imageUri || imageUri === evento.imagemUrl) return;
-
-    try {
-      const formData = new FormData();
-      formData.append('image', {
-        uri: imageUri,
-        name: `evento.jpg`,
-        type: 'image/jpeg',
-      });
-
-      const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Erro ao enviar a imagem');
-      }
-
-      console.log('Imagem enviada com sucesso!');
-    } catch (error) {
-      console.error('Erro ao enviar a imagem:', error);
-      throw new Error('Falha ao enviar a imagem');
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
-        <Ionicons name="arrow-back" size={28} color="#222" />
-      </TouchableOpacity>
+    <>
 
-      <Text style={styles.titulo}>Edite seu Evento</Text>
-
-      <ScrollView contentContainerStyle={styles.form}>
-        <TextInput placeholder="Título" style={styles.input} value={titulo} onChangeText={setTitulo} />
-        <TextInput
-          placeholder="Descrição"
-          style={[styles.input, styles.textArea]}
-          value={descricao}
-          onChangeText={setDescricao}
-          multiline
-          numberOfLines={5}
-        />
-        <TextInput placeholder="Objetivo" style={styles.input} value={objetivo} onChangeText={setObjetivo} />
-
-        <TouchableOpacity onPress={() => setShowInicio(true)} style={styles.input}>
-          <Text style={{ color: dataInicio ? '#222' : '#888' }}>
-            {dataInicio ? dataInicio.split('-').reverse().join('/') : 'Data de Início'}
-          </Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        {showInicio && (
-          <DateTimePicker
-            value={dataInicio ? new Date(dataInicio) : new Date()}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowInicio(false);
-              if (selectedDate) {
-                setDataInicio(selectedDate.toISOString().split('T')[0]);
-              }
-            }}
+        <Text style={styles.headerTitle}>Edite seu Evento</Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.container}>
+
+          <Text style={styles.label}>Título</Text>
+          <TextInput
+            style={styles.input}
+            value={titulo}
+            onChangeText={setTitulo}
           />
-        )}
 
-        <TouchableOpacity onPress={() => setShowFim(true)} style={styles.input}>
-          <Text style={{ color: dataFim ? '#222' : '#888' }}>
-            {dataFim ? dataFim.split('-').reverse().join('/') : 'Data Final'}
-          </Text>
-        </TouchableOpacity>
-        {showFim && (
-          <DateTimePicker
-            value={dataFim ? new Date(dataFim) : new Date()}
-            mode="date"
-            display="default"
-            onChange={(event, selectedDate) => {
-              setShowFim(false);
-              if (selectedDate) {
-                setDataFim(selectedDate.toISOString().split('T')[0]);
-              }
-            }}
+          <Text style={styles.label}>Descrição</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={descricao}
+            onChangeText={setDescricao}
+            multiline
           />
-        )}
 
-        <TextInput placeholder="Rua" style={styles.input} value={rua} onChangeText={setRua} />
-        <TextInput placeholder="Número" style={styles.input} value={numero} onChangeText={setNumero} />
-        <TextInput placeholder="Bairro" style={styles.input} value={bairro} onChangeText={setBairro} />
-        <TextInput placeholder="Cidade" style={styles.input} value={cidade} onChangeText={setCidade} />
-        <TextInput placeholder="Estado" style={styles.input} value={estado} onChangeText={setEstado} />
-        <TextInput placeholder="CEP" style={styles.input} value={cep} onChangeText={setCep} />
+          <Text style={styles.label}>Objetivo</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            value={objetivo}
+            onChangeText={setObjetivo}
+            multiline
+          />
 
-        <View style={styles.imageUpload}>
-          <Text style={styles.imageLabel}>Imagem do Evento</Text>
+          <Text style={styles.label}>Data de Início</Text>
+          <TouchableOpacity style={styles.input} onPress={() => setShowInicio(true)}>
+            <Text>{dataInicio || 'Selecionar data'}</Text>
+          </TouchableOpacity>
+          {showInicio && (
+            <DateTimePicker
+              value={dataInicio ? dataInicio.toLocaleDateString() : new Date()}
+              mode="date"
+              display="default"
+              onChange={(_, d) => {
+                setShowInicio(Platform.OS === 'ios');
+                if (d) setDataInicio(d.toISOString().split('T')[0]);
+              }}
+            />
+          )}
+
+          <Text style={styles.label}>Data de Término</Text>
+          <TouchableOpacity style={styles.input} onPress={() => setShowFim(true)}>
+            <Text>{dataFim || 'Selecionar data'}</Text>
+          </TouchableOpacity>
+          {showFim && (
+            <DateTimePicker
+              value={dataFim ? parseDate(dataFim).toLocaleDateString() : new Date()}
+              mode="date"
+              display="default"
+              onChange={(_, d) => {
+                setShowFim(Platform.OS === 'ios');
+                if (d) setDataFim(d.toISOString().split('T')[0]);
+              }}
+            />
+          )}
+
+          <Text style={styles.label}>Endereço</Text>
+          {['rua', 'numero', 'bairro', 'cidade', 'estado', 'cep'].map(campo => (
+            <TextInput
+              key={campo}
+              placeholder={campo[0].toUpperCase() + campo.slice(1)}
+              style={styles.input}
+              value={endereco[campo]}
+              onChangeText={val => handleEnderecoChange(campo, val)}
+              keyboardType={campo === 'numero' || campo === 'cep' ? 'number-pad' : 'default'}
+            />
+          ))}
+
+          <Text style={styles.label}>Foto do Evento</Text>
           <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} style={{ width: 80, height: 80, borderRadius: 8 }} />
-            ) : (
-              <Text style={styles.plus}>+</Text>
-            )}
+            {imageUri
+              ? <Image source={{ uri: imageUri }} style={styles.image} />
+              : <Text style={styles.plus}>+</Text>
+            }
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSalvar}
+            disabled={loading}
+          >
+            {loading
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.buttonText}>Salvar Alterações</Text>
+            }
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.botao} onPress={handleSalvar} disabled={loading}>
-          <Text style={styles.textoBotao}>{loading ? 'Salvando...' : 'Salvar Alterações'}</Text>
-        </TouchableOpacity>
       </ScrollView>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 50 },
-  voltar: { marginLeft: 16, marginBottom: 10 },
-  titulo: { fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginBottom: 16, color: '#333' },
-  form: { paddingHorizontal: 16, paddingBottom: 50 },
-  input: { backgroundColor: 'white', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, marginBottom: 12, fontSize: 14 },
-  textArea: { height: 100, textAlignVertical: 'top' },
-  imageUpload: { marginBottom: 20 },
-  imageLabel: { fontWeight: 'bold', marginBottom: 8 },
-  imageBox: {
-    width: 80,
-    height: 80,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    justifyContent: 'center',
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    overflow: 'hidden',
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 8,
+    backgroundColor: '#fff',
   },
-  plus: { fontSize: 24, color: '#333' },
-  botao: { backgroundColor: '#9333ea', paddingVertical: 12, borderRadius: 6, alignItems: 'center' },
-  textoBotao: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  backButton: { marginRight: 12 },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
+
+  scroll: { padding: 16, paddingBottom: 80 },
+  container: { backgroundColor: '#fff', borderRadius: 8, padding: 16 },
+  label: { fontWeight: 'bold', marginTop: 12, color: '#333' },
+  input: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    padding: 10,
+    marginTop: 6
+  },
+  textArea: { height: 80, textAlignVertical: 'top' },
+  imageBox: {
+    width: 80, height: 80,
+    alignSelf: 'center',
+    borderRadius: 6,
+    borderWidth: 1, borderColor: '#ccc',
+    justifyContent: 'center', alignItems: 'center',
+    marginTop: 8, marginBottom: 16,
+    overflow: 'hidden'
+  },
+  image: { width: 80, height: 80 },
+  plus: { fontSize: 32, color: '#888' },
+  button: {
+    backgroundColor: '#8A2BE2',
+    paddingVertical: 14,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginTop: 20
+  },
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 }
 });
