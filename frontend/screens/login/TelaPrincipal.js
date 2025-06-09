@@ -12,7 +12,6 @@ function HomeScreen() {
   const telaPrincipalUserId = route.params?.userId;
   const navigation = useNavigation();
   const userId = telaPrincipalUserId;
-  console.log('HomeScreen - userId from route.params:', userId);
 
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
@@ -212,7 +211,6 @@ function HomeScreen() {
               <Image
                 source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem` }}
                 style={styles.listImage}
-                onError={(e) => console.log('Erro img evento:', e.nativeEvent.error)}
               />
               <Text style={styles.listItemText}>{evento.titulo}</Text>
             </TouchableOpacity>

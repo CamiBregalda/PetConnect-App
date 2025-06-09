@@ -9,7 +9,8 @@ import {
   Image,
   Alert,
   ActivityIndicator,
-  Platform
+  Platform,
+  Pressable
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -56,39 +57,40 @@ export default function CriarEvento() {
     }
   };
 
-  const getImageMimeType = uri => {
-    if (uri.endsWith('.png')) return 'image/png';
-    if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
-    return 'image/jpeg';
-  };
-
-  const handleImageUpload = async (eventoId) => {
-    try {
-      const form = new FormData();
-      const mime = getImageMimeType(imageUri);
-      const ext = mime.split('/')[1];
-      form.append('image', {
-        uri: imageUri,
-        name: `evento.${ext}`,
-        type: mime,
-      });
-
-      const res = await fetch(
-        `http://${urlIp}:3000/eventos/${eventoId}/imagem`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'multipart/form-data' },
-          body: form,
+  const getImageMimeType = (uri) => {
+      if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
+        if (uri.endsWith('.png')) return 'image/png';
+          return 'image/jpeg';
+        };
+  
+        const handleImageUpdate = async (eventoId) => {
+        const mimeType = getImageMimeType(imageUri);
+    
+        const formData = new FormData();
+        formData.append('image', {
+          uri: imageUri,
+          name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
+          type: mimeType,
+        });
+    
+        try {
+          const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            body: formData,
+          });
+  
+          if (!response.ok) {
+            throw new Error('Falha ao enviar a imagem');
+          }
+  
+          console.log('Imagem enviada com sucesso');
+        } catch (error) {
+          console.error('Erro ao enviar imagem:', error);
         }
-      );
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || 'Erro ao enviar imagem');
-      }
-    } catch (err) {
-      console.error('Erro ao enviar imagem:', err);
-    }
-  };
+    };
 
   const handleCriar = async () => {
     if (!abrigoId) {
@@ -132,22 +134,21 @@ export default function CriarEvento() {
         },
       };
 
-      const resp = await fetch(`http://${urlIp}:3000/eventos/${abrigoId}`, {
+      const response = await fetch(`http://${urlIp}:3000/eventos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyData),
       });
-      if (!resp.ok) {
-        const errText = await resp.text();
-        throw new Error(errText || `Status ${resp.status}`);
+      
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar evento');
       }
-      const novo = await resp.json();
+      const data = await response.json();
 
-      if (imageUri && novo.id) {
-        await handleImageUpload(novo.id);
+      if (imageUri) {
+        await handleImageUpdate(data.id);
       }
 
-      Alert.alert('Sucesso', 'Evento criado!');
       navigation.navigate('EventosAdm', { userId, abrigoId });
     } catch (err) {
       console.error('Erro ao criar evento:', err);
@@ -269,13 +270,15 @@ export default function CriarEvento() {
             keyboardType="number-pad"
           />
 
-          <Text style={styles.label}>Foto do Evento</Text>
-          <TouchableOpacity style={styles.imageBox} onPress={pickImage}>
-            {imageUri
-              ? <Image source={{ uri: imageUri }} style={styles.image} />
-              : <Text style={styles.plus}>+</Text>
-            }
-          </TouchableOpacity>
+          <Pressable onPress={pickImage} style={{ alignSelf: 'center', marginVertical: 20 }}>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.image} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+              <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+              </View>
+            )}
+          </Pressable>
 
           <TouchableOpacity
             style={styles.button}
@@ -333,7 +336,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     overflow: 'hidden',
   },
-  image: { width: 80, height: 80 },
   plus: { fontSize: 32, color: '#888' },
   button: {
     backgroundColor: '#8A2BE2',
@@ -343,4 +345,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    marginTop: 20,
+  },
+  imagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 10,
+    backgroundColor: '#eee',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  imagePlaceholderText: {
+    color: '#888',
+    textAlign: 'center',
+  },
 });
