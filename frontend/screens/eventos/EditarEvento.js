@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,8 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
-  Pressable
+  Pressable,
+  Modal,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +40,7 @@ export default function EditarEvento() {
   const [loading, setLoading] = useState(false);
   const [showInicio, setShowInicio] = useState(false);
   const [showFim, setShowFim] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleEnderecoChange = (campo, valor) => {
     setEndereco(prev => ({ ...prev, [campo]: valor }));
@@ -60,39 +62,31 @@ export default function EditarEvento() {
     }
   };
 
-  const getImageMimeType = (uri) => {
+  const getImageMimeType = uri => {
     if (uri.endsWith('.jpg') || uri.endsWith('.jpeg')) return 'image/jpeg';
-      if (uri.endsWith('.png')) return 'image/png';
-        return 'image/jpeg';
-      };
+    if (uri.endsWith('.png')) return 'image/png';
+    return 'image/jpeg';
+  };
 
-      const handleImageUpload = async (eventoId) => {
-      const mimeType = getImageMimeType(imageUri);
-  
-      const formData = new FormData();
-      formData.append('image', {
-        uri: imageUri,
-        name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
-        type: mimeType,
+  const handleImageUpload = async eventoId => {
+    const mimeType = getImageMimeType(imageUri);
+    const formData = new FormData();
+    formData.append('image', {
+      uri: imageUri,
+      name: `profile.${mimeType === 'image/png' ? 'png' : 'jpg'}`,
+      type: mimeType,
+    });
+    try {
+      const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/form-data' },
+        body: formData,
       });
-  
-      try {
-        const response = await fetch(`http://${urlIp}:3000/eventos/${eventoId}/imagem`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error('Falha ao enviar a imagem');
-        }
-
-        console.log('Imagem enviada com sucesso');
-      } catch (error) {
-        console.error('Erro ao enviar imagem:', error);
-      }
+      if (!response.ok) throw new Error('Falha ao enviar a imagem');
+      console.log('Imagem enviada com sucesso');
+    } catch (error) {
+      console.error('Erro ao enviar imagem:', error);
+    }
   };
 
   const handleSalvar = async () => {
@@ -110,7 +104,6 @@ export default function EditarEvento() {
       Alert.alert('Erro', 'Preencha todos os campos.');
       return;
     }
-
     setLoading(true);
     try {
       const bodyData = {
@@ -129,7 +122,6 @@ export default function EditarEvento() {
           cep: endereco.cep.trim(),
         },
       };
-
       const resp = await fetch(`http://${urlIp}:3000/eventos/${evento.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -139,9 +131,7 @@ export default function EditarEvento() {
         const errText = await resp.text();
         throw new Error(errText || `Status ${resp.status}`);
       }
-
       await handleImageUpload(evento.id);
-
       Alert.alert('Sucesso', 'Evento atualizado!');
       navigation.navigate('EventosAdm', { userId, abrigoId });
     } catch (err) {
@@ -149,6 +139,20 @@ export default function EditarEvento() {
       Alert.alert('Erro', err.message || 'Não foi possível salvar.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`http://${urlIp}:3000/eventos/${evento.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) throw new Error('Erro ao deletar evento');
+      
+    } catch (error) {
+      console.error('Erro ao deletar evento:', error);
+      Alert.alert('Erro', 'Não foi possível deletar o evento');
     }
   };
 
@@ -163,13 +167,9 @@ export default function EditarEvento() {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.container}>
-
+         
           <Text style={styles.label}>Título</Text>
-          <TextInput
-            style={styles.input}
-            value={titulo}
-            onChangeText={setTitulo}
-          />
+          <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} />
 
           <Text style={styles.label}>Descrição</Text>
           <TextInput
@@ -219,71 +219,95 @@ export default function EditarEvento() {
             />
           )}
 
-          {/* Campos de Endereço com labels acima */}
-          <Text style={styles.label}>Rua</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco.rua}
-            onChangeText={val => handleEnderecoChange('rua', val)}
-          />
+         
+          {['rua', 'numero', 'bairro', 'cidade', 'estado', 'cep'].map(campo => (
+            <React.Fragment key={campo}>
+              <Text style={styles.label}>
+                {campo.charAt(0).toUpperCase() + campo.slice(1)}
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={endereco[campo]}
+                onChangeText={val => handleEnderecoChange(campo, val)}
+                keyboardType={
+                  campo === 'numero' || campo === 'cep' ? 'number-pad' : 'default'
+                }
+              />
+            </React.Fragment>
+          ))}
 
-          <Text style={styles.label}>Número</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco.numero}
-            onChangeText={val => handleEnderecoChange('numero', val)}
-            keyboardType="number-pad"
-          />
-
-          <Text style={styles.label}>Bairro</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco.bairro}
-            onChangeText={val => handleEnderecoChange('bairro', val)}
-          />
-
-          <Text style={styles.label}>Cidade</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco.cidade}
-            onChangeText={val => handleEnderecoChange('cidade', val)}
-          />
-
-          <Text style={styles.label}>Estado</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco.estado}
-            onChangeText={val => handleEnderecoChange('estado', val)}
-          />
-
-          <Text style={styles.label}>CEP</Text>
-          <TextInput
-            style={styles.input}
-            value={endereco.cep}
-            onChangeText={val => handleEnderecoChange('cep', val)}
-            keyboardType="number-pad"
-          />
-
+        
           <Pressable onPress={pickImage} style={{ alignSelf: 'center', marginVertical: 20 }}>
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.image} />
             ) : (
               <View style={styles.imagePlaceholder}>
-              <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+                <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
               </View>
             )}
           </Pressable>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleSalvar}
-            disabled={loading}
+        
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={[styles.baseButton, styles.saveButton]}
+              onPress={handleSalvar}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text
+                  style={styles.buttonText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Salvar
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.baseButton, styles.deleteButton]}
+              onPress={() => setModalVisible(true)}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>Deletar</Text>
+            </TouchableOpacity>
+          </View>
+
+        
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
           >
-            {loading
-              ? <ActivityIndicator color="#fff" />
-              : <Text style={styles.buttonText}>Salvar Alterações</Text>
-            }
-          </TouchableOpacity>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalText}>
+                  Tem certeza que deseja deletar este evento?
+                </Text>
+                <View style={styles.modalButtons}>
+                  <Pressable
+                    style={styles.modalCancelButton}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.buttonText}>Cancelar</Text>
+                  </Pressable>
+                  <Pressable
+                    style={styles.modalConfirmButton}
+                    onPress={() => {
+                      handleDelete();
+                      navigation.navigate('EventosAdm', { userId, abrigoId });
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Confirmar</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       </ScrollView>
     </>
@@ -304,6 +328,7 @@ const styles = StyleSheet.create({
 
   scroll: { padding: 16, paddingBottom: 80 },
   container: { backgroundColor: '#fff', borderRadius: 8, padding: 16 },
+
   label: { fontWeight: 'bold', marginTop: 12, color: '#333' },
   input: {
     backgroundColor: '#f5f5f5',
@@ -312,28 +337,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   textArea: { height: 80, textAlignVertical: 'top' },
-  imageBox: {
-    width: 80,
-    height: 80,
-    alignSelf: 'center',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  plus: { fontSize: 32, color: '#888' },
-  button: {
-    backgroundColor: '#8A2BE2',
-    paddingVertical: 14,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+
   image: {
     width: 120,
     height: 120,
@@ -352,5 +356,71 @@ const styles = StyleSheet.create({
   imagePlaceholderText: {
     color: '#888',
     textAlign: 'center',
+  },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 30,
+  },
+  baseButton: {
+    flex: 1,
+    paddingVertical: 8,    
+    paddingHorizontal: 32,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center', 
+    marginHorizontal: 5,
+  },
+  saveButton: {
+    backgroundColor: '#8A2BE2',
+  },
+  deleteButton: {
+    backgroundColor: '#B22222',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+    flexShrink: 1,        
+    textAlign: 'center',
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalCancelButton: {
+    backgroundColor: '#888',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  modalConfirmButton: {
+    backgroundColor: '#B22222',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginHorizontal: 10,
   },
 });

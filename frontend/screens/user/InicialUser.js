@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
-import MapView from './../../components/MapView'; // Componente de mapa
+import MapView from './../../components/MapView'; 
 
 export default function InicialUser() {
   const route = useRoute();
@@ -11,7 +11,49 @@ export default function InicialUser() {
   const [userInfo, setUserInfo] = useState(null);
   const navigation = useNavigation();
 
-  // Configura header com saudação e botão de edição
+
+  const handleAdminAbrigo = async () => {
+    try {
+      const response = await fetch(`http://${urlIp}:3000/admAbrigo/${userId}/user`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao buscar abrigo');
+      }
+
+      const data = await response.json();
+
+      fetch(`http://${urlIp}:3000/admAbrigo/${data.id}/abrigo`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });;
+      if (resAdmin.status === 404) {
+        navigation.navigate('CadastroAbrigo');
+        return;
+      }
+      if (!resAdmin.ok) {
+        throw new Error('Não foi possível verificar dados do abrigo.');
+      }
+      const adminData = await resAdmin.json();
+      console.log('🏠 handleAdminAbrigo adminData =', adminData);
+      const abrigoId = adminData.abrigoId || adminData.idAbrigo || adminData.id;
+      if (!abrigoId) {
+        throw new Error('Campo abrigoId não retornado pela API de admAbrigo.');
+      }
+      navigation.navigate('AtualizarAbrigo', { userId, abrigoId });
+    } catch (err) {
+      console.error('Erro ao buscar adminAbrigo:', err);
+      Alert.alert('Erro', err.message.includes('abrigoId') ? err.message : 'Falha na conexão ao servidor.');
+    }
+  };
+
+  // Configura header com saudação e botão de casa
   useLayoutEffect(() => {
     navigation.setOptions({
       title: userInfo ? `${userInfo.nome}` : 'Usuário',
@@ -20,24 +62,17 @@ export default function InicialUser() {
       headerTitleStyle: { fontWeight: 'bold' },
       headerTitleAlign: 'center',
       headerRight: () => (
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => navigation.navigate('AtualizarUser', { userId })}
-        >
-          <Ionicons name="create-outline" size={24} color="#fff" />
+        <TouchableOpacity onPress={handleAdminAbrigo} style={styles.homeButton}>
+          <Ionicons name="home-outline" size={24} color="#fff" />
         </TouchableOpacity>
       ),
     });
   }, [navigation, userInfo]);
 
-  // Busca os dados do usuário
+  // Busca informações do usuário
   const getUserInfo = async () => {
     try {
-      const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!response.ok) throw new Error('Erro ao buscar usuário');
+      const response = await fetch(`http://${urlIp}:3000/users/${userId}`);
       const data = await response.json();
       setUserInfo(data);
     } catch (error) {
@@ -49,81 +84,77 @@ export default function InicialUser() {
     getUserInfo();
   }, []);
 
-  // Formata o endereço completo
-  const formatarEndereco = endereco => {
-    if (!endereco) return 'Endereço não informado';
-    const { rua, numero, bairro, cidade, estado, cep } = endereco;
-    return `${rua || ''}${numero ? ', ' + numero : ''}${
-      bairro ? ' - ' + bairro : ''
-    }, ${cidade || ''}${estado ? ' - ' + estado : ''}${
-      cep ? ' - CEP: ' + cep : ''
-    }`.trim();
-  };
+  if (!userInfo) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Carregando...</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView contentContainerStyle={styles.container}>
+      {/* Foto de perfil */}
+      <Image
+        source={{
+          uri:
+            userInfo.imagemUrl ||
+            userInfo.avatarUrl ||
+            'https://via.placeholder.com/150'
+        }}
+        style={styles.profileImage}
+      />
 
-        {/* Foto de perfil dinâmica */}
-        <Image
-          source={{
-            uri:
-              userInfo?.imagemUrl || userInfo?.avatarUrl ||
-              'https://via.placeholder.com/150'
-          }}
-          style={styles.profileImage}
-        />
-
-        {/* Informações básicas */}
-        <View style={styles.infoBox}>
-          <View style={styles.headerRow}>
-            <Text style={styles.label}>
-              {userInfo ? userInfo.nome : 'Carregando...'}
-            </Text>
-          </View>
-          <Text style={styles.description}>
-            {userInfo?.descricao || 'Sem descrição cadastrada.'}
-          </Text>
+      {/* Card com nome, descrição e botão de editar */}
+      <View style={styles.infoBox}>
+        <View style={styles.headerRow}>
+          <Text style={styles.label}>{userInfo.nome}</Text>
+          <TouchableOpacity
+            style={styles.editProfileButton}
+            onPress={() => navigation.navigate('AtualizarUser', { userId })}
+          >
+            <Ionicons name="create-outline" size={20} color="#9333ea" />
+          </TouchableOpacity>
         </View>
+        <Text style={styles.description}>
+          {userInfo.descricao || 'Sem descrição cadastrada.'}
+        </Text>
+      </View>
 
-        {/* Endereço e Mapa */}
-        <View style={styles.infoBox}>
-          <Text style={styles.label}>Endereço:</Text>
-          <View style={styles.mapContainer}>
-            {userInfo?.endereco ? (
-              <MapView enderecoAbrigo={userInfo.endereco} />
-            ) : (
-              <Text style={styles.text}>Endereço não disponível para o mapa.</Text>
-            )}
-          </View>
-          <Text style={styles.addressText}>
-            {formatarEndereco(userInfo?.endereco)}
-          </Text>
+      {/* Endereço e Mapa */}
+      <View style={styles.infoBox}>
+        <Text style={styles.label}>Endereço:</Text>
+        <Text style={styles.addressText}>
+          {userInfo.endereco
+            ? `${userInfo.endereco.rua}, ${userInfo.endereco.numero} - ${userInfo.endereco.bairro}, ${userInfo.endereco.cidade} - ${userInfo.endereco.estado}, ${userInfo.endereco.cep}`
+            : 'Sem endereço.'}
+        </Text>
+        <View style={styles.mapContainer}>
+          {userInfo.endereco && (
+            <MapView enderecoAbrigo={userInfo.endereco} />
+          )}
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#f1f1f1',
-  },
-  scrollContainer: {
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingBottom: 120,
   },
-  editButton: {
-    marginRight: 16,
+  container: {
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#f5f5f5',
   },
   profileImage: {
     width: 150,
     height: 150,
     borderRadius: 75,
-    resizeMode: 'cover',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   infoBox: {
     width: '90%',
@@ -140,6 +171,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
   label: {
@@ -151,22 +183,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
   },
-  mapContainer: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: '#e0e0e0',
-    marginTop: 8,
+  editProfileButton: {
+    padding: 4,
   },
-  text: {
-    color: '#555',
-    fontSize: 12,
+  homeButton: {
+    marginRight: 16,
   },
   addressText: {
     marginTop: 8,
     textAlign: 'center',
     color: '#333',
     fontSize: 14,
+  },
+  mapContainer: {
+    marginTop: 8,
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#e0e0e0',
   },
 });
