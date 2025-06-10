@@ -31,7 +31,7 @@ export const getAnimalById = async (id: string) => {
 export const getAnimaisByAbrigoId = async (abrigoId: string) => {
     try {
         const animais = await AnimalModel.find({ idDono: abrigoId, ativo: true });
-        return animais.map(animal => animal.toObject());
+        return animais;
     } catch (error: any) {
         throw new Error("Erro ao buscar animais do abrigo: " + error.message);
     }
@@ -40,7 +40,7 @@ export const getAnimaisByAbrigoId = async (abrigoId: string) => {
 export const getAnimaisAdotadosPorUsuario = async (userId: string) => {
     try {
         const animais = await AnimalModel.find({ idDono: userId, ativo: true }).select('-image');
-        return animais.map(animal => animal.toObject());
+        return animais;
     } catch (error: any) {
         throw new Error("Erro ao buscar animais do abrigo: " + error.message);
     }

@@ -8,9 +8,7 @@ import { urlIp } from '@env';
 function AtualizarAnimalScreen() {
     const route = useRoute();
     const navigation = useNavigation();
-    const userId = route.params.userId;
-    const abrigoId = route.params.abrigoId;
-    const { animalId } = route.params;
+    let { userId, abrigoId, animalId } = route.params;
 
     const [nome, onChangeNome] = useState('');
     const [sexo, onChangeSexo] = useState('');
@@ -35,14 +33,10 @@ function AtualizarAnimalScreen() {
     }, []);
 
     const getAbrigo = async () => {
-        try {
-            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`);
-            if (!response.ok) throw new Error('Erro ao buscar abrigo');
-            const data = await response.json();
-            setAbrigoUserId(data.userId);
-        } catch (error) {
-            console.error('Erro ao buscar abrigo:', error);
-        }
+        const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`);
+        if (!response.ok) throw new Error('Erro ao buscar abrigo');
+        const data = await response.json();
+        setAbrigoUserId(data.userId);
     };
 
     const parseDate = (dateString) => {
@@ -112,9 +106,9 @@ function AtualizarAnimalScreen() {
             onChangeRaca(data.raca);
             onChangePorte(data.porte);
             onChangeCastrado(data.castrado);
-            onChangeDoencas(data.doencas);
-            onChangeDeficiencias(data.deficiencias);
-            onChangeVacinas(data.vacinas);
+            onChangeDoencas(data.doencas.length > 0 ? data.doencas : [""]);
+            onChangeDeficiencias(data.deficiencias.length > 0 ? data.deficiencias : [""]);
+            onChangeVacinas(data.vacinas.length > 0 ? data.vacinas : [""]);
             onChangeInformacoes(data.informacoes);
 
             const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`);
@@ -179,17 +173,17 @@ function AtualizarAnimalScreen() {
     };
 
     const bodyData = {
-        nome: nome?.trim(),
-        sexo: sexo?.trim(),
+        nome: (nome || '').trim(),
+        sexo: (sexo || '').trim(),
         dataNascimento: dataNascimento instanceof Date ? dataNascimento.toISOString() : '',
-        especie: especie?.trim(),
-        raca: raca?.trim(),
-        porte: porte?.trim(),
+        especie: (especie || '').trim(),
+        raca: (raca || '').trim(),
+        porte: (porte || '').trim(),
         castrado: castrado !== null ? castrado : false,
         doencas: clearList(doencas),
         deficiencias: clearList(deficiencias),
         vacinas: clearList(vacinas),
-        informacoes: informacoes?.trim()
+        informacoes: (informacoes || '').trim()
     };
 
     for (const key in bodyData) {

@@ -135,19 +135,19 @@ function AtualizarUserScreen() {
     };
 
     const bodyData = {
-        nome: nome.trim(),
-        cpf: cpf.trim(),
-        telefone: telefone.trim(),
+        nome: (nome || '').trim(),
+        cpf: (cpf || '').trim(),
+        telefone: (telefone || '').trim(),
         idade: idade ? parseInt(idade, 10) : 0,
-        ocupacao: ocupacao.trim(),
-        descricao: descricao.trim(),
+        ocupacao: (ocupacao || '').trim(),
+        descricao: (descricao || '').trim(),
         endereco: {
-            rua: endereco.rua.trim(),
-            numero: endereco.numero.trim(),
-            bairro: endereco.bairro.trim(),
-            cidade: endereco.cidade.trim(),
-            estado: endereco.estado.trim(),
-            cep: endereco.cep.trim(),
+            rua: (endereco.rua || '').trim(),
+            numero: (endereco.numero || '').trim(),
+            bairro: (endereco.bairro || '').trim(),
+            cidade: (endereco.cidade || '').trim(),
+            estado: (endereco.estado || '').trim(),
+            cep: (endereco.cep || '').trim(),
         },
     };
 
@@ -313,7 +313,6 @@ const styles = StyleSheet.create({
         color: '#888',
         textAlign: 'center',
     },
-    
     botao: {
         borderRadius: 5,
         paddingVertical: 10,
