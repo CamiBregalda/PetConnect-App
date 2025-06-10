@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import { useNavigation, useFocusEffect, useRoute } from "@react-navigation/native";
 import { StyleSheet, Text, View, Pressable, ActivityIndicator, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { AbrigoContext } from './../../AppContext';
@@ -19,6 +19,9 @@ function InfoAdm() {
   const [loading, setLoading] = useState(true);
   const [loadingCuidadores, setLoadingCuidadores] = useState(true);
   const [error, setError] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [errorEvents, setErrorEvents] = useState(null);
 
   const buscarInfoAbrigo = useCallback(async (abrigoId) => {
     if (!abrigoId) {
@@ -96,9 +99,33 @@ function InfoAdm() {
         navigation.setOptions({ title: 'Informações Gerais' });
       }
       return () => {
-        
+
       };
     }, [currentAbrigoId, buscarInfoAbrigo, buscarCuidadores, navigation])
+
+    , useEffect(() => {
+
+      if (!abrigoInfo) return;
+      const fetchEvents = async () => {
+        setLoadingEvents(true);
+        setErrorEvents(null);
+        try {
+          const endpoint = abrigoInfo.userId === userId
+            ? `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`
+            : `http://${urlIp}:3000/eventos`;
+          const res = await fetch(endpoint);
+          if (!res.ok) throw new Error('Erro ao buscar eventos');
+          const data = await res.json();
+          setEvents(data);
+        } catch (err) {
+          setErrorEvents(err.message);
+        } finally {
+          setLoadingEvents(false);
+        }
+      };
+
+      fetchEvents();
+    }, [abrigoInfo, currentAbrigoId, userId])
   );
 
   const verChamadosAbandono = (abrigoId) => {
@@ -168,66 +195,73 @@ function InfoAdm() {
         <View style={styles.eventosContainer}>
           <TouchableOpacity
             style={styles.eventosHeader}
-            onPress={() => navigation.navigate('ListaEventos', { abrigoId: currentAbrigoId })}
+            onPress={() => {
+              if (abrigoInfo.userId === userId) {
+                navigation.navigate('EventosAdm', { userId, abrigoId: currentAbrigoId });
+              } else {
+                navigation.navigate('ListaEventos', { abrigoId: currentAbrigoId });
+              }
+            }}
           >
             <Text style={styles.eventosTitle}>Nossos Eventos:</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.eventItem}
-            onPress={() => navigation.navigate('EventoDetalhe', {
-              evento: {
-                titulo: '15/05 Limpeza do Canil',
-                objetivo: 'Limpar e organizar o espaço dos animais.',
-                dataInicio: '15/05/2024',
-                dataFim: '15/05/2024',
-                detalhes: 'Levar luvas e materiais de limpeza.',
-              }
-            })}
-          >
-            <Text style={styles.eventText}>15/05 Limpeza do Canil</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.eventItem}
-            onPress={() => navigation.navigate('EventoDetalhe', {
-              evento: {
-                titulo: '26/05 Adoção na Praça',
-                objetivo: 'Evento de adoção pública.',
-                dataInicio: '26/05/2024',
-                dataFim: '26/05/2024',
-                detalhes: 'Traga coleiras e plaquinhas.',
-              }
-            })}
-          >
-            <Text style={styles.eventText}>26/05 Adoção na Praça</Text>
-          </TouchableOpacity>
+
+          {loadingEvents ? (
+            <ActivityIndicator color="#fff" style={{ marginTop: 10 }} />
+          ) : errorEvents ? (
+            <Text style={{ color: '#fff', padding: 12 }}>Erro: {errorEvents}</Text>
+          ) : (
+            events.map(evento => (
+              <TouchableOpacity
+                key={evento.id}
+                style={styles.eventItem}
+                onPress={() => {
+                  if (abrigoInfo.userId === userId) {
+                    navigation.navigate('EventoDetalheAdm', {
+                      evento,
+                      userId,
+                      abrigoId: currentAbrigoId
+                    });
+                  } else {
+                    navigation.navigate('EventoDetalhe', { evento });
+                  }
+                }}
+              >
+                <Text style={styles.eventText}>
+                  {new Date(evento.dataInicio).toLocaleDateString('pt-BR')} – {evento.titulo}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )}
+
         </View>
 
-       <View style={styles.whiteContainer}>
-  <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>Voluntários</Text>
-    <TouchableOpacity onPress={() => navigation.navigate('VoluntariosAdm', { userId })}>
-      <Text style={styles.verTodosText}>Ver todos</Text>
-    </TouchableOpacity>
-  </View>
-  {cuidadores.length > 0 ? (
-    <View style={styles.listContainer}>
-      {cuidadores.map((cuidador) => (
-        <View key={cuidador.id} style={styles.itemContainer}>
-          <TouchableOpacity  onPress={() => exibirDetalhesVoluntario(cuidador)}>
-            <Image
-              source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
-              style={styles.listImage}
-              onError={(e) => console.log('Erro img cuidador:', e.nativeEvent.error)}
-            />
-          </TouchableOpacity>
-          <Text style={styles.listItemText}>{cuidador.nome}</Text>
+        <View style={styles.whiteContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Voluntários</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('VoluntariosAdm', { userId })}>
+              <Text style={styles.verTodosText}>Ver todos</Text>
+            </TouchableOpacity>
+          </View>
+          {cuidadores.length > 0 ? (
+            <View style={styles.listContainer}>
+              {cuidadores.map((cuidador) => (
+                <View key={cuidador.id} style={styles.itemContainer}>
+                  <TouchableOpacity onPress={() => exibirDetalhesVoluntario(cuidador)}>
+                    <Image
+                      source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
+                      style={styles.listImage}
+                      onError={(e) => console.log('Erro img cuidador:', e.nativeEvent.error)}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.listItemText}>{cuidador.nome}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text>Nenhum voluntário associado a este abrigo.</Text>
+          )}
         </View>
-      ))}
-    </View>
-  ) : (
-    <Text>Nenhum voluntário associado a este abrigo.</Text>
-  )}
-</View>
         <View style={styles.buttonsContainer}>
           <Pressable style={styles.botao} onPress={() => verChamadosAbandono(currentAbrigoId)}>
             <Text style={styles.textoBotao}>Chamados de Abandono</Text>
@@ -357,7 +391,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
-    width: '100%', 
+    width: '100%',
   },
   sectionTitle: {
 
