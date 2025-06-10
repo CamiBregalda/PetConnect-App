@@ -162,13 +162,6 @@ function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-       <TouchableOpacity
-        style={styles.botaoEventosAdm}
-        onPress={() => navigation.navigate('EventosAdm', { userId: userId, abrigoId: "682a3ea6bc939ba819b39e79" })} // Passa abrigoId como null para eventos administrativos
-      >
-        <Text style={styles.botaoEventosAdmTexto}>Gerenciar Eventos (Admin)</Text>
-      </TouchableOpacity>
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Animais para Adoção</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>

@@ -32,13 +32,13 @@ export default function InicialUser() {
   const handleAdminAbrigo = async () => {
     try {
       if (!userId) throw new Error('ID do usuário não fornecido.');
-      // 1) Buscar registro de adminAbrigo para o user
+
       const resAdminRecord = await fetch(`http://${urlIp}:3000/admAbrigo/${userId}/user`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
       if (resAdminRecord.status === 404) {
-        // Sem registro, navegar para cadastro
+
         navigation.navigate('CadastroAbrigo', { userId });
         return;
       }
@@ -47,7 +47,6 @@ export default function InicialUser() {
       const adminAbrigoId = adminRecord.id || adminRecord.adminAbrigoId;
       if (!adminAbrigoId) throw new Error('Campo id (adminAbrigo) não retornado pela API.');
 
-      // 2) Buscar dados do abrigo vinculado
       const resAbrigo = await fetch(`http://${urlIp}:3000/admAbrigo/${adminAbrigoId}/abrigo`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -66,8 +65,7 @@ export default function InicialUser() {
         abrigoData.idAbrigo;
       if (!abrigoId) throw new Error('Campo abrigoId não retornado pela API.');
 
-      // Navegar para AtualizarAbrigo
-      navigation.navigate('AtualizarAbrigo', { userId, abrigoId });
+      navigation.navigate('Main', { userId, abrigoId });
     } catch (err) {
       console.error('Erro ao buscar adminAbrigo:', err);
       Alert.alert('Erro', err.message || 'Falha na conexão ao servidor.');
@@ -100,8 +98,9 @@ export default function InicialUser() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
-        source={{ uri: userInfo.imagemUrl || userInfo.avatarUrl || 'https://via.placeholder.com/150' }}
+        source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem` }}
         style={styles.profileImage}
+        onError={(e) => console.log('Erro img usuário:', e.nativeEvent.error)}
       />
       <View style={styles.infoBox}>
         <View style={styles.headerRow}>
