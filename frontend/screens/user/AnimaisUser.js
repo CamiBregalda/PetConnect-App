@@ -118,7 +118,7 @@ export default function AnimaisUser() {
                   <View style={styles.itemRow}>
                     <Text style={styles.itemText}>{animal.nome}</Text>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate('AtualizarAnimal', { userId, animalId: animal.id })}
+                      onPress={() => navigation.navigate('AtualizarAnimal', { userId, abrigoId: animal.idDono, animalId: animal.id })}
                     >
                       <Ionicons name="create-outline" size={18} color="#555" />
                     </TouchableOpacity>

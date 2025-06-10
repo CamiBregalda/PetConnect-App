@@ -126,11 +126,11 @@ function AtualizarAbrigoScreen() {
     };
 
     const bodyData = {
-        nome: nome.trim(),
-        cnpj: cnpj.trim(),
-        email: email.trim(),
-        telefone: telefone.trim(),
-        descricao: descricao.trim(),
+        nome: (nome || '').trim(),
+        cnpj: (cnpj || '').trim(),
+        email: (email || '').trim(),
+        telefone: (telefone || '').trim(),
+        descricao: (descricao || '').trim(),
         endereco: {
             rua: (endereco.rua || '').trim(),
             numero: (endereco.numero || '').trim(),
