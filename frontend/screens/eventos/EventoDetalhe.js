@@ -2,14 +2,15 @@ import React, { useLayoutEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import MapView from './../../components/MapView'; 
+import MapView from './../../components/MapView';
+import { urlIp } from '@env';
 
 export default function EventoDetalheUsuario() {
   const navigation = useNavigation();
   const route = useRoute();
   const { evento, abrigoId, userId } = route.params; // <-- agora recebe abrigoId
 
- 
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerStyle: { backgroundColor: '#9333ea' },
@@ -25,16 +26,14 @@ export default function EventoDetalheUsuario() {
     if (!data) return 'Data não informada';
     return new Date(data).toLocaleDateString('pt-BR');
   };
+  console.log(evento);
 
- 
   const formatarEndereco = endereco => {
     if (!endereco) return 'Endereço não informado';
     const { rua, numero, bairro, cidade, estado, cep } = endereco;
-    return `${rua || ''}${numero ? ', ' + numero : ''}${
-      bairro ? ' - ' + bairro : ''
-    }, ${cidade || ''}${estado ? ' - ' + estado : ''}${
-      cep ? ' - CEP: ' + cep : ''
-    }`.trim();
+    return `${rua || ''}${numero ? ', ' + numero : ''}${bairro ? ' - ' + bairro : ''
+      }, ${cidade || ''}${estado ? ' - ' + estado : ''}${cep ? ' - CEP: ' + cep : ''
+      }`.trim();
   };
 
   return (
@@ -72,8 +71,11 @@ export default function EventoDetalheUsuario() {
         <View style={styles.card}>
           <Text style={styles.label}>Fotos:</Text>
           <View style={styles.row}>
-            {evento.imagemUrl ? (
-              <Image source={{ uri: evento.imagemUrl }} style={styles.foto} />
+            {evento.id ? (
+              <Image
+                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem?${Date.now()}` }}
+                style={styles.foto}
+              />
             ) : (
               <Text style={styles.text}>Nenhuma foto disponível</Text>
             )}
@@ -100,7 +102,7 @@ export default function EventoDetalheUsuario() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1'},
+  container: { flex: 1, backgroundColor: '#f1f1f1' },
   voltar: { marginLeft: 16, marginBottom: 10 },
   scroll: { paddingTop: 20, paddingBottom: 90, paddingHorizontal: 16 },
   card: {

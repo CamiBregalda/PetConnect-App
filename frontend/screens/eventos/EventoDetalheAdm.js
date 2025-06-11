@@ -2,6 +2,7 @@ import React, { useLayoutEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import MapView from './../../components/MapView';
+import { urlIp } from '@env';
 
 export default function EventoDetalheAdm() {
   const navigation = useNavigation();
@@ -53,7 +54,7 @@ export default function EventoDetalheAdm() {
           <Text style={styles.text}>{formatarEndereco(evento.endereco)}</Text>
           <View style={styles.mapContainer}>
             {evento.endereco ? (
-              <MapView enderecoAbrigo={evento.endereco} /> 
+              <MapView enderecoAbrigo={evento.endereco} />
             ) : (
               <Text style={styles.text}>Endereço não disponível para exibir o mapa.</Text>
             )}
@@ -69,8 +70,11 @@ export default function EventoDetalheAdm() {
         <View style={styles.card}>
           <Text style={styles.label}>Fotos:</Text>
           <View style={styles.row}>
-            {evento.imagemUrl ? (
-              <Image source={{ uri: evento.imagemUrl }} style={styles.foto} />
+            {evento.id ? (
+              <Image
+                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem?${Date.now()}` }}
+                style={styles.foto}
+              />
             ) : (
               <Text style={styles.text}>Nenhuma foto disponível</Text>
             )}
