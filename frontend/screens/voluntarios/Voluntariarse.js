@@ -19,9 +19,30 @@ function VoluntarioFormScreen() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [error, setError] = useState(null);
   const [jaInscrito, setJaInscrito] = useState(false);
+  const [jaCuidador, setJaCuidador] = useState(false);
   const route = useRoute();
   const { abrigoId, userId } = route.params || {};
 
+  // Verifica se já é cuidador
+  const verificarCuidador = async () => {
+    try {
+      const url = `http://${urlIp}:3000/abrigos/${abrigoId}/Cuidadores`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      const jaEhCuidador = (data.cuidadores || []).some(c => String(c.userId) === String(userId));
+      setJaCuidador(jaEhCuidador);
+    } catch (error) {
+      // Não faz nada, só não marca como cuidador
+    }
+  };
+
+  // Verifica se já está inscrito
   const verificarInscricao = async () => {
     try {
       const inscricaoUrl = `http://${urlIp}:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
@@ -44,46 +65,52 @@ function VoluntarioFormScreen() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoadingUser(true);
-      setError(null);
-      try {
-        const userUrl = `http://${urlIp}:3000/users/${userId}`;
-        const response = await fetch(userUrl, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+  const fetchData = async () => {
+    setLoadingUser(true);
+    setError(null);
+    try {
+      const userUrl = `http://${urlIp}:3000/users/${userId}`;
+      const response = await fetch(userUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Erro ao buscar dados do usuário: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
-        }
-
-        const userData = await response.json();
-        setNome(userData.nome || '');
-        setIdade(userData.idade ? userData.idade.toString() : '');
-        setCpf(userData.cpf || '');
-        setTelefone(userData.telefone || '');
-        setEmail(userData.email || '');
-        setRua(userData.endereco?.rua || '');
-        setNumero(userData.endereco?.numero || '');
-        setBairro(userData.endereco?.bairro || '');
-        setCidade(userData.endereco?.cidade || '');
-        setEstado(userData.endereco?.estado || '');
-        setCep(userData.endereco?.cep || '');
-
-        await verificarInscricao(); // Verificar a inscrição após buscar os dados do usuário
-      } catch (err) {
-        setError(`Erro ao buscar dados: ${err.message}`);
-      } finally {
-        setLoadingUser(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Erro ao buscar dados do usuário: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-    };
 
-    fetchData();
-  }, [userId, abrigoId]);
+      const userData = await response.json();
+      setNome(userData.nome || '');
+      setIdade(userData.idade ? userData.idade.toString() : '');
+      setCpf(userData.cpf || '');
+      setTelefone(userData.telefone || '');
+      setEmail(userData.email || '');
+      setRua(userData.endereco?.rua || '');
+      setNumero(userData.endereco?.numero || '');
+      setBairro(userData.endereco?.bairro || '');
+      setCidade(userData.endereco?.cidade || '');
+      setEstado(userData.endereco?.estado || '');
+      setCep(userData.endereco?.cep || '');
+
+      // Primeiro verifica se já é cuidador
+      await verificarCuidador();
+      // Só verifica inscrição se NÃO for cuidador
+      if (!jaCuidador) {
+        await verificarInscricao();
+      }
+    } catch (err) {
+      setError(`Erro ao buscar dados: ${err.message}`);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  fetchData();
+  // Adicione jaCuidador como dependência para garantir atualização correta
+}, [userId, abrigoId, jaCuidador]);
 
   const handleVoluntariar = async () => {
     setLoading(true);
@@ -133,7 +160,6 @@ function VoluntarioFormScreen() {
         responseData = await volunteerResponse.text();
       }
 
-
       if (!volunteerResponse.ok) {
         const errorMessage = typeof responseData === 'object' && responseData.message ?
           responseData.message :
@@ -155,7 +181,7 @@ function VoluntarioFormScreen() {
             setCidade('');
             setEstado('');
             setCep('');
-            setJaInscrito(true); // Atualizar o estado após a inscrição
+            setJaInscrito(true);
           }
         },
       ]);
@@ -174,103 +200,17 @@ function VoluntarioFormScreen() {
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.errorText}>{error}</Text>
-        <Text style={styles.title}>Candidatar-se como Voluntário</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Nome Completo"
-          value={nome}
-          onChangeText={setNome}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Idade"
-          value={idade}
-          onChangeText={setIdade}
-          keyboardType="numeric"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="CPF"
-          value={cpf}
-          onChangeText={setCpf}
-          keyboardType="text"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Telefone"
-          value={telefone}
-          onChangeText={setTelefone}
-          keyboardType="phone-pad"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Rua"
-          value={rua}
-          onChangeText={setRua}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Número"
-          value={numero}
-          onChangeText={setNumero}
-          keyboardType="text"
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Bairro"
-          value={bairro}
-          onChangeText={setBairro}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Cidade"
-          value={cidade}
-          onChangeText={setCidade}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Estado"
-          value={estado}
-          onChangeText={setEstado}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="CEP"
-          value={cep}
-          onChangeText={setCep}
-          keyboardType="text"
-        />
-
-        <Pressable style={({ pressed }) => [styles.button, pressed && { opacity: 0.8 }]} onPress={handleVoluntariar} disabled={loading}>
-          {loading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontSize: 16 }}>Candidatar-se</Text>}
-        </Pressable>
       </ScrollView>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {jaInscrito ? (
-        <Text style={styles.title}>Você já está inscrito, aguarde o resultado.</Text>
-      ) : (
+  <ScrollView contentContainerStyle={styles.container}>
+    {jaCuidador ? (
+      <Text style={styles.title}>Você já faz parte desse abrigo.</Text>
+    ) : jaInscrito ? (
+      <Text style={styles.title}>Você já está inscrito, aguarde o resultado.</Text>
+    ) : (
         <>
           <TextInput
             style={styles.input}
