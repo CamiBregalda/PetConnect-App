@@ -14,6 +14,8 @@ Este projeto visa promover o bem-estar animal e dar visibilidade aos pets que pr
 ### Backend:
 - [Node.js](https://nodejs.org/)
 - [TypeScript](https://www.typescriptlang.org/)
+
+### Banco de Dados:
 - [MongoDB](https://www.mongodb.com/)
 
 
@@ -30,7 +32,7 @@ npm run start
 ### Frontend
 
 ```bash
-cd backend
+cd frontend
 npm install      
 npx expo start
 ```
