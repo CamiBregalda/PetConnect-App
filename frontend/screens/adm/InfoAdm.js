@@ -97,22 +97,26 @@ function InfoAdm() {
       return () => {
 
       };
-    }, [currentAbrigoId, buscarInfoAbrigo, buscarCuidadores, navigation])
+    }, [currentAbrigoId, buscarInfoAbrigo, buscarCuidadores, navigation]),
 
-    , useEffect(() => {
-
+    useEffect(() => {
       if (!abrigoInfo) return;
       const fetchEvents = async () => {
         setLoadingEvents(true);
         setErrorEvents(null);
         try {
-          const endpoint = abrigoInfo.userId === userId
-            ? `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`
-            : `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`
+          const endpoint = `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`;
           const res = await fetch(endpoint);
-          if (!res.ok) throw new Error('Erro ao buscar eventos');
-          const data = await res.json();
-          setEvents(data);
+          if (res.status === 404) {
+            // Nenhum evento encontrado, apenas zera a lista e não seta erro
+            setEvents([]);
+            setErrorEvents(null);
+          } else if (!res.ok) {
+            throw new Error('Erro ao buscar eventos.');
+          } else {
+            const data = await res.json();
+            setEvents(data);
+          }
         } catch (err) {
           setErrorEvents(err.message);
         } finally {
@@ -208,8 +212,8 @@ function InfoAdm() {
 
           {loadingEvents ? (
             <ActivityIndicator color="#fff" style={{ marginTop: 10 }} />
-          ) : errorEvents ? (
-            <Text style={{ color: '#fff', padding: 12 }}>Erro: {errorEvents}</Text>
+          ) : events.length === 0 ? (
+            <Text style={{ color: '#fff', padding: 12 }}>Não há eventos cadastrados para este abrigo.</Text>
           ) : (
             events.map(evento => (
               <TouchableOpacity
