@@ -9,17 +9,17 @@ function TelaInicialScreen() {
         <View style={styles.divCadastro} edges={['top']}>
         <Image
             style={styles.logo}
-            source={require('../../img/PET.png')} // Ajuste o path se necessário
+            source={require('../../img/PET.png')}
         />
         <Pressable
             style={styles.botao}
-            onPress={() => navigation.navigate('CadastroUser')} // Navega para o TabNavigator
+            onPress={() => navigation.navigate('CadastroUser')} 
         >
             <Text style={styles.textoBotao}>Cadastrar</Text>
         </Pressable>
         <Pressable
             style={styles.botao}
-            onPress={() => navigation.navigate('Login')} // Navega para o TabNavigator
+            onPress={() => navigation.navigate('Login')}
         >
             <Text style={styles.textoBotao}>Logar</Text>
         </Pressable>
@@ -31,9 +31,9 @@ const styles = StyleSheet.create({
     divCadastro: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center', // Centraliza o conteúdo na tela de login
+        justifyContent: 'center', 
         backgroundColor: 'white',
-        padding: 20, // Adicionado um padding para o conteúdo não ficar nas bordas
+        padding: 20, 
     },
     logo: {
         width: 200,

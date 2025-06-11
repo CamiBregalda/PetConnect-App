@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigation } from "@react-navigation/native";
-//import { BACKEND_BASE_URL } from 'expo-constants';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import TextCadastroUserInput from '../../components/TextCadastroUserInput';
@@ -74,12 +73,6 @@ function CadastroUserScreen() {
             Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
             return;
         }
-
-        /*
-        const hashedSenha = await Crypto.digestStringAsync(
-            Crypto.CryptoDigestAlgorithm.SHA256,
-            senha
-        );*/
 
         try {           
 

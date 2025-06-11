@@ -2,14 +2,12 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
-import TelaFiltro from '../../components/TelaFiltro'; // Importa o componente do modal de filtro
+import TelaFiltro from '../../components/TelaFiltro'; 
 
-// Não é mais necessário importar Enums aqui, pois TelaFiltro cuidará disso
-// import { EspecieEnum, PorteEnum } from '../../src/models/enums';
 
 function HomeScreen() {
   const route = useRoute();
-  // Pega o userId passado por parâmetro da tela anterior
+ 
   const userId = route.params?.userId;
   const navigation = useNavigation();
 
@@ -31,7 +29,7 @@ function HomeScreen() {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: true,
-      title: '', // Pode ser 'PetConnect' ou um logo
+      title: '', 
       headerTitleAlign: 'center',
       headerStyle: {
         backgroundColor: '#8A2BE2',
@@ -40,7 +38,7 @@ function HomeScreen() {
       headerLeft: () => (
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Image
-            source={require('../../img/logout.png')} // Certifique-se que o caminho está correto
+            source={require('../../img/logout.png')} 
             style={styles.headerLogoutIcon}
           />
         </TouchableOpacity>
@@ -48,7 +46,7 @@ function HomeScreen() {
       headerRight: () => (
         <TouchableOpacity onPress={() => exibirDetalhesUsuario(userId)}>
           <Image
-            source={require('../../img/Profile_Active.png')} // Certifique-se que o caminho está correto
+            source={require('../../img/Profile_Active.png')} 
             style={styles.headerProfileIcon}
           />
         </TouchableOpacity>
@@ -122,7 +120,7 @@ function HomeScreen() {
     const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
     const racaMatch = activeFilters.raca ? animal.raca === activeFilters.raca : true;
     const porteMatch = activeFilters.porte ? animal.porte === activeFilters.porte : true;
-    const adotadoMatch = animal.adotado === false; // <-- Apenas não adotados
+    const adotadoMatch = animal.adotado === false; 
 
     return nomeMatch && especieMatch && racaMatch && porteMatch && adotadoMatch;
   });
@@ -213,7 +211,7 @@ function HomeScreen() {
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
         onApplyFilters={handleApplyAdvancedFilters}
-        currentFilters={activeFilters} // Passa os filtros ativos para o modal
+        currentFilters={activeFilters} 
       />
     </ScrollView>
   );
@@ -223,15 +221,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
-    paddingBottom: 20, // Espaço no final da rolagem
+    paddingBottom: 20, 
   },
-  loadingContainer: { // Estilo para centralizar o ActivityIndicator
+  loadingContainer: { 
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f0f0f0',
   },
-  errorContainer: { // Estilo para centralizar a mensagem de erro
+  errorContainer: { 
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -248,7 +246,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginRight: 15,
-    // tintColor: 'white', // Se a imagem do perfil precisar de tint
+
   },
   title: {
     fontSize: 26,
@@ -289,7 +287,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 25,
     paddingLeft: 20,
-    paddingRight: 15, // Ajustado
+    paddingRight: 15,
     backgroundColor: 'white',
     fontSize: 16,
     shadowColor: '#000',
@@ -301,15 +299,14 @@ const styles = StyleSheet.create({
   filterIconContainer: {
     padding: 10,
     marginLeft: 10,
-    borderRadius: 20, // Para um visual mais arredondado se usar ícone
-    // backgroundColor: '#e0e0e0', // Fundo opcional para o botão de filtro
+    borderRadius: 20, 
   },
   filterIconText: {
     fontSize: 14,
-    color: '#333', // Cor do texto do filtro
+    color: '#333',
     fontWeight: '600',
   },
-  filterIcon: { // Se você usar uma imagem de ícone
+  filterIcon: { 
     width: 24,
     height: 24,
     tintColor: '#333',
@@ -352,13 +349,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
     resizeMode: 'cover',
-    backgroundColor: '#e0e0e0', // Placeholder visual
+    backgroundColor: '#e0e0e0',
   },
   listItemText: {
     fontSize: 15,
     fontWeight: '600',
     textAlign: 'center',
-    color: "#8A2BE2", // Cor roxa para o nome
+    color: "#8A2BE2", 
   },
   listItemSubText: {
     fontSize: 12,
@@ -373,15 +370,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   notFoundText: {
-    // marginLeft: 10, // Removido para centralizar melhor
+ 
     marginTop: 10,
     color: '#666',
     fontStyle: 'italic',
     paddingHorizontal: 10,
-    width: 150, // Para ter uma largura definida no scroll horizontal
-    textAlign: 'center', // Centraliza o texto
-    alignSelf: 'center', // Centraliza o componente Text dentro do ScrollView
-    flex: 1, // Para ocupar o espaço disponível se for o único item
+    width: 150, 
+    textAlign: 'center', 
+    alignSelf: 'center', 
+    flex: 1, 
   }
 });
 

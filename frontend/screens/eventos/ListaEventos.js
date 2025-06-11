@@ -1,24 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 export default function ListaEventos() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+  const route = useRoute(); 
+  const { abrigoId } = route.params; 
+
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchEventos = async () => {
+      if (!abrigoId) {
+        setLoading(false);
+        setError('ID do abrigo não fornecido.');
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`http://${urlIp}:3000/eventos/`);
-        if (!response.ok) throw new Error('Erro ao buscar eventos');
-        const data = await response.json();
-        setEventos(data);
+  
+        const response = await fetch(`http://${urlIp}:3000/eventos/abrigo/${abrigoId}`);
+        if (response.status === 404) {
+          setEventos([]); 
+        } else if (!response.ok) {
+          throw new Error('Erro ao buscar eventos');
+        } else {
+          const data = await response.json();
+          setEventos(data);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -28,13 +42,12 @@ export default function ListaEventos() {
     if (isFocused) {
       fetchEventos();
     }
-  }, [isFocused]);
-
+  }, [isFocused, abrigoId]); 
   if (loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#9333ea" />
-        <Text style={{ marginTop: 10 }}>Carregando eventos...</Text>
+        <Text style={{ marginTop: 10 }}>Carregando eventos do abrigo...</Text>
       </View>
     );
   }
@@ -49,27 +62,29 @@ export default function ListaEventos() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backText}>Voltar</Text>
-      </TouchableOpacity>
-
       <ScrollView contentContainerStyle={styles.scroll}>
-        {eventos.map((evento) => (
-          <TouchableOpacity
-            key={evento.id}
-            style={styles.eventoBox}
-            onPress={() => navigation.navigate('EventoDetalhe', { evento })}
-          >
-            <Text style={styles.eventoTitulo}>{evento.titulo}</Text>
-            <Text style={styles.eventoDescricao}>{evento.descricao}</Text>
-            {evento.imagemUrl && (
-              <Image
-                source={{ uri: evento.imagemUrl }}
-                style={styles.eventoImagem}
-              />
-            )}
-          </TouchableOpacity>
-        ))}
+        {eventos.length === 0 ? (
+          <Text style={{ textAlign: 'center', marginTop: 20, color: '#555' }}>
+            Não há eventos cadastrados para este abrigo.
+          </Text>
+        ) : (
+          eventos.map((evento) => (
+            <TouchableOpacity
+              key={evento.id}
+              style={styles.eventoBox}
+              onPress={() => navigation.navigate('EventoDetalhe', { evento })}
+            >
+              <Text style={styles.eventoTitulo}>{evento.titulo}</Text>
+              <Text style={styles.eventoDescricao}>{evento.descricao}</Text>
+              {evento.imagemUrl && (
+                <Image
+                  source={{ uri: evento.imagemUrl }}
+                  style={styles.eventoImagem}
+                />
+              )}
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -79,19 +94,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f1f1f1',
-    paddingTop: 50,
+    paddingTop: 30,
   },
   scroll: {
     paddingBottom: 120,
     paddingHorizontal: 16,
-  },
-  backButton: {
-    marginLeft: 16,
-    marginBottom: 10,
-  },
-  backText: {
-    color: '#9333ea',
-    fontSize: 16,
   },
   eventoBox: {
     backgroundColor: '#fff',

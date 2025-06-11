@@ -24,8 +24,6 @@ function AtualizarAnimalScreen() {
     const [informacoes, onChangeInformacoes] = useState('');
     const [imageUri, onChangeImageUri] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-
-    // Novo: userId do dono do abrigo
     const [abrigoUserId, setAbrigoUserId] = useState(null);
 
     useEffect(() => {

@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
    width: '100%',
-    height: 200, // Defina a altura desejada para o mapa
+    height: 200, 
     borderRadius: 8,
-    overflow: 'hidden', // Importante para o borderRadius do WebView funcionar
+    overflow: 'hidden',
     backgroundColor: '#e0e0e0',
   },
 });

@@ -19,6 +19,95 @@ import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { urlIp } from '@env';
 
+const FormularioEvento = ({
+    titulo, setTitulo,
+    descricao, setDescricao,
+    objetivo, setObjetivo,
+    dataInicio, setShowInicio,
+    dataFim, setShowFim,
+    endereco, handleEnderecoChange
+}) => {
+    return (
+        <>
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Título:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={titulo}
+                    onChangeText={setTitulo}
+                />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Descrição:</Text>
+                <TextInput
+                    style={[styles.input, { height: 80, paddingTop: 8 }]}
+                    value={descricao}
+                    onChangeText={setDescricao}
+                    multiline
+                    textAlignVertical="top"
+                />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Objetivo:</Text>
+                <TextInput
+                    style={[styles.input, { height: 80, paddingTop: 8 }]} 
+                    value={objetivo}
+                    onChangeText={setObjetivo}
+                    multiline
+                    textAlignVertical="top"
+                />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Início:</Text>
+                <TouchableOpacity style={styles.input} onPress={() => setShowInicio(true)}>
+                    <Text style={{fontSize: 16}}>{dataInicio.toLocaleDateString('pt-BR')}</Text>
+                </TouchableOpacity>
+            </View>
+            
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Término:</Text>
+                <TouchableOpacity style={styles.input} onPress={() => setShowFim(true)}>
+                    <Text style={{fontSize: 16}}>{dataFim.toLocaleDateString('pt-BR')}</Text>
+                </TouchableOpacity>
+            </View>
+            
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Rua:</Text>
+                <TextInput style={styles.input} value={endereco.rua} onChangeText={val => handleEnderecoChange('rua', val)} />
+            </View>
+            
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Número:</Text>
+                <TextInput style={styles.input} value={endereco.numero} onChangeText={val => handleEnderecoChange('numero', val)} keyboardType="number-pad" />
+            </View>
+            
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Bairro:</Text>
+                <TextInput style={styles.input} value={endereco.bairro} onChangeText={val => handleEnderecoChange('bairro', val)} />
+            </View>
+            
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Cidade:</Text>
+                <TextInput style={styles.input} value={endereco.cidade} onChangeText={val => handleEnderecoChange('cidade', val)} />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Estado:</Text>
+                <TextInput style={styles.input} value={endereco.estado} onChangeText={val => handleEnderecoChange('estado', val)} />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>CEP:</Text>
+                <TextInput style={styles.input} value={endereco.cep} onChangeText={val => handleEnderecoChange('cep', val)} keyboardType="number-pad" />
+            </View>
+        </>
+    );
+};
+
+
 export default function EditarEvento() {
   const navigation = useNavigation();
   const { evento, userId, abrigoId } = useRoute().params;
@@ -149,7 +238,7 @@ export default function EditarEvento() {
         headers: { 'Content-Type': 'application/json' },
       });
       if (!response.ok) throw new Error('Erro ao deletar evento');
-      
+
     } catch (error) {
       console.error('Erro ao deletar evento:', error);
       Alert.alert('Erro', 'Não foi possível deletar o evento');
@@ -157,40 +246,25 @@ export default function EditarEvento() {
   };
 
   return (
-    <>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edite seu Evento</Text>
-      </View>
+    <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: 'white' }}>
+        <View style={styles.headerContainer}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.title}>Edite seu Evento</Text>
+        </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.container}>
-         
-          <Text style={styles.label}>Título</Text>
-          <TextInput style={styles.input} value={titulo} onChangeText={setTitulo} />
+      <View style={styles.divCadastro}>
+        
+        <FormularioEvento 
+            titulo={titulo} setTitulo={setTitulo}
+            descricao={descricao} setDescricao={setDescricao}
+            objetivo={objetivo} setObjetivo={setObjetivo}
+            dataInicio={dataInicio} setShowInicio={setShowInicio}
+            dataFim={dataFim} setShowFim={setShowFim}
+            endereco={endereco} handleEnderecoChange={handleEnderecoChange}
+        />
 
-          <Text style={styles.label}>Descrição</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={descricao}
-            onChangeText={setDescricao}
-            multiline
-          />
-
-          <Text style={styles.label}>Objetivo</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={objetivo}
-            onChangeText={setObjetivo}
-            multiline
-          />
-
-          <Text style={styles.label}>Data de Início</Text>
-          <TouchableOpacity style={styles.input} onPress={() => setShowInicio(true)}>
-            <Text>{dataInicio.toLocaleDateString()}</Text>
-          </TouchableOpacity>
           {showInicio && (
             <DateTimePicker
               value={dataInicio}
@@ -203,10 +277,6 @@ export default function EditarEvento() {
             />
           )}
 
-          <Text style={styles.label}>Data de Término</Text>
-          <TouchableOpacity style={styles.input} onPress={() => setShowFim(true)}>
-            <Text>{dataFim.toLocaleDateString()}</Text>
-          </TouchableOpacity>
           {showFim && (
             <DateTimePicker
               value={dataFim}
@@ -219,25 +289,7 @@ export default function EditarEvento() {
             />
           )}
 
-         
-          {['rua', 'numero', 'bairro', 'cidade', 'estado', 'cep'].map(campo => (
-            <React.Fragment key={campo}>
-              <Text style={styles.label}>
-                {campo.charAt(0).toUpperCase() + campo.slice(1)}
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={endereco[campo]}
-                onChangeText={val => handleEnderecoChange(campo, val)}
-                keyboardType={
-                  campo === 'numero' || campo === 'cep' ? 'number-pad' : 'default'
-                }
-              />
-            </React.Fragment>
-          ))}
-
-        
-          <Pressable onPress={pickImage} style={{ alignSelf: 'center', marginVertical: 20 }}>
+          <Pressable onPress={pickImage} style={styles.imagePicker}>
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.image} />
             ) : (
@@ -247,10 +299,9 @@ export default function EditarEvento() {
             )}
           </Pressable>
 
-        
           <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={[styles.baseButton, styles.saveButton]}
+              style={styles.updateButton}
               onPress={handleSalvar}
               disabled={loading}
             >
@@ -258,9 +309,7 @@ export default function EditarEvento() {
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text
-                  style={styles.buttonText}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
+                  style={styles.textoBotao}
                 >
                   Salvar
                 </Text>
@@ -268,15 +317,14 @@ export default function EditarEvento() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.baseButton, styles.deleteButton]}
+              style={styles.deleteButton}
               onPress={() => setModalVisible(true)}
               disabled={loading}
             >
-              <Text style={styles.buttonText}>Deletar</Text>
+              <Text style={styles.textoBotao}>Deletar</Text>
             </TouchableOpacity>
           </View>
 
-        
           <Modal
             animationType="fade"
             transparent={true}
@@ -293,7 +341,7 @@ export default function EditarEvento() {
                     style={styles.modalCancelButton}
                     onPress={() => setModalVisible(false)}
                   >
-                    <Text style={styles.buttonText}>Cancelar</Text>
+                    <Text style={styles.textoBotao}>Cancelar</Text>
                   </Pressable>
                   <Pressable
                     style={styles.modalConfirmButton}
@@ -302,125 +350,157 @@ export default function EditarEvento() {
                       navigation.navigate('EventosAdm', { userId, abrigoId });
                     }}
                   >
-                    <Text style={styles.buttonText}>Confirmar</Text>
+                    <Text style={styles.textoBotao}>Confirmar</Text>
                   </Pressable>
                 </View>
               </View>
             </View>
           </Modal>
         </View>
-      </ScrollView>
-    </>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 50,
-    paddingBottom: 8,
-    backgroundColor: '#fff',
-  },
-  backButton: { marginRight: 12 },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#333' },
-
-  scroll: { padding: 16, paddingBottom: 80 },
-  container: { backgroundColor: '#fff', borderRadius: 8, padding: 16 },
-
-  label: { fontWeight: 'bold', marginTop: 12, color: '#333' },
-  input: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 6,
-    padding: 10,
-    marginTop: 6,
-  },
-  textArea: { height: 80, textAlignVertical: 'top' },
-
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  imagePlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
-    backgroundColor: '#eee',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  imagePlaceholderText: {
-    color: '#888',
-    textAlign: 'center',
-  },
-
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 30,
-  },
-  baseButton: {
-    flex: 1,
-    paddingVertical: 8,    
-    paddingHorizontal: 32,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center', 
-    marginHorizontal: 5,
-  },
-  saveButton: {
-    backgroundColor: '#8A2BE2',
-  },
-  deleteButton: {
-    backgroundColor: '#B22222',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
-    flexShrink: 1,        
-    textAlign: 'center',
-  },
-
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#333',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  modalCancelButton: {
-    backgroundColor: '#888',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginHorizontal: 10,
-  },
-  modalConfirmButton: {
-    backgroundColor: '#B22222',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginHorizontal: 10,
-  },
+    headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 40,
+        paddingHorizontal: 16,
+        backgroundColor: 'white',
+        paddingBottom: 10,
+    },
+    backButton: {
+        padding: 5,
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginLeft: 15,
+    },
+    divCadastro: {
+        flex: 1,
+        alignItems: 'center',
+        backgroundColor: 'white',
+        paddingHorizontal: 25,
+        paddingBottom: 25,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 15, 
+    },
+    label: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginRight: 5,
+        width: '25%', 
+    },
+    input: {
+        flex: 1, 
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 25, 
+        paddingVertical: 8,
+        paddingHorizontal: 15,
+        backgroundColor: '#fff',
+        fontSize: 16,
+        elevation: 7, 
+        shadowColor: '#000', 
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    imagePicker: {
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    image: {
+        width: 150,
+        height: 150,
+        borderRadius: 10,
+    },
+    imagePlaceholder: {
+        width: 150,
+        height: 150,
+        borderRadius: 10,
+        backgroundColor: '#eee',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#ddd'
+    },
+    imagePlaceholderText: {
+        color: '#888',
+        textAlign: 'center',
+    },
+    textoBotao: {
+        color: 'white',
+        fontSize: 16,
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginTop: 40,
+    },
+    updateButton: {
+        backgroundColor: '#8A2BE2',
+        borderRadius: 8, 
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        flex: 1,
+        marginHorizontal: 5,
+        elevation: 2,
+    },
+    deleteButton: {
+        backgroundColor: '#B22222',
+        borderRadius: 8, 
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+        flex: 1,
+        marginHorizontal: 5,
+        elevation: 2,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        alignItems: 'center',
+        elevation: 5,
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalCancelButton: {
+        backgroundColor: '#888',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 25, 
+        marginHorizontal: 10,
+    },
+    modalConfirmButton: {
+        backgroundColor: '#B22222',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 25, 
+        marginHorizontal: 10,
+    },
 });

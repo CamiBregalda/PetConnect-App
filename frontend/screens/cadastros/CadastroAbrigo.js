@@ -143,7 +143,7 @@ function CadastroAbrigoScreen() {
                     email: email.trim(),
                     telefone: telefone.trim(),
                     descricao: descricao.trim(),
-                    userId: userId, // <-- Adicione esta linha
+                    userId: userId,
                     endereco: {
                         rua: endereco.rua.trim(),
                         numero: endereco.numero.trim(),

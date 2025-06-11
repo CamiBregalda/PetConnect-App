@@ -4,25 +4,22 @@ import { useNavigation } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 function PerfilAnimal({ route }) {
-  const { animalId, abrigoId, userId } = route.params; // Removido 'animal' se não for usado diretamente aqui
+  const { animalId, abrigoId, userId } = route.params; 
   const [animalDetalhes, setAnimalDetalhes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
 
-  // Configura o header da tela
   useLayoutEffect(() => {
     if (animalDetalhes) {
       navigation.setOptions({
-        title: animalDetalhes.nome || 'Perfil do Animal', // Usa o nome do animal como título
+        title: animalDetalhes.nome || 'Perfil do Animal', 
         headerShown: true,
         headerStyle: {
           backgroundColor: '#8A2BE2',
         },
         headerTintColor: 'white',
         headerTitleAlign: 'center',
-        // O botão de voltar padrão do header já deve funcionar.
-        // Se precisar de um comportamento customizado, pode adicionar headerLeft aqui.
       });
     } else {
       navigation.setOptions({
@@ -36,15 +33,6 @@ function PerfilAnimal({ route }) {
       });
     }
   }, [navigation, animalDetalhes]);
-
-  //const goToHomeAdm = (abrigoId) => {
-  //  if (abrigoId) {
-  //    console.log(`ID do Dono (Abrigo): ${abrigoId}`);
-  //    navigation.navigate('Main', { screen: 'Home', params: { abrigoId: abrigoId } });
-  //  } else {
-  //    Alert.alert('Erro', 'ID do abrigo não encontrado para navegar.');
-  //  }
-  //};
 
   useEffect(() => {
     const buscarDetalhesAnimal = async () => {
@@ -73,9 +61,6 @@ function PerfilAnimal({ route }) {
     }
   }, [animalId]);
 
-  // Removido goToHomeAdm, pois o header padrão já terá um botão de voltar
-  // Se precisar de navegação específica ao voltar, pode reimplementar no headerLeft
-
   if (loading) {
     return (
       <View style={styles.centeredMessageContainer}>
@@ -91,16 +76,12 @@ function PerfilAnimal({ route }) {
         <TouchableOpacity
           style={styles.retryButton}
           onPress={() => {
-            // Reinicia a busca
             if (animalId) {
               setLoading(true);
               setError(null);
-              // buscarDetalhesAnimal(); // A dependência [animalId] no useEffect já fará isso se animalId mudar,
-              // mas para um retry manual, chamamos diretamente.
-              // Para forçar re-fetch com o mesmo animalId, podemos resetar animalDetalhes
+
               setAnimalDetalhes(null);
-              // E então o useEffect será re-executado na próxima renderização
-              // Ou chamar a função de busca diretamente:
+
               const reFetch = async () => {
                 setLoading(true);
                 setError(null);
@@ -133,7 +114,7 @@ function PerfilAnimal({ route }) {
       </View>
     );
   }
-  const InfoRow = ({ label, value, style }) => ( // Adicionado 'style' como prop opcional
+  const InfoRow = ({ label, value, style }) => (
     <View style={[styles.infoRowBase, style]}>
       <Text style={styles.label}>{label}: </Text>
       <Text style={styles.value}>{value}</Text>
@@ -185,21 +166,21 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 300,
   },
-  detailsContainer: { // Container geral abaixo da imagem
+  detailsContainer: { 
     padding: 10,
   },
-  infoGridContainer: { // Container para os InfoRows com layout de grid
+  infoGridContainer: { 
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  infoRowBase: { // Estilo base para cada caixa de informação individual
-    flexDirection: 'row', // Label e valor na mesma linha
-    flexWrap: 'wrap',    // Permite que o valor quebre a linha se for longo
+  infoRowBase: {
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
     backgroundColor: 'white',
     borderRadius: 8,
-    padding: 12, // Aumentei um pouco o padding para melhor visualização
+    padding: 12, 
     borderColor: '#8A2BE2',
     borderWidth: 1,
     shadowColor: "#000",
@@ -210,13 +191,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.20,
     shadowRadius: 1.41,
     elevation: 2,
-    alignItems: 'flex-start', // Alinha o label e value no topo
+    alignItems: 'flex-start',
   },
-  infoGridItem: { // Estilo para InfoRows que ocupam metade da largura
-    width: '48.5%', // Ajustado para melhor encaixe com space-between
+  infoGridItem: { 
+    width: '48.5%', 
     marginBottom: 10,
   },
-  infoGridItemWide: { // Estilo para InfoRows que ocupam a largura total
+  infoGridItemWide: { 
     width: '100%',
     marginBottom: 10,
   },
@@ -224,16 +205,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#555',
-    marginRight: 5, // Adiciona um pequeno espaço entre o label e o valor
+    marginRight: 5, 
   },
   value: {
     fontSize: 15,
     color: '#333',
-    flexShrink: 1, // Importante para o valor quebrar corretamente
+    flexShrink: 1, 
   },
   centeredMessageContainer: {
     flex: 1,
-    // ...existing code...
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

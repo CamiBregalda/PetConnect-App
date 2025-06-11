@@ -12,8 +12,6 @@ import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons';
 import { urlIp } from '@env';
 
-const BACKEND_URL = `http://${urlIp}:3000/eventos/`;
-
 export default function EventosAdm() {
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -31,19 +29,30 @@ export default function EventosAdm() {
       headerTintColor: '#fff',
       headerTitleStyle: { fontWeight: 'bold' },
       headerTitleAlign: 'center',
-      title: 'Eventos',
+      title: 'Meus Eventos', 
     });
   }, [navigation]);
 
   useEffect(() => {
     const fetchEventos = async () => {
+      if (!abrigoId) { 
+        setLoading(false);
+        setError('ID do abrigo não fornecido.');
+        return;
+      }
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(BACKEND_URL);
-        if (!response.ok) throw new Error('Erro ao buscar eventos');
-        const data = await response.json();
-        setEventos(data);
+       
+        const response = await fetch(`http://${urlIp}:3000/eventos/abrigo/${abrigoId}`);
+        if (response.status === 404) {
+          setEventos([]);
+        } else if (!response.ok) {
+          throw new Error('Erro ao buscar eventos');
+        } else {
+          const data = await response.json();
+          setEventos(data);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -52,7 +61,7 @@ export default function EventosAdm() {
     };
 
     if (isFocused) fetchEventos();
-  }, [isFocused]);
+  }, [isFocused, abrigoId]); 
 
   if (loading) {
     return (
@@ -84,7 +93,7 @@ export default function EventosAdm() {
       <ScrollView contentContainerStyle={styles.scroll}>
         {eventos.length === 0 ? (
           <Text style={{ textAlign: 'center', marginTop: 30, color: '#555' }}>
-            Nenhum evento cadastrado.
+            Nenhum evento cadastrado para este abrigo.
           </Text>
         ) : (
           eventos.map(evento => (
@@ -106,7 +115,6 @@ export default function EventosAdm() {
                 <Text style={styles.titulo}>{evento.titulo}</Text>
                 <Text style={styles.descricao}>{evento.descricao}</Text>
 
-                {/* Apenas exibe a imagem se existir */}
                 {evento.imagemUrl && (
                   <Image source={{ uri: evento.imagemUrl }} style={styles.imagem} />
                 )}
