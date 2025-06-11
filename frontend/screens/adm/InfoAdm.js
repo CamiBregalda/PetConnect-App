@@ -251,7 +251,6 @@ function InfoAdm() {
                     <Image
                       source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
                       style={styles.listImage}
-                      onError={(e) => console.log('Erro img cuidador:', e.nativeEvent.error)}
                     />
                   </TouchableOpacity>
                   <Text style={styles.listItemText}>{cuidador.nome}</Text>

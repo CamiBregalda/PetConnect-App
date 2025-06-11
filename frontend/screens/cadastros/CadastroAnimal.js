@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, StyleSheet, Text, View, ScrollView  } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView, TouchableOpacity  } from 'react-native';
 import TextCadastroAnimalInput from '../../components/TextCadastroAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { urlIp } from '@env';
 
 function CadastroAnimalScreen() {
     const route = useRoute();
     const idDono = route.params.abrigoId;
+    const { userId } = route.params;
     const navigation = useNavigation();
 
     const [nome, onChangeNome] = React.useState('');
@@ -144,7 +146,7 @@ function CadastroAnimalScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('AnimaisAdm', { abrigoId: idDono });
+            navigation.navigate('AnimaisAdm', { abrigoId: idDono, userId: userId });
         } catch (error) {
             console.error('Erro ao fazer cadastro:', error);
             Alert.alert('Erro', 'Cadastro inválido');
@@ -153,60 +155,70 @@ function CadastroAnimalScreen() {
 
     return (
         <ScrollView>
-        <View style={styles.divCadastro} edges={['top']}>
-        <Text style={styles.title}>Cadastrar Animal</Text>
-        <TextCadastroAnimalInput 
-            nome={nome}
-            onChangeNome={onChangeNome}
-            sexo={sexo}
-            onChangeSexo={onChangeSexo}
-            dataNascimento={dataNascimento}
-            onChangeDataNascimento={onChangeDataNascimento}
-            especie={especie}
-            onChangeEspecie={onChangeEspecie}
-            raca={raca}
-            onChangeRaca={onChangeRaca}
-            porte={porte}
-            onChangePorte={onChangePorte}
-            castrado={castrado}
-            onChangeCastrado={onChangeCastrado}
-            doencas={doencas}
-            onChangeDoencas={onChangeDoencas}
-            deficiencias={deficiencias}
-            onChangeDeficiencias={onChangeDeficiencias}
-            vacinas={vacinas}
-            onChangeVacinas={onChangeVacinas}
-            informacoesAdicionais={informacoes}
-            onChangeInformacoesAdicionais={onChangeInformacoes}
-            errors={errors}
-        />
+            <TouchableOpacity onPress={() => navigation.navigate('Main', { abrigoId: idDono, userId: userId })} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color="#333" />
+            </TouchableOpacity>
 
-        <Pressable onPress={pickImage}>
-            {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
-            ) : (
-                <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
-                </View>
-            )}
-        </Pressable>
+            <View style={styles.divCadastro} edges={['top']}>
+                <Text style={styles.title}>Cadastrar Animal</Text>
+                <TextCadastroAnimalInput 
+                    nome={nome}
+                    onChangeNome={onChangeNome}
+                    sexo={sexo}
+                    onChangeSexo={onChangeSexo}
+                    dataNascimento={dataNascimento}
+                    onChangeDataNascimento={onChangeDataNascimento}
+                    especie={especie}
+                    onChangeEspecie={onChangeEspecie}
+                    raca={raca}
+                    onChangeRaca={onChangeRaca}
+                    porte={porte}
+                    onChangePorte={onChangePorte}
+                    castrado={castrado}
+                    onChangeCastrado={onChangeCastrado}
+                    doencas={doencas}
+                    onChangeDoencas={onChangeDoencas}
+                    deficiencias={deficiencias}
+                    onChangeDeficiencias={onChangeDeficiencias}
+                    vacinas={vacinas}
+                    onChangeVacinas={onChangeVacinas}
+                    informacoesAdicionais={informacoes}
+                    onChangeInformacoesAdicionais={onChangeInformacoes}
+                    errors={errors}
+                />
 
-        {errors.image && (
-            <Text style={styles.errorText}>Imagem obrigatória</Text>
-        )}
+                <Pressable onPress={pickImage}>
+                    {imageUri ? (
+                        <Image source={{ uri: imageUri }} style={styles.image} />
+                    ) : (
+                        <View style={styles.imagePlaceholder}>
+                            <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+                        </View>
+                    )}
+                </Pressable>
 
-        <Pressable
-            style={styles.botao}
-            onPress={handleCadastro}
-        >
-            <Text style={styles.textoBotao}>Cadastrar</Text>
-        </Pressable>
-        </View>
+                {errors.image && (
+                    <Text style={styles.errorText}>Imagem obrigatória</Text>
+                )}
+
+                <Pressable
+                    style={styles.botao}
+                    onPress={handleCadastro}
+                >
+                    <Text style={styles.textoBotao}>Cadastrar</Text>
+                </Pressable>
+            </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 40,    
+        left: 16,
+        zIndex: 1,
+    },
     divCadastro: {
         flex: 1,
         alignItems: 'center',

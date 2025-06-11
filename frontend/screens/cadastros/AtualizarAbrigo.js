@@ -177,7 +177,7 @@ function AtualizarAbrigoScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('AnimaisUser', { userId: userId });
+            navigation.navigate('Main', { userId, abrigoId });
         } catch (error) {
             console.error('Erro ao fazer update:', error);
             Alert.alert('Erro', 'Atualização inválida');
