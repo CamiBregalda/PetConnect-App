@@ -88,7 +88,7 @@ function PerfilCandidato({ route, onAprovado }) {
         const errorData = await response.json();
         throw new Error(`Erro ao rejeitar candidato: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-      
+
       // Atualizar a interface para refletir a rejeição
     } catch (err) {
       setError(`Erro ao rejeitar candidato: ${err.message}`);
@@ -152,9 +152,14 @@ function PerfilCandidato({ route, onAprovado }) {
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
-        <Image
-          source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}` }}
-          style={styles.listImage} />
+        {candidatoDetalhes && candidatoDetalhes.temImagem ? (
+          <Image
+            source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}` }}
+            style={styles.listImage}
+          />
+        ) : (
+          <Text style={{ color: '#888', marginBottom: 10, textAlign: 'center' }}>Não possui foto</Text>
+        )}
         {candidatoDetalhes && (
           <>
             <Text style={styles.label}>Nome:</Text>

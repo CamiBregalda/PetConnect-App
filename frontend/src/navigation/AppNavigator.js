@@ -225,7 +225,16 @@ export default function AppNavigator() {
         <Stack.Screen name="TelaPrincipal" component={TelaPrincipal} />
         <Stack.Screen name="RegistroAbandono" component={RegistroAbandono} />
         <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
-        <Stack.Screen name="ListaEventos" component={ListaEventos} />
+        <Stack.Screen name="ListaEventos" component={ListaEventos} 
+        options={{
+            headerShown: true,
+            title: 'Lista de Eventos',
+            headerStyle: {
+              backgroundColor: '#8A2BE2',
+            },
+            headerTintColor: 'white',
+          }}
+        />
         <Stack.Screen name="InfoAdm" component={InfoAdm} />
         <Stack.Screen name="VoluntariosEvento" component={VoluntariosEvento} />
         <Stack.Screen name="EditarEvento" component={EditarEvento} />
@@ -248,7 +257,14 @@ export default function AppNavigator() {
         <Stack.Screen
           name="EventoDetalheAdm"
           component={EventoDetalheAdm}
-          options={{ headerShown: true }}
+          options={{
+            headerShown: true,
+            title: 'Detalhes do Evento',
+            headerStyle: {
+              backgroundColor: '#8A2BE2',
+            },
+            headerTintColor: 'white',
+          }}
         />
 
         <Stack.Screen
@@ -312,7 +328,16 @@ export default function AppNavigator() {
             },
             headerTintColor: 'white',
           }} />
-        <Stack.Screen name="PerfilCandidato" component={PerfilCandidato} />
+        <Stack.Screen name="PerfilCandidato" component={PerfilCandidato}
+          options={{
+            headerShown: true,
+            title: 'Perfil do Candidato',
+            headerStyle: {
+              backgroundColor: '#8A2BE2',
+            },
+            headerTintColor: 'white',
+          }}
+           />
         <Stack.Screen name="PerfilCuidador" component={PerfilCuidador} />
         <Stack.Screen name="PerfilAnimal" component={PerfilAnimal} />
 
