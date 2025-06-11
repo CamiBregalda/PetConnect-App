@@ -136,7 +136,7 @@ function Voluntarios() {
               <View key={cuidador.id} style={styles.itemContainer}>
                 <TouchableOpacity style={styles.listItem} onPress={() => exibirPerfil(cuidador)}>
                   <Image
-                    source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
+                    source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem?${Date.now()}` }}
                     style={styles.listImage}
                   />
                 </TouchableOpacity>

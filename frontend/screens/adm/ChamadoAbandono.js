@@ -109,7 +109,7 @@ const ChamadoAbandono = () => {
                         {/* Exibir as imagens */}
                         <ScrollView horizontal style={styles.imagesContainer}>
                             {abandono.images?.map((image, index) => (
-                                <Image key={index} source={{ uri: `http://${urlIp}:3000/abandono/${abandono.id}/imagem` }} style={styles.image} />
+                                <Image key={index} source={{ uri: `http://${urlIp}:3000/abandono/${abandono.id}/imagem?${Date.now()}` }} style={styles.image} />
                             ))}
                         </ScrollView>
 

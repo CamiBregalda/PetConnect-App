@@ -118,7 +118,7 @@ export default function InicialUser() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
-        source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem` }}
+        source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}` }}
         style={styles.profileImage}
         onError={(e) => console.log('Erro img usuário:', e.nativeEvent.error)}
       />

@@ -186,7 +186,7 @@ function PerfilCuidador({ route }) {
   return (
     <ScrollView style={styles.scrollContainer}>
       <Image
-        source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidadorDetalhes.id}/imagem` }}
+        source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidadorDetalhes.id}/imagem?${Date.now()}` }}
         style={styles.profileHeaderImage}
         resizeMode="cover"
       />

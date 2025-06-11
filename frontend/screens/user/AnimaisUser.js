@@ -113,7 +113,7 @@ export default function AnimaisUser() {
               filteredAdopted.map(animal => (
                 <View key={animal.id} style={styles.itemBox}>
                   <Image
-                    source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem` }}
+                    source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem?${Date.now()}` }}
                     style={styles.itemImage}
                   />
                   <View style={styles.itemRow}>
@@ -140,7 +140,7 @@ export default function AnimaisUser() {
               filteredShelters.map(abrigo => (
                 <View key={abrigo.id} style={styles.itemBox}>
                   <Image
-                    source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
+                    source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem?${Date.now()}` }}
                     style={styles.itemImage}
                   />
                   <View style={styles.itemRow}>

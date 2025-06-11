@@ -47,7 +47,7 @@ const Tab = createBottomTabNavigator();
 function MainTabs({ route }) {
   const userId = route?.params?.userId;
   const abrigoId = route?.params?.abrigoId;
-  console.log('MainTabs userId:', userId, 'abrigoId:', abrigoId);
+
   
 
   return (
@@ -130,7 +130,7 @@ function MainTabs({ route }) {
 function UserTabs({ route }) {
   const userId = route?.params?.userId;
   const abrigoId = route?.params?.abrigoId;
-  console.log('MainTabs userId:', userId, 'abrigoId:', abrigoId);
+
   
 
   return (

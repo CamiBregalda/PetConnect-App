@@ -142,7 +142,7 @@ function PerfilAnimal({ route }) {
   return (
     <ScrollView style={styles.scrollContainer}>
       <Image
-        source={{ uri: `http://${urlIp}:3000/animais/${animalDetalhes.id}/imagem` }}
+        source={{ uri: `http://${urlIp}:3000/animais/${animalDetalhes.id}/imagem?${Date.now()}` }}
         style={styles.animalHeaderImage}
         resizeMode="cover"
       />

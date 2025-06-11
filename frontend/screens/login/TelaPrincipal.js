@@ -168,7 +168,7 @@ function HomeScreen() {
           {animaisFiltrados.length > 0 ? animaisFiltrados.map((animal) => (
             <TouchableOpacity key={animal.id} style={styles.listItem} onPress={() => exibirDetalhesAnimal(animal)}>
               <Image
-                source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/animais/${animal.id}/imagem?${Date.now()}` }}
                 style={styles.listImage}
                 onError={(e) => console.log('Erro img animal:', e.nativeEvent.error)}
               />
@@ -184,7 +184,7 @@ function HomeScreen() {
           {abrigosFiltrados.length > 0 ? abrigosFiltrados.map((abrigo) => (
             <TouchableOpacity key={abrigo.id} style={styles.listItem} onPress={() => exibirDetalhesAbrigo(abrigo.id, userId)}>
               <Image
-                source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/abrigos/${abrigo.id}/imagem?${Date.now()}` }}
                 style={styles.listImage}
                 onError={(e) => console.log('Erro img abrigo:', e.nativeEvent.error)}
               />
@@ -200,7 +200,7 @@ function HomeScreen() {
           {eventosFiltrados.length > 0 ? eventosFiltrados.map((evento) => (
             <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
               <Image
-                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem` }}
+                source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem?${Date.now()}` }}
                 style={styles.listImage}
               />
               <Text style={styles.listItemText}>{evento.titulo}</Text>

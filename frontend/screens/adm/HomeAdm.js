@@ -1,10 +1,10 @@
-import React, { useState, useEffect,useLayoutEffect, useContext } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import { View, Image, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
 // Removido WebView daqui, pois será usado no AbrigoMapView
 import { useNavigation } from '@react-navigation/native';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
-import MapView from './../../components/MapView'; 
+import MapView from './../../components/MapView';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 function HomeAdm({ route }) {
@@ -17,7 +17,6 @@ function HomeAdm({ route }) {
   const navigation = useNavigation();
   const { setCurrentAbrigoId } = useContext(AbrigoContext);
 
-  console.log("admin info", adminInfo);
   useEffect(() => {
 
     const buscarInfoAbrigo = async () => {
@@ -43,7 +42,7 @@ function HomeAdm({ route }) {
           if (data.idAdmAbrigo) {
             await buscarInfoAdmin(data.idAdmAbrigo);
           } else {
-             setLoading(false); // Se não houver admin para buscar, para o loading aqui
+            setLoading(false); // Se não houver admin para buscar, para o loading aqui
           }
         } else {
           setError("ID do abrigo não fornecido.");
@@ -84,22 +83,22 @@ function HomeAdm({ route }) {
   useLayoutEffect(() => {
     // Só mostra o botão se userId do abrigo (abrigoInfo.userId) for igual ao userId do parâmetro
     if (abrigoInfo && abrigoInfo.userId && abrigoInfo.userId === userId) {
-        navigation.setOptions({
-            headerRight: () => (
-                <TouchableOpacity
-                    style={{ marginRight: 20 }}
-                    onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId, userId })}
-                >
-                    <Ionicons name="create-outline" size={30} color="white" />
-                </TouchableOpacity>
-            ),
-        });
+      navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            style={{ marginRight: 20 }}
+            onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId, userId })}
+          >
+            <Ionicons name="create-outline" size={30} color="white" />
+          </TouchableOpacity>
+        ),
+      });
     } else {
-        navigation.setOptions({
-            headerRight: () => null,
-        });
+      navigation.setOptions({
+        headerRight: () => null,
+      });
     }
-}, [navigation, abrigoInfo, userId, abrigoId]);
+  }, [navigation, abrigoInfo, userId, abrigoId]);
 
   if (loading) {
     return (
@@ -125,7 +124,7 @@ function HomeAdm({ route }) {
       const { rua, numero, bairro, cidade, estado, cep } = abrigoInfo.endereco;
       enderecoCompletoParaExibir = `${rua || ''}${numero ? ', ' + numero : ''}${bairro ? ' - ' + bairro : ''}\n${cidade || ''}${estado ? ' - ' + estado : ''}\n${cep ? 'CEP: ' + cep : ''}`.replace(/ ,|, \n|\n,/g, '\n').trim();
     } else if (typeof abrigoInfo.endereco === 'string') { // Caso o endereço seja uma string simples
-         enderecoCompletoParaExibir = abrigoInfo.endereco;
+      enderecoCompletoParaExibir = abrigoInfo.endereco;
     }
 
 
@@ -134,12 +133,12 @@ function HomeAdm({ route }) {
         <View style={styles.container}>
           <View>
             <Image
-              source={{ uri: `http://${urlIp}:3000/abrigos/${abrigoInfo.id}/imagem` }}
+              source={{ uri: `http://${urlIp}:3000/abrigos/${abrigoInfo.id}/imagem?${Date.now()}` }}
               style={styles.imgPerfil}
               onError={(e) => console.log("Erro ao carregar imagem do abrigo:", e.nativeEvent.error)}
             />
           </View>
-      
+
           {error && <Text style={styles.errorTextWarning}>Aviso: {error}</Text>}
 
           <View style={styles.about}>
@@ -155,7 +154,7 @@ function HomeAdm({ route }) {
               {abrigoInfo.endereco ? (
                 <MapView enderecoAbrigo={abrigoInfo.endereco} />
               ) : (
-                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                   <Text>Endereço não disponível para exibir o mapa.</Text>
                 </View>
               )}
@@ -169,7 +168,7 @@ function HomeAdm({ route }) {
                 <View style={styles.infoAdm}>
                   {adminInfo.id && (
                     <Image
-                      source={{ uri: `http://${urlIp}:3000/admAbrigo/${adminInfo.id}/imagem` }}
+                      source={{ uri: `http://${urlIp}:3000/admAbrigo/${adminInfo.id}/imagem?${Date.now()}` }}
                       style={styles.imgADM}
                       onError={(e) => console.log("Erro ao carregar imagem do admin:", e.nativeEvent.error)}
                     />

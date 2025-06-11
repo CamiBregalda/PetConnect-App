@@ -153,7 +153,7 @@ function PerfilCandidato({ route, onAprovado }) {
     <View style={styles.container}>
       <View style={styles.infoContainer}>
         <Image
-          source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem` }}
+          source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}` }}
           style={styles.listImage} />
         {candidatoDetalhes && (
           <>

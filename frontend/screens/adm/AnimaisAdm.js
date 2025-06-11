@@ -173,7 +173,7 @@ useLayoutEffect(() => {
                 )}
                 <TouchableOpacity style={styles.listItem} onPress={() => exibirDetalhesAnimal(item)}>
                   <Image
-                    source={{ uri: `http://${urlIp}:3000/animais/${item.id}/imagem` }}
+                    source={{ uri: `http://${urlIp}:3000/animais/${item.id}/imagem?${Date.now()}` }}
                     style={styles.listImage}
                     onError={(e) => console.log('Erro img animal:', e.nativeEvent.error)}
                   />

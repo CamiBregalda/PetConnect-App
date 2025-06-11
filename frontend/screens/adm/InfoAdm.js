@@ -249,7 +249,7 @@ function InfoAdm() {
                 <View key={cuidador.id} style={styles.itemContainer}>
                   <TouchableOpacity onPress={() => exibirDetalhesVoluntario(cuidador)}>
                     <Image
-                      source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem` }}
+                      source={{ uri: `http://${urlIp}:3000/cuidadores/${cuidador.id}/imagem?${Date.now()}` }}
                       style={styles.listImage}
                     />
                   </TouchableOpacity>
