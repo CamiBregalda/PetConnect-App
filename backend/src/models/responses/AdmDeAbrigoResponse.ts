@@ -32,7 +32,7 @@ export class AdmDeAbrigoResponse {
             endereco: adm.userId.endereco,
             idade: adm.userId.idade,
             ocupacao: adm.userId.ocupacao,
-            descricao: adm.descricao,
+            descricao: adm.userId.descricao,
             userId: adm.userId.id,
         });
     }
