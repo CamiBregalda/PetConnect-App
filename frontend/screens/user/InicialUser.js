@@ -101,7 +101,7 @@ export default function InicialUser() {
       headerTitleAlign: 'center',
       headerRight: () => (
         <TouchableOpacity onPress={handleAdminAbrigo} style={styles.homeButton}>
-          <Ionicons name="home-outline" size={24} color="#fff" />
+          <Ionicons name="home-outline" size={30} color="#fff" />
         </TouchableOpacity>
       ),
     });
@@ -155,25 +155,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center'
   },
-
   container: {
     alignItems: 'center', 
     padding: 16, 
     backgroundColor: '#f5f5f5'
   },
-
   profileImage: {
-    width: 150, 
-    height: 150, 
-    borderRadius: 75, 
-    marginVertical: 20
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 20,
   },
-
   infoBox: {
     width: '90%', 
     backgroundColor: '#fff', 
-    borderRadius: 10, 
-    padding: 16,
+    borderRadius: 10, padding: 16,
     marginBottom: 16, 
     shadowColor: '#000', 
     shadowOffset: { width: 0, height: 1 },
@@ -181,46 +178,43 @@ const styles = StyleSheet.create({
     shadowRadius: 2, 
     elevation: 2
   },
-
   headerRow: {
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between', 
     marginBottom: 8
   },
-
   label: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    color: '#333' 
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333', 
   },
-
   description: { 
-    fontSize: 14, 
-    color: '#555' 
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'justify',
+    lineHeight: 22,
   },
-
   editProfileButton: { 
-    padding: 4 
+    size:30,
+    color: 'white',
   },
-
   homeButton: { 
     marginRight: 16 
   },
-
   addressText: {
-    marginTop: 8, 
-    textAlign: 'center', 
-    color: '#333', 
-    fontSize: 14
+    fontSize: 15,
+    color: '#444',
+    textAlign: 'center',
+    marginBottom: 10,
+    lineHeight: 20,
   },
-
   mapContainer: {
-    marginTop: 8, 
-    width: '100%', 
-    height: 200, 
-    borderRadius: 10,
-    overflow: 'hidden', 
-    backgroundColor: '#e0e0e0'
+   width: '100%',
+    height: 200, // Defina a altura desejada para o mapa
+    borderRadius: 8,
+    overflow: 'hidden', // Importante para o borderRadius do WebView funcionar
+    backgroundColor: '#e0e0e0',
   },
 });

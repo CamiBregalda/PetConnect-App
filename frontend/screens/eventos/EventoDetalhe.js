@@ -39,9 +39,6 @@ export default function EventoDetalheUsuario() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.voltar}>
-        <Ionicons name="arrow-back" size={28} color="#222" />
-      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.scroll}>
 
         <View style={styles.card}>
@@ -94,9 +91,9 @@ export default function EventoDetalheUsuario() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 40 },
+  container: { flex: 1, backgroundColor: '#f1f1f1'},
   voltar: { marginLeft: 16, marginBottom: 10 },
-  scroll: { paddingTop: 20, paddingBottom: 120, paddingHorizontal: 16 },
+  scroll: { paddingTop: 20, paddingBottom: 90, paddingHorizontal: 16 },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,

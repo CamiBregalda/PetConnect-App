@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text,Alert, View } from 'react-native';
 import TextCadastroAbrigoInput from '../../components/TextCadastroAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
 import { urlIp } from '@env';
@@ -40,6 +40,7 @@ function CadastroAbrigoScreen() {
             cep: false,
         },
         image: false,
+        userId: false,
     });
 
     const pickImage = async () => {
@@ -128,7 +129,7 @@ function CadastroAbrigoScreen() {
         }
 
 
-        try {           
+        try {
             const response = await fetch(`http://${urlIp}:3000/abrigos/${userId}`, {
 
                 method: 'POST',
@@ -141,6 +142,7 @@ function CadastroAbrigoScreen() {
                     email: email.trim(),
                     telefone: telefone.trim(),
                     descricao: descricao.trim(),
+                    userId: userId, // <-- Adicione esta linha
                     endereco: {
                         rua: endereco.rua.trim(),
                         numero: endereco.numero.trim(),
@@ -162,7 +164,8 @@ function CadastroAbrigoScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('CadastroAnimal');
+            navigation.navigate('TelaPrincipal', { userId: userId });
+            Alert.alert('Sucesso', 'Abrigo cadastrado com sucesso!');
         } catch (error) {
             console.error('Erro ao fazer cadastro:', error);
             Alert.alert('Erro', 'Cadastro inválido');
@@ -171,45 +174,45 @@ function CadastroAbrigoScreen() {
 
     return (
         <ScrollView>
-        <View style={styles.divCadastro} edges={['top']}>
-        <Text style={styles.title}>Cadastrar Abrigo</Text>
-        <TextCadastroAbrigoInput
-            nome={nome}
-            onChangeNome={onChangeNome}
-            cnpj={cnpj}
-            onChangeCnpj={onChangeCnpj}
-            email={email}
-            onChangeEmail={onChangeEmail}
-            telefone={telefone}
-            onChangeTelefone={onChangeTelefone}
-            endereco={endereco}
-            onChangeEndereco={handleEnderecoChange}
-            descricao={descricao}
-            onChangeDescricao={onChangeDescricao}
-            errors={errors}
-        />
+            <View style={styles.divCadastro} edges={['top']}>
+                <Text style={styles.title}>Cadastrar Abrigo</Text>
+                <TextCadastroAbrigoInput
+                    nome={nome}
+                    onChangeNome={onChangeNome}
+                    cnpj={cnpj}
+                    onChangeCnpj={onChangeCnpj}
+                    email={email}
+                    onChangeEmail={onChangeEmail}
+                    telefone={telefone}
+                    onChangeTelefone={onChangeTelefone}
+                    endereco={endereco}
+                    onChangeEndereco={handleEnderecoChange}
+                    descricao={descricao}
+                    onChangeDescricao={onChangeDescricao}
+                    errors={errors}
+                />
 
-        <Pressable onPress={pickImage}>
-            {imageUri ? (
-                <Image source={{ uri: imageUri }} style={styles.image} />
-            ) : (
-                <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
-                </View>
-            )}
-        </Pressable>
+                <Pressable onPress={pickImage}>
+                    {imageUri ? (
+                        <Image source={{ uri: imageUri }} style={styles.image} />
+                    ) : (
+                        <View style={styles.imagePlaceholder}>
+                            <Text style={styles.imagePlaceholderText}>Selecionar Imagem</Text>
+                        </View>
+                    )}
+                </Pressable>
 
-        {errors.image && (
-            <Text style={styles.errorText}>Imagem obrigatória</Text>
-        )}
+                {errors.image && (
+                    <Text style={styles.errorText}>Imagem obrigatória</Text>
+                )}
 
-        <Pressable
-            style={styles.botao}
-            onPress={handleCadastro}
-        >
-            <Text style={styles.textoBotao}>Cadastrar</Text>
-        </Pressable>
-        </View>
+                <Pressable
+                    style={styles.botao}
+                    onPress={handleCadastro}
+                >
+                    <Text style={styles.textoBotao}>Cadastrar</Text>
+                </Pressable>
+            </View>
         </ScrollView>
     );
 }
@@ -220,7 +223,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
-        padding: 50, 
+        padding: 50,
     },
     title: {
         fontSize: 18,

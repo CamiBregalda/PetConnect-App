@@ -262,9 +262,11 @@ function InfoAdm() {
           )}
         </View>
         <View style={styles.buttonsContainer}>
-          <Pressable style={styles.botao} onPress={() => verChamadosAbandono(currentAbrigoId)}>
-            <Text style={styles.textoBotao}>Chamados de Abandono</Text>
-          </Pressable>
+          {abrigoInfo && String(abrigoInfo.userId) === String(userId) && (
+            <Pressable style={styles.botao} onPress={() => verChamadosAbandono(currentAbrigoId)}>
+              <Text style={styles.textoBotao}>Chamados de Abandono</Text>
+            </Pressable>
+          )}
           <Pressable style={styles.botao} onPress={() => seVoluntariar(currentAbrigoId)}>
             <Text style={styles.textoBotao}>Voluntariar-se</Text>
           </Pressable>
