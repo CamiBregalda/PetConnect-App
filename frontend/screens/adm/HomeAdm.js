@@ -17,7 +17,7 @@ function HomeAdm({ route }) {
   const navigation = useNavigation();
   const { setCurrentAbrigoId } = useContext(AbrigoContext);
 
-
+  console.log("admin info", adminInfo);
   useEffect(() => {
 
     const buscarInfoAbrigo = async () => {
@@ -61,7 +61,7 @@ function HomeAdm({ route }) {
 
     const buscarInfoAdmin = async (idAdmAbrigo) => {
       try {
-        const adminApiUrl = `http://${urlIp}:3000/admAbrigo/${idAdmAbrigo}`;
+        const adminApiUrl = `http://${urlIp}:3000/admAbrigo/${idAdmAbrigo}/abrigo`;
         const adminResponse = await fetch(adminApiUrl);
 
         if (!adminResponse.ok) {
@@ -139,7 +139,7 @@ function HomeAdm({ route }) {
               onError={(e) => console.log("Erro ao carregar imagem do abrigo:", e.nativeEvent.error)}
             />
           </View>
-          {/* Mostra erros secundários (ex: falha ao buscar admin) como aviso se abrigoInfo carregou */}
+      
           {error && <Text style={styles.errorTextWarning}>Aviso: {error}</Text>}
 
           <View style={styles.about}>
