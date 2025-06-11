@@ -97,9 +97,9 @@ function HomeScreen() {
     navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal, userId: userId });
   };
 
- const exibirDetalhesAbrigo = (idDoAbrigo, userId) => {
-  navigation.navigate('Main', { abrigoId: idDoAbrigo, userId: userId });
-};
+  const exibirDetalhesAbrigo = (idDoAbrigo, userId) => {
+    navigation.navigate('Main', { abrigoId: idDoAbrigo, userId: userId });
+  };
 
   const exibirDetalhesUsuario = (userId) => {
     navigation.navigate('InicialUser', { userId: userId });
@@ -118,23 +118,25 @@ function HomeScreen() {
   };
 
   const animaisFiltrados = animais.filter(animal => {
-      const nomeMatch = animal.nome ? animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
-  const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
-  const racaMatch = activeFilters.raca ? animal.raca === activeFilters.raca : true;
-  const porteMatch = activeFilters.porte ? animal.porte === activeFilters.porte : true;
-  const adotadoMatch = animal.adotado === false; // <-- Apenas não adotados
+    const nomeMatch = animal.nome ? animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+    const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
+    const racaMatch = activeFilters.raca ? animal.raca === activeFilters.raca : true;
+    const porteMatch = activeFilters.porte ? animal.porte === activeFilters.porte : true;
+    const adotadoMatch = animal.adotado === false; // <-- Apenas não adotados
 
- 
-  return nomeMatch && especieMatch && racaMatch && porteMatch && adotadoMatch;
-});
+    return nomeMatch && especieMatch && racaMatch && porteMatch && adotadoMatch;
+  });
 
   const abrigosFiltrados = abrigos.filter(abrigo =>
     abrigo.nome ? abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 
-  const eventosFiltrados = eventos.filter(evento =>
-    evento.nome ? evento.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true
-  );
+  const eventosFiltrados = eventos.filter(evento => {
+    const nomeMatch = evento.nome ? evento.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true
+    const dataMatch = evento.dataFim ? new Date(evento.dataFim) >= new Date() : false;
+
+    return nomeMatch && dataMatch;
+  });
 
   if (loading) {
     return <View style={styles.loadingContainer}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
@@ -156,7 +158,7 @@ function HomeScreen() {
           onChangeText={handleSearch}
         />
         <TouchableOpacity onPress={() => setFilterModalVisible(true)} style={styles.filterIconContainer}>
-           <Image source={require('../../img/Filtro.png')} style={styles.filterIcon} />
+          <Image source={require('../../img/Filtro.png')} style={styles.filterIcon} />
         </TouchableOpacity>
       </View>
 

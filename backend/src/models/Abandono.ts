@@ -3,7 +3,7 @@ import { Endereco, EnderecoSchema } from "./Endereco";
 
 export interface AbandonoAttributes {
     id?: string;
-    emailUser: string;
+    userId: Types.ObjectId;
     local: Endereco;
     descricao: string;
     animalResgatado: boolean;
@@ -16,7 +16,7 @@ export interface AbandonoAttributes {
 
 const AbandonoSchema = new Schema<AbandonoAttributes>(
     {
-        emailUser: { type: String, required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         local: { type: EnderecoSchema, required: true },
         descricao: { type: String, required: true },
         animalResgatado: { type: Boolean, required: true },

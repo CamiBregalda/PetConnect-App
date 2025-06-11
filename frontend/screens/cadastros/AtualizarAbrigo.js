@@ -197,7 +197,7 @@ function AtualizarAbrigoScreen() {
                 throw new Error('Erro ao deletar abrigo');
             }
     
-            navigation.navigate('TelaInicial');
+            navigation.navigate('TelaPrincipal', { userId: userId });
         } catch (error) {
             console.error('Erro ao deletar abrigo:', error);
             Alert.alert('Erro', 'Não foi possível deletar o abrigo');

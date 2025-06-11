@@ -97,8 +97,7 @@ const ChamadoAbandono = () => {
                 abandonosNaoResgatados?.map((abandono) => (
 
                     <View key={abandono.id} style={styles.abandonoContainer}>
-
-                        <Text style={styles.emailUser}>Usuário: {getUsernameFromEmail(abandono.emailUser)}</Text>
+                        <Text style={styles.emailUser}>Usuário: {getUsernameFromEmail(abandono.usuario.email)}</Text>
 
                         {/* Exibir o MapViewComponent */}
                         <View style={styles.mapContainer}>

@@ -1,12 +1,11 @@
 import AbandonoModel from "../models/Abandono";
 import { AbandonoAttributes } from "../models/Abandono";
-import { Imagem } from "../models/Imagem";
 import * as UsuarioService from "./userService";
 import { AbandonoComUsuarioResponse } from "../models/responses/AbandonoComUsuarioResponse";
 
 export const createAbandono = async (data: AbandonoAttributes) => {
     try {
-        const usuario = await UsuarioService.getUserByEmail(data.emailUser);
+        const usuario = await UsuarioService.getUserById(data.userId.toString());
         if (!usuario) {
             throw new Error("Usuário não encontrado");
         }
@@ -25,7 +24,7 @@ export const getAbandono = async () => {
         const abandonos = await AbandonoModel.find({ ativo: true }).select('-image');
 
         const responses = await Promise.all(abandonos.map(async (abandono) => {
-            const usuario = await UsuarioService.getUserByEmail(abandono.emailUser);
+            const usuario = await UsuarioService.getUserById(abandono.userId.toString());
             if (!usuario) {
                 throw new Error("Usuário não encontrado");
             }
