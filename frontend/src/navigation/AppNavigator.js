@@ -100,7 +100,7 @@ function MainTabs({ route }) {
         name="HomeAdm"
         component={HomeAdm}
         initialParams={{ userId, abrigoId }}
-       options={{
+        options={{
           title: 'Inicio',
           tabBarShowLabel: false,
         }}
@@ -183,7 +183,7 @@ function UserTabs({ route }) {
         name="Home"
         component={InicialUser}
         initialParams={{ userId, abrigoId }}
-       options={{
+        options={{
           title: 'Inicio',
           tabBarShowLabel: false,
         }}
@@ -233,7 +233,7 @@ export default function AppNavigator() {
         <Stack.Screen name="CriarEvento" component={CriarEvento} />
         <Stack.Screen name="ChamadoAbandono" component={ChamadoAbandono} />
         <Stack.Screen name="AdocaoAnimal" component={AdocaoAnimal} />
-        
+
         <Stack.Screen name="InicialUser"
           component={UserTabs}
           options={{

@@ -149,6 +149,12 @@ export const deleteAbrigo = async (id: string) => {
         }
         abrigo.ativo = false;
         await abrigo.save();
+
+        if (!abrigo.idAdmAbrigo) {
+            throw new Error('Abrigo não possui administrador associado');
+        }
+        await AdmDeAbrigoService.deleteAdmDeAbrigo(abrigo.idAdmAbrigo.toString());
+        
         return abrigo;
     } catch (error: any) {
         throw new Error('Erro ao deletar abrigo: ' + error.message);

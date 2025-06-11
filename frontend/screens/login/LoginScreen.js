@@ -1,7 +1,8 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import TextLoginInput from '../../components/TextLoginInput';
 import { urlIp } from '@env';
 
@@ -66,6 +67,11 @@ function LoginScreen() {
 
   return (
     <View style={styles.divCadastro} edges={['top']}>
+      
+      <TouchableOpacity onPress={() => navigation.navigate('TelaInicial')} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={28} color="#333" />
+      </TouchableOpacity>
+
       <Image
         style={styles.logo}
         source={require('../../img/PET.png')}
@@ -85,6 +91,12 @@ function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    position: 'absolute',
+    top: 40,     
+    left: 16,
+    zIndex: 1,
+  },
   divCadastro: {
     flex: 1,
     alignItems: 'center',
