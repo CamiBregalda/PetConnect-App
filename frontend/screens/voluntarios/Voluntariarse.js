@@ -44,26 +44,27 @@ function VoluntarioFormScreen() {
 
   // Verifica se já está inscrito
   const verificarInscricao = async () => {
-    try {
-      const inscricaoUrl = `http://${urlIp}:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
-      const response = await fetch(inscricaoUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  try {
+    const inscricaoUrl = `http://${urlIp}:3000/candidaturas?userId=${userId}&abrigoId=${abrigoId}`;
+    const response = await fetch(inscricaoUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(`Erro ao verificar inscrição: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setJaInscrito(data.length > 0);
-    } catch (error) {
-      setError(`Erro ao verificar inscrição: ${error.message}`);
+    if (!response.ok) {
+      throw new Error(`Erro ao verificar inscrição: ${response.status}`);
     }
-  };
 
+    const data = await response.json();
+    // Considere apenas candidaturas pendentes (aprovacao null ou undefined)
+    const inscritoAtivo = data.some(c => c.aprovacao === false);
+    setJaInscrito(inscritoAtivo);
+  } catch (error) {
+    setError(`Erro ao verificar inscrição: ${error.message}`);
+  }
+};
   useEffect(() => {
   const fetchData = async () => {
     setLoadingUser(true);
@@ -95,12 +96,9 @@ function VoluntarioFormScreen() {
       setEstado(userData.endereco?.estado || '');
       setCep(userData.endereco?.cep || '');
 
-      // Primeiro verifica se já é cuidador
+      // Sempre verifica as duas coisas, em sequência
       await verificarCuidador();
-      // Só verifica inscrição se NÃO for cuidador
-      if (!jaCuidador) {
-        await verificarInscricao();
-      }
+      await verificarInscricao();
     } catch (err) {
       setError(`Erro ao buscar dados: ${err.message}`);
     } finally {
@@ -109,8 +107,7 @@ function VoluntarioFormScreen() {
   };
 
   fetchData();
-  // Adicione jaCuidador como dependência para garantir atualização correta
-}, [userId, abrigoId, jaCuidador]);
+}, [userId, abrigoId]);
 
   const handleVoluntariar = async () => {
     setLoading(true);
@@ -204,7 +201,7 @@ function VoluntarioFormScreen() {
     );
   }
 
-  return (
+ return (
   <ScrollView contentContainerStyle={styles.container}>
     {jaCuidador ? (
       <Text style={styles.title}>Você já faz parte desse abrigo.</Text>

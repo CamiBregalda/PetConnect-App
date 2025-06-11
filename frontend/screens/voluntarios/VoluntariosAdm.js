@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useLayoutEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { AbrigoContext } from '../../AppContext';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 function Voluntarios() {
@@ -17,67 +17,69 @@ function Voluntarios() {
 
 
   // Buscar detalhes do abrigo (inclui userId do admin)
-  useEffect(() => {
-    const fetchAbrigoDetails = async () => {
-      if (!currentAbrigoId) {
-        setLoadingAbrigoDetails(false);
-        setAbrigoDetails(null);
-        return;
-      }
-      setLoadingAbrigoDetails(true);
-      try {
-        const response = await fetch(`http://${urlIp}:3000/abrigos/${currentAbrigoId}`);
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Falha ao buscar detalhes do abrigo: ${response.status} - ${errorText}`);
+  // Buscar detalhes do abrigo ao focar a tela
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchAbrigoDetails = async () => {
+        if (!currentAbrigoId) {
+          setLoadingAbrigoDetails(false);
+          setAbrigoDetails(null);
+          return;
         }
-        const data = await response.json();
-        setAbrigoDetails(data);
-
-      } catch (e) {
-        console.error("VoluntariosAdm: Erro ao buscar detalhes do abrigo:", e);
-        setError(e.message);
-        setAbrigoDetails(null);
-      } finally {
-        setLoadingAbrigoDetails(false);
-      }
-    };
-    fetchAbrigoDetails();
-  }, [currentAbrigoId]);
-
-  // Buscar cuidadores (voluntários)
-  useEffect(() => {
-    const buscarCuidadoresDoAbrigo = async () => {
-      if (!currentAbrigoId) {
-        setLoadingCuidadores(false);
-        setCuidadores([]);
-        return;
-      }
-
-      setLoadingCuidadores(true);
-      setError(null);
-      try {
-        const apiUrl = `http://${urlIp}:3000/abrigos/${currentAbrigoId}/Cuidadores`;
-        const response = await fetch(apiUrl);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Erro ao buscar voluntários: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+        setLoadingAbrigoDetails(true);
+        try {
+          const response = await fetch(`http://${urlIp}:3000/abrigos/${currentAbrigoId}`);
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Falha ao buscar detalhes do abrigo: ${response.status} - ${errorText}`);
+          }
+          const data = await response.json();
+          setAbrigoDetails(data);
+        } catch (e) {
+          console.error("VoluntariosAdm: Erro ao buscar detalhes do abrigo:", e);
+          setError(e.message);
+          setAbrigoDetails(null);
+        } finally {
+          setLoadingAbrigoDetails(false);
         }
+      };
+      fetchAbrigoDetails();
+    }, [currentAbrigoId, urlIp])
+  );
 
-        const data = await response.json();
-        setCuidadores(data.cuidadores || []);
-      } catch (err) {
-        console.error('VoluntariosAdm: Erro ao buscar voluntários:', err);
-        setError(err.message);
-        setCuidadores([]);
-      } finally {
-        setLoadingCuidadores(false);
-      }
-    };
+  // Buscar cuidadores ao focar a tela
+  useFocusEffect(
+    React.useCallback(() => {
+      const buscarCuidadoresDoAbrigo = async () => {
+        if (!currentAbrigoId) {
+          setLoadingCuidadores(false);
+          setCuidadores([]);
+          return;
+        }
+        setLoadingCuidadores(true);
+        setError(null);
+        try {
+          const apiUrl = `http://${urlIp}:3000/abrigos/${currentAbrigoId}/Cuidadores`;
+          const response = await fetch(apiUrl);
 
-    buscarCuidadoresDoAbrigo();
-  }, [currentAbrigoId]);
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro ao buscar voluntários: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
+          }
+
+          const data = await response.json();
+          setCuidadores(data.cuidadores || []);
+        } catch (err) {
+          console.error('VoluntariosAdm: Erro ao buscar voluntários:', err);
+          setError(err.message);
+          setCuidadores([]);
+        } finally {
+          setLoadingCuidadores(false);
+        }
+      };
+      buscarCuidadoresDoAbrigo();
+    }, [currentAbrigoId, urlIp])
+  );
 
   // HeaderRight só aparece se userId do usuário for igual ao userId do admin do abrigo
   useLayoutEffect(() => {
