@@ -29,11 +29,6 @@ function LoginScreen() {
         Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios.');
         return;
     }
-/*
-    const hashedPassword  = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      password
-    );*/
 
     try {
       const response = await fetch(`http://${urlIp}:3000/users/login`, {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { urlIp } from '@env';
+import { useNavigation } from '@react-navigation/native';
 
 function PerfilCandidato({ route, onAprovado }) {
   const { userId, candidaturaId } = route.params;
@@ -9,18 +10,18 @@ function PerfilCandidato({ route, onAprovado }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasTriedLoading, setHasTriedLoading] = useState(false);
+  const [imagemErro, setImagemErro] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const buscarDetalhesCandidato = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Busca os detalhes do usuário
         const userResponse = await fetch(`http://${urlIp}:3000/users/${userId}`);
         const userData = await userResponse.json();
         setCandidatoDetalhes(userData);
 
-        // Busca os detalhes da candidatura usando o ID da candidatura
         const candidaturaResponse = await fetch(`http://${urlIp}:3000/candidaturas/${candidaturaId}`);
         if (!candidaturaResponse.ok) {
           throw new Error(`Erro ao buscar candidatura: ${candidaturaResponse.status}`);
@@ -29,10 +30,10 @@ function PerfilCandidato({ route, onAprovado }) {
         setCandidatura(candidaturaData);
 
       } catch (err) {
-        console.error('Erro:', err);
         setError(err.message);
       } finally {
         setLoading(false);
+        setHasTriedLoading(true);
       }
     };
 
@@ -43,10 +44,8 @@ function PerfilCandidato({ route, onAprovado }) {
     try {
       const response = await fetch(`http://${urlIp}:3000/candidaturas/${candidaturaId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ aprovacao: true }), // Define aprovacao como true
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aprovacao: true }),
       });
 
       if (!response.ok) {
@@ -57,18 +56,15 @@ function PerfilCandidato({ route, onAprovado }) {
       Alert.alert('Sucesso', 'Candidato aprovado com sucesso!', [
         {
           text: 'OK', onPress: () => {
-            if (onAprovado) {
-              onAprovado(candidaturaId);
-            }
-            rejeitarCandidato(); // Exclui a candidatura após a aprovação
+
           }
         },
       ]);
-      // Atualizar a interface para refletir a aprovação
       setCandidatura(prevCandidatura => ({
         ...prevCandidatura,
         aprovacao: true,
       }));
+      rejeitarCandidato();
     } catch (err) {
       setError(`Erro ao aprovar candidato: ${err.message}`);
       Alert.alert('Erro', `Não foi possível aprovar o candidato: ${err.message}`);
@@ -77,25 +73,22 @@ function PerfilCandidato({ route, onAprovado }) {
 
   const rejeitarCandidato = async () => {
     try {
-      const response = await fetch(`http://${urlIp}:3000/candidaturas/${candidaturaId}`, { // Use candidaturaId
+      const response = await fetch(`http://${urlIp}:3000/candidaturas/${candidaturaId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Erro ao rejeitar candidato: ${response.status} - ${errorData.message || 'Erro desconhecido'}`);
       }
-      
-      // Atualizar a interface para refletir a rejeição
+
+      navigation.replace('Candidatos', { abrigoId: candidatura.abrigoId, userId: userId });
     } catch (err) {
       setError(`Erro ao rejeitar candidato: ${err.message}`);
       Alert.alert('Erro', `Não foi possível remover a candidatura: ${err.message}`);
     }
   };
-
 
   if (loading && !hasTriedLoading) {
     return <View style={styles.container}><ActivityIndicator size="large" color="#8A2BE2" /></View>;
@@ -111,7 +104,8 @@ function PerfilCandidato({ route, onAprovado }) {
             setError(null);
             setLoading(true);
             setHasTriedLoading(false);
-
+            setImagemErro(false);
+            // Recarrega os dados
             const buscarDetalhesCandidato = async () => {
               try {
                 const userResponse = await fetch(`http://${urlIp}:3000/users/${userId}`);
@@ -152,9 +146,15 @@ function PerfilCandidato({ route, onAprovado }) {
   return (
     <View style={styles.container}>
       <View style={styles.infoContainer}>
-        <Image
-          source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}` }}
-          style={styles.listImage} />
+        {!imagemErro ? (
+          <Image
+            source={{ uri: `http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}` }}
+            style={styles.listImage}
+            onError={() => setImagemErro(true)}
+          />
+        ) : (
+          <Text style={{ color: '#888', marginBottom: 10, textAlign: 'center' }}>Não possui foto</Text>
+        )}
         {candidatoDetalhes && (
           <>
             <Text style={styles.label}>Nome:</Text>
@@ -170,8 +170,8 @@ function PerfilCandidato({ route, onAprovado }) {
             <Text style={styles.value}>{candidatoDetalhes.email}</Text>
 
             <Text style={styles.label}>Endereço:</Text>
-            <Text style={styles.value}>{candidatoDetalhes.endereco.rua}</Text>
-            {/* Display other user data */}
+            <Text style={styles.value}>{candidatoDetalhes.endereco?.rua}</Text>
+            {/* Outros campos se necessário */}
           </>
         )}
 
@@ -185,7 +185,7 @@ function PerfilCandidato({ route, onAprovado }) {
         )}
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.aprovarButton} onPress={() => aprovarCandidato()}>
+        <TouchableOpacity style={styles.aprovarButton} onPress={aprovarCandidato}>
           <Text style={styles.buttonText}>Aprovar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.rejeitarButton} onPress={rejeitarCandidato}>

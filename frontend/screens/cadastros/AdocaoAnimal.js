@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { urlIp } from '@env'; // Certifique-se de que o arquivo .env está configurado corretamente
+import { urlIp } from '@env'; 
 
 function AdocaoAnimal() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { animalId } = route.params; // Passe animalId por parâmetro na navegação
-
+  const { animalId } = route.params;
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +17,7 @@ function AdocaoAnimal() {
     }
     setLoading(true);
     try {
-      // Confirmar adoção
+    
       const response = await fetch(`http://${urlIp}:3000/animais/${animalId}/adotado`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 function PerfilCuidador({ route }) {
-  // Receber userId, abrigoId e cuidadorId dos parâmetros da rota
   const { userId, abrigoId, cuidadorId } = route.params;
   const [cuidadorDetalhes, setCuidadorDetalhes] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,7 +46,7 @@ function PerfilCuidador({ route }) {
           throw new Error(`Erro ao buscar abrigo: ${response.status}`);
         }
         const data = await response.json();
-        setAbrigoUserId(data.userId); // salva o userId do abrigo
+        setAbrigoUserId(data.userId); 
       } catch (err) {
         console.error('Erro ao buscar userId do abrigo:', err);
         setError(err.message);

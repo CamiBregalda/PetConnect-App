@@ -1,9 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 function ListaCandidatosScreen() {
+  const route = useRoute();
+  const { abrigoId } = route.params || {};
   const [candidatos, setCandidatos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +15,7 @@ function ListaCandidatosScreen() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = `http://${urlIp}:3000/candidaturas`;
+      const apiUrl = `http://${urlIp}:3000/candidaturas/abrigo/${abrigoId}`;
 
       const response = await fetch(apiUrl, {
         method: 'GET',

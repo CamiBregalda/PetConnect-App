@@ -1,15 +1,15 @@
 import React, { useState, useLayoutEffect, useCallback, useContext } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, Image, TextInput, TouchableOpacity } from 'react-native';
-import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'; // Adicionado useRoute
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'; 
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
 import TelaFiltro from '../../components/TelaFiltro';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-function AnimaisAdm() { // Removido route como prop
+function AnimaisAdm() { 
   const navigation = useNavigation();
-  const route = useRoute(); // Hook para acessar os parâmetros da rota
-  const { userId } = route.params || {}; // Acessa userId passado via initialParams
+  const route = useRoute(); 
+  const { userId } = route.params || {};
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     especie: null,
@@ -25,7 +25,7 @@ function AnimaisAdm() { // Removido route como prop
   const [error, setError] = useState(null);
 
 useLayoutEffect(() => {
-    // Só mostra o botão se userId do abrigo (abrigoInfo.userId) for igual ao userId do parâmetro
+   
     if (
         abrigoInfo &&
         abrigoInfo.userId &&
@@ -53,9 +53,9 @@ useLayoutEffect(() => {
     setLoading(true);
     setError(null);
     try {
-      // Adapte as URLs se precisarem do userId
+      
       const [animaisResponse, abrigoResponse] = await Promise.all([
-        fetch(`http://${urlIp}:3000/animais/`), // Esta rota busca todos, depois filtramos. OK.
+        fetch(`http://${urlIp}:3000/animais/`),
         fetch(`http://${urlIp}:3000/abrigos/${currentAbrigoId}`),
       ]);
 
@@ -89,11 +89,11 @@ useLayoutEffect(() => {
   }, [todosAnimais, currentAbrigoId]);
 
   const exibirDetalhesAnimal = (animal) => {
-    // Passar userId para PerfilAnimal
-    navigation.navigate('PerfilAnimal', { animalId: animal.id, userId: userId, abrigoId: currentAbrigoId /* ou animal.idDono */ });
+    
+    navigation.navigate('PerfilAnimal', { animalId: animal.id, userId: userId, abrigoId: currentAbrigoId });
   };
 
-  // Filtragem dos animais
+ 
   const animaisFiltrados = animaisDoAbrigo.filter(animal => {
     const nomeMatch = animal.nome ? animal.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true;
     const especieMatch = activeFilters.especie ? animal.especie === activeFilters.especie : true;
@@ -127,7 +127,7 @@ useLayoutEffect(() => {
     <View style={styles.container}>
 
 
-      {/* Campo de busca e botão de filtro */}
+ 
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
         <TextInput
           style={{
@@ -187,7 +187,6 @@ useLayoutEffect(() => {
         )}
       </View>
 
-      {/* Modal de filtro */}
       <TelaFiltro
         visible={filterModalVisible}
         onClose={() => setFilterModalVisible(false)}
@@ -223,7 +222,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
-    position: 'relative', // necessário para posicionar o ícone
+    position: 'relative',
   },
   editIcon: {
     position: 'absolute',

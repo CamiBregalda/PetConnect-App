@@ -108,7 +108,7 @@ function InfoAdm() {
           const endpoint = `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`;
           const res = await fetch(endpoint);
           if (res.status === 404) {
-            // Nenhum evento encontrado, apenas zera a lista e não seta erro
+
             setEvents([]);
             setErrorEvents(null);
           } else if (!res.ok) {
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   scrollViewContentContainer: {
     alignItems: 'center',
     paddingVertical: 20,
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
   mainContentContainer: {
     width: '100%',

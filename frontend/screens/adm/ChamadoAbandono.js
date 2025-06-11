@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import MapViewComponent from '../../components/MapView'; // Importe o componente MapView
+import MapViewComponent from '../../components/MapView';
 import { urlIp } from '@env';
-import { useRoute } from '@react-navigation/native'; // Importe o hook useRoute
+import { useRoute } from '@react-navigation/native'; 
 
 const ChamadoAbandono = () => {
-    const route = useRoute(); // Use o hook useRoute para acessar os parâmetros da rota
-    const { abrigoId } = route.params; // Acesse o parâmetro abrigoId
+    const route = useRoute(); 
+    const { abrigoId } = route.params;
 
     const [abandonos, setAbandonos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,8 +16,8 @@ const ChamadoAbandono = () => {
         setLoading(true);
         setError(null);
         try {
-            const url = `http://${urlIp}:3000/abandonos`; // Endpoint para buscar todos os abandonos
-            console.log('Fetching abandonos from:', url); // Adicione este log
+            const url = `http://${urlIp}:3000/abandonos`; 
+            console.log('Fetching abandonos from:', url); 
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`Erro ao buscar abandonos: ${response.status}`);
@@ -38,7 +38,7 @@ const ChamadoAbandono = () => {
 
     const handleResgatarAnimal = async (abandonoId) => {
         try {
-            const response = await fetch(`http://${urlIp}:3000/abandonos/${abandonoId}`, { // Endpoint para marcar como resgatado
+            const response = await fetch(`http://${urlIp}:3000/abandonos/${abandonoId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,13 +53,13 @@ const ChamadoAbandono = () => {
                 throw new Error(`Erro ao resgatar animal: ${response.status}`);
             }
 
-            // Atualizar a lista de abandonos após o resgate
+          
             setAbandonos(
                 abandonos.map((abandono) =>
                     abandono.id === abandonoId ? { ...abandono, animalResgatado: true } : abandono
                 )
             );
-            fetchAbandonos(); // Busca novamente os abandonos atualizados
+            fetchAbandonos(); 
             Alert.alert('Sucesso', 'Animal marcado como resgatado!');
         } catch (err) {
             console.error('Erro ao marcar animal como resgatado:', err);
@@ -75,16 +75,16 @@ const ChamadoAbandono = () => {
         return <Text>Erro ao carregar chamados: {error}</Text>;
     }
 
-    // Filtrar os abandonos para exibir apenas aqueles com animalResgatado como false
+
     const abandonosNaoResgatados = abandonos.filter(abandono => !abandono.animalResgatado);
 
     const getUsernameFromEmail = (email) => {
-        // Tenta extrair o nome do usuário do email
+
         try {
             return email.split('@')[0];
         } catch (error) {
             console.error("Erro ao extrair o nome do usuário do email:", error);
-            return "Usuário"; // Retorna um nome padrão em caso de erro
+            return "Usuário";
         }
     };
 
@@ -99,21 +99,21 @@ const ChamadoAbandono = () => {
                     <View key={abandono.id} style={styles.abandonoContainer}>
                         <Text style={styles.emailUser}>Usuário: {getUsernameFromEmail(abandono.usuario.email)}</Text>
 
-                        {/* Exibir o MapViewComponent */}
+       
                         <View style={styles.mapContainer}>
                             <MapViewComponent enderecoAbrigo={abandono.local} />
                         </View>
 
                         <Text style={styles.descricao}>Descrição: {abandono.descricao}</Text>
 
-                        {/* Exibir as imagens */}
+           
                         <ScrollView horizontal style={styles.imagesContainer}>
                             {abandono.images?.map((image, index) => (
                                 <Image key={index} source={{ uri: `http://${urlIp}:3000/abandono/${abandono.id}/imagem?${Date.now()}` }} style={styles.image} />
                             ))}
                         </ScrollView>
 
-                        {/* Botão de Resgate */}
+         
                         <TouchableOpacity style={styles.resgateButton} onPress={() => handleResgatarAnimal(abandono.id)}>
                             <Text style={styles.resgateButtonText}>Resgatar</Text>
                         </TouchableOpacity>

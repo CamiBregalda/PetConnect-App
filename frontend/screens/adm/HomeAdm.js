@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useContext } from 'react';
 import { View, Image, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
-// Removido WebView daqui, pois será usado no AbrigoMapView
 import { useNavigation } from '@react-navigation/native';
 import { AbrigoContext } from './../../AppContext';
 import { urlIp } from '@env';
@@ -22,7 +21,7 @@ function HomeAdm({ route }) {
     const buscarInfoAbrigo = async () => {
       setLoading(true);
       setError(null);
-      // setMapCoordinates(null); // Não é mais necessário aqui
+  
       try {
         if (abrigoId) {
           const apiUrl = `http://${urlIp}:3000/abrigos/${abrigoId}`;
@@ -42,7 +41,7 @@ function HomeAdm({ route }) {
           if (data.idAdmAbrigo) {
             await buscarInfoAdmin(data.idAdmAbrigo);
           } else {
-            setLoading(false); // Se não houver admin para buscar, para o loading aqui
+            setLoading(false); 
           }
         } else {
           setError("ID do abrigo não fornecido.");
@@ -55,7 +54,7 @@ function HomeAdm({ route }) {
         navigation.setOptions({ title: 'Erro no Abrigo' });
         setLoading(false);
       }
-      // setLoading(false) é chamado no finally de buscarInfoAdmin ou se não houver admin
+
     };
 
     const buscarInfoAdmin = async (idAdmAbrigo) => {
@@ -81,7 +80,7 @@ function HomeAdm({ route }) {
   }, [navigation, abrigoId, setCurrentAbrigoId, urlIp]);
 
   useLayoutEffect(() => {
-    // Só mostra o botão se userId do abrigo (abrigoInfo.userId) for igual ao userId do parâmetro
+ 
     if (abrigoInfo && abrigoInfo.userId && abrigoInfo.userId === userId) {
       navigation.setOptions({
         headerRight: () => (
@@ -117,13 +116,13 @@ function HomeAdm({ route }) {
   }
 
   if (abrigoInfo) {
-    // Removida a lógica de mapaHtmlContent daqui
+  
 
     let enderecoCompletoParaExibir = "Endereço não fornecido";
     if (abrigoInfo.endereco && typeof abrigoInfo.endereco === 'object') {
       const { rua, numero, bairro, cidade, estado, cep } = abrigoInfo.endereco;
       enderecoCompletoParaExibir = `${rua || ''}${numero ? ', ' + numero : ''}${bairro ? ' - ' + bairro : ''}\n${cidade || ''}${estado ? ' - ' + estado : ''}\n${cep ? 'CEP: ' + cep : ''}`.replace(/ ,|, \n|\n,/g, '\n').trim();
-    } else if (typeof abrigoInfo.endereco === 'string') { // Caso o endereço seja uma string simples
+    } else if (typeof abrigoInfo.endereco === 'string') { 
       enderecoCompletoParaExibir = abrigoInfo.endereco;
     }
 
@@ -150,7 +149,7 @@ function HomeAdm({ route }) {
             <Text style={styles.title}>Endereço:</Text>
             <Text style={styles.enderecoTexto}>{enderecoCompletoParaExibir}</Text>
             <View style={styles.mapContainer}>
-              {/* Usa o novo componente AbrigoMapView */}
+  
               {abrigoInfo.endereco ? (
                 <MapView enderecoAbrigo={abrigoInfo.endereco} />
               ) : (
@@ -190,7 +189,7 @@ function HomeAdm({ route }) {
   );
 }
 
-// Seus estilos permanecem aqui (ajuste o path do import do AbrigoMapView se necessário)
+
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
@@ -262,14 +261,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 20,
   },
-  mapContainer: { // Este container agora envolve o AbrigoMapView
+  mapContainer: { 
     width: '100%',
-    height: 200, // Defina a altura desejada para o mapa
+    height: 200, 
     borderRadius: 8,
-    overflow: 'hidden', // Importante para o borderRadius do WebView funcionar
-    backgroundColor: '#e0e0e0', // Placeholder enquanto o mapa carrega
+    overflow: 'hidden', 
+    backgroundColor: '#e0e0e0', 
   },
-  // Removido styles.webView pois está dentro de AbrigoMapView.js
+
   aboutADM: {
     marginTop: 10,
     marginBottom: 20,
