@@ -4,6 +4,7 @@ export class AbrigoComUserIdResponse {
     email?: string;
     telefone?: string;
     abrigoId?: string;
+    idAdmAbrigo?: string;
     userId?: string;
     ativo?: boolean;
     createdAt?: Date;
@@ -17,6 +18,7 @@ export class AbrigoComUserIdResponse {
         email?: string;
         telefone?: string;
         abrigoId?: string;
+        idAdmAbrigo?: string;
         userId?: string;
         ativo?: boolean;
         createdAt?: Date;
@@ -34,6 +36,7 @@ export class AbrigoComUserIdResponse {
             email: abrigo.email,
             telefone: abrigo.telefone,
             abrigoId: abrigo.abrigoId,
+            idAdmAbrigo: abrigo.idAdmAbrigo,
             userId: userId,
             ativo: abrigo.ativo,
             cuidadores: abrigo.cuidadores,
