@@ -34,7 +34,7 @@ export class AdmDeAbrigoWithAbrigoResponse {
             telefone: admDeAbrigo.userId.telefone,
             email: admDeAbrigo.userId.email,
             endereco: admDeAbrigo.userId.endereco,
-            descricao: admDeAbrigo.descricao,
+            descricao: admDeAbrigo.userId.descricao,
             ativo: admDeAbrigo.userId.ativo,
             createdAt: admDeAbrigo.userId.createdAt,
             updatedAt: admDeAbrigo.userId.updatedAt,
