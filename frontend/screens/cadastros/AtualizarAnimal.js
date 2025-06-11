@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, StyleSheet, Text, View, ScrollView, Alert, Modal, modalVisible } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView, Alert, Modal, modalVisible, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import TextAtualizacaoAnimalInput from '../../components/TextAtualizacaoAnimalInput';
 import * as ImagePicker from 'expo-image-picker';
 import { urlIp } from '@env';
@@ -8,7 +9,7 @@ import { urlIp } from '@env';
 function AtualizarAnimalScreen() {
     const route = useRoute();
     const navigation = useNavigation();
-    let { userId, abrigoId, animalId } = route.params;
+    let { userId, abrigoId, animalId, rootScreen } = route.params;
 
     const [nome, onChangeNome] = useState('');
     const [sexo, onChangeSexo] = useState('');
@@ -67,7 +68,7 @@ function AtualizarAnimalScreen() {
                             });
                             if (!response.ok) throw new Error('Erro ao deletar animal');
                             Alert.alert('Sucesso', 'Animal deletado com sucesso!');
-                            navigation.navigate('TelaPrincipal', { userId });
+                            navigation.navigate(rootScreen, { userId });
                         } catch (error) {
                             Alert.alert('Erro', 'Erro ao deletar animal');
                         }
@@ -212,15 +213,25 @@ function AtualizarAnimalScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('TelaPrincipal', { userId: userId });
+            navigation.navigate(rootScreen, { userId: userId, abrigoId: abrigoId });
         } catch (error) {
             console.error('Erro ao fazer update:', error);
             Alert.alert('Erro', 'Atualização inválida');
         }
     };
+    
+    if (rootScreen === 'AnimaisAdm') {
+        rootScreen = 'Main';
+    } else if (rootScreen === 'AnimaisUser') {
+        rootScreen = 'InicialUser';
+    }
 
     return (
         <ScrollView>
+            <TouchableOpacity onPress={() => navigation.navigate(rootScreen, { userId, abrigoId })} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color="#333" />
+            </TouchableOpacity>
+
             <View style={styles.divCadastro} edges={['top']}>
                 <Text style={styles.title}>Atualizar Animal</Text>
                 <TextAtualizacaoAnimalInput 
@@ -310,6 +321,12 @@ function AtualizarAnimalScreen() {
 }
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 40,    
+        left: 16,
+        zIndex: 1,
+    },
     divCadastro: {
         flex: 1,
         alignItems: 'center',

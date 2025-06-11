@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, TouchableOpacity, Modal, modalVisible } from 'react-native';
 import TextAtualizacaoAbrigoInput from '../../components/TextAtualizacaoAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
 import { urlIp } from '@env';
@@ -24,6 +25,7 @@ function AtualizarAbrigoScreen() {
         cep: '',
     });
     const [imageUri, setImageUri] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
 
     useEffect(() => {
         getAbrigo();
@@ -182,8 +184,32 @@ function AtualizarAbrigoScreen() {
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error('Erro ao deletar abrigo');
+            }
+    
+            navigation.navigate('TelaInicial');
+        } catch (error) {
+            console.error('Erro ao deletar abrigo:', error);
+            Alert.alert('Erro', 'Não foi possível deletar o abrigo');
+        }
+    }
+
     return (
         <ScrollView>
+            <TouchableOpacity onPress={() => navigation.navigate('Main', { userId, abrigoId })} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color="#333" />
+            </TouchableOpacity>
+
             <View style={styles.divCadastro} edges={['top']}>
                 <Text style={styles.title}>Atualizar Abrigo</Text>
                 <TextAtualizacaoAbrigoInput
@@ -211,18 +237,56 @@ function AtualizarAbrigoScreen() {
                     )}
                 </Pressable>
 
-                <Pressable
-                    style={styles.botao}
-                    onPress={handleUpdate}
+                <View style={styles.buttonContainer}>
+                    <Pressable style={styles.updateButton} onPress={handleUpdate}>
+                        <Text style={styles.textoBotao}>Atualizar</Text>
+                        </Pressable>
+                    <Pressable style={styles.deleteButton} onPress={() => setModalVisible(true)}>
+                        <Text style={styles.textoBotao}>Deletar</Text>
+                    </Pressable>
+                </View>
+                
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => setModalVisible(false)}
                 >
-                    <Text style={styles.textoBotao}>Atualizar</Text>
-                </Pressable>
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalText}>Tem certeza que deseja deletar conta de usuário?</Text>
+                            <View style={styles.modalButtons}>
+                                <Pressable
+                                    style={styles.modalCancelButton}
+                                    onPress={() => setModalVisible(false)}
+                                >
+                                    <Text style={styles.textoBotao}>Cancelar</Text>
+                                </Pressable>
+                                <Pressable
+                                    style={styles.modalConfirmButton}
+                                    onPress={() => {
+                                        setModalVisible(false);
+                                        handleDelete();
+                                    }}
+                                >
+                                    <Text style={styles.textoBotao}>Confirmar</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 40,    
+        left: 16,
+        zIndex: 1,
+    },
     divCadastro: {
         flex: 1,
         alignItems: 'center',
@@ -261,14 +325,6 @@ const styles = StyleSheet.create({
         color: '#888',
         textAlign: 'center',
     },
-    botao: {
-        backgroundColor: '#8A2BE2',
-        borderRadius: 5,
-        paddingVertical: 10,
-        paddingHorizontal: 80,
-        elevation: 3,
-        marginTop: 50,
-    },
     textoBotao: {
         color: 'white',
         fontSize: 16,
@@ -277,6 +333,74 @@ const styles = StyleSheet.create({
         color: 'red',
         marginTop: 8,
         fontSize: 14,
+    },
+    botao: {
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        elevation: 3,
+        marginTop: 50,
+    },
+    updateButton: {
+        backgroundColor: '#8A2BE2',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        marginHorizontal: 5,
+    },
+    deleteButton: {
+        backgroundColor: '#B22222',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 40,
+        marginHorizontal: 5,
+    },
+    textoBotao: {
+        color: 'white',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 30,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalCancelButton: {
+        backgroundColor: '#888',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 10,
+    },
+    modalConfirmButton: {
+        backgroundColor: '#B22222',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        marginHorizontal: 10,
     },
 });
 

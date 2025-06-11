@@ -168,7 +168,7 @@ useLayoutEffect(() => {
                 {(abrigoInfo?.userId === userId) && (
                   <TouchableOpacity
                     style={styles.editIcon}
-                    onPress={() => navigation.navigate('AtualizarAnimal', { animalId: item.id, abrigoId: currentAbrigoId, userId })}
+                    onPress={() => navigation.navigate('AtualizarAnimal', { animalId: item.id, abrigoId: currentAbrigoId, userId, rootScreen: 'AnimaisAdm' })}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <Ionicons name="create-outline" size={18} color="#555" />

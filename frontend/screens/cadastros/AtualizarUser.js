@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, StyleSheet, Text, View, ScrollView, Modal, modalVisible } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView, Modal, modalVisible, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import TextAtualizarUserInput from '../../components/TextAtualizacaoUserInput';
 import { urlIp } from '@env';
 import * as ImagePicker from 'expo-image-picker';
@@ -116,6 +117,7 @@ function AtualizarUserScreen() {
         });
 
         try {
+            console.log('Enviando imagem para o servidor...');
             const response = await fetch(`http://${urlIp}:3000/users/${userId}/imagem`, {
                 method: 'POST',
                 headers: {
@@ -159,7 +161,6 @@ function AtualizarUserScreen() {
 
     const handleUpdate = async () => {
         try {
-
             const response = await fetch(`http://${urlIp}:3000/users/${userId}`, {
                 method: 'PUT',
                 headers: {
@@ -171,6 +172,8 @@ function AtualizarUserScreen() {
             if (!response.ok) {
                 throw new Error('Falha ao atualizar usuário');
             }
+
+            console.log('Usuário atualizado com sucesso', imageUri);
 
             if (imageUri) {
                 await handleImageUpdate();
@@ -196,7 +199,7 @@ function AtualizarUserScreen() {
                 throw new Error('Erro ao deletar usuário');
             }
 
-            navigation.navigate('Login');
+            navigation.navigate('TelaInicial');
         } catch (error) {
             console.error('Erro ao deletar usuário:', error);
             Alert.alert('Erro', 'Não foi possível deletar o usuário');
@@ -205,6 +208,10 @@ function AtualizarUserScreen() {
 
     return (
         <ScrollView>
+        <TouchableOpacity onPress={() => navigation.navigate('InicialUser', { userId })} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={28} color="#333" />
+        </TouchableOpacity>
+
         <View style={styles.divCadastro} edges={['top']}>
             <Image
                 style={styles.logo}
@@ -282,6 +289,12 @@ function AtualizarUserScreen() {
 }
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 40,     
+        left: 16,
+        zIndex: 1,
+    },
     divCadastro: {
         flex: 1,
         alignItems: 'center',

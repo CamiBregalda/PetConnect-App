@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigation } from "@react-navigation/native";
 //import { BACKEND_BASE_URL } from 'expo-constants';
-import { Image, Pressable, StyleSheet, Text, View, ScrollView } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import TextCadastroUserInput from '../../components/TextCadastroUserInput';
 import { urlIp } from '@env';
 
@@ -120,6 +121,9 @@ function CadastroUserScreen() {
     return (
         <ScrollView>
         <View style={styles.divCadastro} edges={['top']}>
+            <TouchableOpacity onPress={() => navigation.navigate('TelaInicial')} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color="#333" />
+            </TouchableOpacity>
             <Image
                 style={styles.logo}
                 source={require('../../img/PET.png')}
@@ -151,6 +155,12 @@ function CadastroUserScreen() {
 }
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 40,     
+        left: 16,
+        zIndex: 1,
+    },
     divCadastro: {
         flex: 1,
         alignItems: 'center',
