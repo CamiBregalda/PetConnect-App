@@ -4,12 +4,14 @@ import { useNavigation } from '@react-navigation/native';
 import { urlIp } from '@env';
 
 function PerfilAnimal({ route }) {
-  const { animalId, abrigoId } = route.params; // Removido 'animal' se não for usado diretamente aqui
+  const { animalId, abrigoId, userId } = route.params; // Removido 'animal' se não for usado diretamente aqui
   const [animalDetalhes, setAnimalDetalhes] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
-
+console.log('PerfilAnimal - animalId:', animalId);
+console.log('PerfilAnimal - abrigoId:', abrigoId);
+console.log('PerfilAnimal - userId:', userId);
   // Configura o header da tela
   useLayoutEffect(() => {
     if (animalDetalhes) {
@@ -46,7 +48,7 @@ function PerfilAnimal({ route }) {
   //  }
   //};
 
-useEffect(() => {
+  useEffect(() => {
     const buscarDetalhesAnimal = async () => {
       setLoading(true);
       setError(null);
@@ -93,30 +95,30 @@ useEffect(() => {
           onPress={() => {
             // Reinicia a busca
             if (animalId) {
+              setLoading(true);
+              setError(null);
+              // buscarDetalhesAnimal(); // A dependência [animalId] no useEffect já fará isso se animalId mudar,
+              // mas para um retry manual, chamamos diretamente.
+              // Para forçar re-fetch com o mesmo animalId, podemos resetar animalDetalhes
+              setAnimalDetalhes(null);
+              // E então o useEffect será re-executado na próxima renderização
+              // Ou chamar a função de busca diretamente:
+              const reFetch = async () => {
                 setLoading(true);
                 setError(null);
-                // buscarDetalhesAnimal(); // A dependência [animalId] no useEffect já fará isso se animalId mudar,
-                                        // mas para um retry manual, chamamos diretamente.
-                // Para forçar re-fetch com o mesmo animalId, podemos resetar animalDetalhes
-                setAnimalDetalhes(null);
-                // E então o useEffect será re-executado na próxima renderização
-                // Ou chamar a função de busca diretamente:
-                const reFetch = async () => {
-                    setLoading(true);
-                    setError(null);
-                    try {
-                        const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`);
-                        if (!response.ok) throw new Error(`Erro na requisição: ${response.status}`);
-                        const data = await response.json();
-                        setAnimalDetalhes(data);
-                    } catch (err) {
-                        console.error('Erro ao buscar detalhes do animal:', err);
-                        setError(err.message);
-                    } finally {
-                        setLoading(false);
-                    }
-                };
-                reFetch();
+                try {
+                  const response = await fetch(`http://${urlIp}:3000/animais/${animalId}`);
+                  if (!response.ok) throw new Error(`Erro na requisição: ${response.status}`);
+                  const data = await response.json();
+                  setAnimalDetalhes(data);
+                } catch (err) {
+                  console.error('Erro ao buscar detalhes do animal:', err);
+                  setError(err.message);
+                } finally {
+                  setLoading(false);
+                }
+              };
+              reFetch();
             }
           }}
         >
@@ -133,7 +135,7 @@ useEffect(() => {
       </View>
     );
   }
-const InfoRow = ({ label, value, style }) => ( // Adicionado 'style' como prop opcional
+  const InfoRow = ({ label, value, style }) => ( // Adicionado 'style' como prop opcional
     <View style={[styles.infoRowBase, style]}>
       <Text style={styles.label}>{label}: </Text>
       <Text style={styles.value}>{value}</Text>
@@ -147,29 +149,29 @@ const InfoRow = ({ label, value, style }) => ( // Adicionado 'style' como prop o
         resizeMode="cover"
       />
       <View style={styles.detailsContainer}>
-        {/* Container principal para os InfoRows com flexWrap */}
+
         <View style={styles.infoGridContainer}>
           <InfoRow label="Nome" value={animalDetalhes.nome} style={styles.infoGridItem} />
           <InfoRow label="Sexo" value={animalDetalhes.sexo} style={styles.infoGridItem} />
-          {/* Data de Nascimento ocupando a linha toda */}
+
           <InfoRow label="Data de Nascimento" value={animalDetalhes.dataNascimento} style={styles.infoGridItemWide} />
           <InfoRow label="Espécie" value={animalDetalhes.especie} style={styles.infoGridItem} />
           <InfoRow label="Raça" value={animalDetalhes.raca} style={styles.infoGridItem} />
           <InfoRow label="Porte" value={animalDetalhes.porte} style={styles.infoGridItem} />
           <InfoRow label="Castrado(a)" value={animalDetalhes.castrado ? 'Sim' : 'Não'} style={styles.infoGridItem} />
-          {/* Campos mais longos ocupando a linha toda */}
+
           <InfoRow label="Doenças" value={animalDetalhes.doencas || 'Nenhuma informada'} style={styles.infoGridItemWide} />
           <InfoRow label="Deficiências" value={animalDetalhes.deficiencias || 'Nenhuma informada'} style={styles.infoGridItemWide} />
           <InfoRow label="Sobre" value={animalDetalhes.informacoes || 'Nenhuma informação adicional'} style={styles.infoGridItemWide} />
         </View>
-        {/* Botão para ir para o perfil do abrigo, se necessário */}
-        {abrigoId && (
-            <TouchableOpacity
-                style={styles.abrigoButton}
-                onPress={() => navigation.navigate('Main', { screen: 'Home', params: { abrigoId: abrigoId } })}
-            >
-                <Text style={styles.abrigoButtonText}>Ver Abrigo</Text>
-            </TouchableOpacity>
+
+        {animalDetalhes?.idDono && (
+          <TouchableOpacity
+            style={styles.abrigoButton}
+            onPress={() => navigation.navigate('Main', { abrigoId: animalDetalhes.idDono, userId: userId })}
+          >
+            <Text style={styles.abrigoButtonText}>Ver Abrigo</Text>
+          </TouchableOpacity>
         )}
       </View>
     </ScrollView>
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
   },
   centeredMessageContainer: {
     flex: 1,
-// ...existing code...
+    // ...existing code...
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

@@ -115,7 +115,8 @@ function Voluntarios() {
 
   const exibirPerfil = (cuidador) => {
     navigation.navigate('PerfilCuidador', {
-      userId: cuidador.id,
+      cuidadorId: cuidador.id,
+      userId: loggedInUserId,
       abrigoId: currentAbrigoId,
     });
   };

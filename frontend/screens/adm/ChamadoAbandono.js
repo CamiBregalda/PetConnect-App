@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import MapViewComponent from '../../components/MapView'; // Importe o componente MapView
 import { urlIp } from '@env';
@@ -36,19 +36,6 @@ const ChamadoAbandono = () => {
     useEffect(() => {
         fetchAbandonos();
     }, []);
-
-    useLayoutEffect(() => {
-      navigation.setOptions({
-        headerRight: () => (
-          <TouchableOpacity
-            style={{ marginRight: 20 }}
-            onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId: currentAbrigoId, userId })}
-          >
-            <Ionicons name="add-circle-outline" size={30} color="white" />
-          </TouchableOpacity>
-        ),
-      });
-    }, [navigation, currentAbrigoId, userId]);
 
     const handleResgatarAnimal = async (abandonoId) => {
         try {

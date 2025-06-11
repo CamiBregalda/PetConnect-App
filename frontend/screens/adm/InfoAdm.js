@@ -148,7 +148,11 @@ function InfoAdm() {
   };
 
   const exibirDetalhesVoluntario = (cuidador) => {
-    navigation.navigate('PerfilCuidador', { cuidadoresId: cuidador.id, userId: userId });
+    navigation.navigate('PerfilCuidador', {
+      cuidadorId: cuidador.id,
+      userId: userId,
+      abrigoId: currentAbrigoId,
+    });
   };
 
   if (loading) {
