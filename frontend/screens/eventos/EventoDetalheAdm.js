@@ -89,13 +89,6 @@ export default function EventoDetalheAdm() {
           >
             <Text style={styles.buttonText}>Editar Evento</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.volunteersButton]}
-            onPress={() => navigation.navigate('VoluntariosEvento', { eventoId: evento.id })}
-          >
-            <Text style={styles.buttonText}>Voluntários</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -104,7 +97,7 @@ export default function EventoDetalheAdm() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f1f1f1', paddingTop: 20 },
-  scroll: { paddingBottom: 120, paddingHorizontal: 16 },
+  scroll: { paddingBottom: 70, paddingHorizontal: 16 },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,

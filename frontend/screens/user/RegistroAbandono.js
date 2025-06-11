@@ -1,5 +1,3 @@
-// frontend/screens/RegistroAbandono.js
-
 import React, { useState } from 'react';
 import {
   View,
@@ -21,7 +19,6 @@ export default function RegistroAbandono() {
   const { userId } = useRoute().params;
   console.log('abandono - userId from route.params:', userId);
 
-  // Estado para descrição e endereço
   const [descricao, onChangeDescricao] = useState('');
   const [endereco, onChangeEndereco] = useState({
     rua: '',
@@ -32,16 +29,13 @@ export default function RegistroAbandono() {
     cep: '',
   });
 
-  // Estado para imagem e loading
   const [imageUri, onChangeImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Função unificada para atualizar campos de endereço
   const handleEnderecoChange = (campo, valor) => {
     onChangeEndereco(prev => ({ ...prev, [campo]: valor }));
   };
 
-  // Escolher foto da galeria
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -58,14 +52,12 @@ export default function RegistroAbandono() {
     }
   };
 
-  // Detectar mime type pela extensão
   const getImageMimeType = uri => {
     if (uri.endsWith('.png')) return 'image/png';
     if (uri.match(/\.(jpe?g)$/)) return 'image/jpeg';
     return 'image/jpeg';
   };
 
-  // Função para enviar imagem após criar o abandono
   const handleImageUpload = async (abandonoId) => {
     try {
       const form = new FormData();
@@ -85,13 +77,12 @@ export default function RegistroAbandono() {
       if (!res.ok) throw new Error(`Status ${res.status}`);
     } catch (err) {
       console.error('Erro ao enviar imagem:', err);
-      // não bloqueia a navegação; apenas log
+
     }
   };
 
-  // Monta o JSON e faz o POST para /abandonos
   const handleRegister = async () => {
-    // Validação mínima
+  
     if (!descricao.trim() ||
         !endereco.rua.trim() ||
         !endereco.numero.trim() ||
@@ -106,9 +97,9 @@ export default function RegistroAbandono() {
 
     setLoading(true);
     try {
-      // 1) Monta o objeto igual ao service espera
+
       const bodyData = {
-        emailUser: userId,            // o campo que o model exige
+        userId: userId,     
         descricao: descricao.trim(),
         local: {
           rua: endereco.rua.trim(),
@@ -118,12 +109,11 @@ export default function RegistroAbandono() {
           estado: endereco.estado.trim(),
           cep: endereco.cep.trim(),
         },
-        animalResgatado: false,       // flag default
-        ativo: true,                  // flag default
-        images: [],                   // será preenchido depois
+        animalResgatado: false,     
+        ativo: true,                                 
       };
 
-      // 2) POST JSON
+   
       const response = await fetch(`http://${urlIp}:3000/abandonos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -133,9 +123,9 @@ export default function RegistroAbandono() {
         throw new Error(`Status ${response.status}`);
       }
 
-      const novoAbandono = await response.json(); // deve conter .id
+      const novoAbandono = await response.json(); 
 
-      // 3) Se houver foto, envie-a após criar o registro
+  
       if (imageUri && novoAbandono.id) {
         await handleImageUpload(novoAbandono.id);
       }
@@ -153,7 +143,7 @@ export default function RegistroAbandono() {
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
       <View style={styles.container}>
-        {/* Descrição */}
+      
         <Text style={styles.label}>Descrição do animal</Text>
         <TextInput
           style={styles.textArea}
@@ -163,7 +153,6 @@ export default function RegistroAbandono() {
           onChangeText={onChangeDescricao}
         />
 
-        {/* Endereço */}
         <Text style={styles.label}>Endereço onde encontrou</Text>
         {['rua','numero','bairro','cidade','estado','cep'].map(campo => (
           <TextInput
@@ -176,7 +165,6 @@ export default function RegistroAbandono() {
           />
         ))}
 
-        {/* Foto */}
         <Text style={styles.label}>Foto do animal (opcional)</Text>
         <TouchableOpacity onPress={pickImage}>
           {imageUri
@@ -185,7 +173,6 @@ export default function RegistroAbandono() {
           }
         </TouchableOpacity>
 
-        {/* Botão Registrar */}
         <TouchableOpacity
           style={styles.button}
           onPress={handleRegister}
