@@ -7,7 +7,7 @@ import MapView from './../../components/MapView';
 export default function EventoDetalheUsuario() {
   const navigation = useNavigation();
   const route = useRoute();
-  const { evento } = route.params;
+  const { evento, abrigoId, userId } = route.params; // <-- agora recebe abrigoId
 
  
   useLayoutEffect(() => {
@@ -85,6 +85,15 @@ export default function EventoDetalheUsuario() {
           <Text style={styles.text}>{evento.descricao || 'Nenhum detalhe adicional informado'}</Text>
         </View>
 
+        {abrigoId && (
+          <TouchableOpacity
+            style={styles.abrigoButton}
+            onPress={() => navigation.navigate('Main', { abrigoId, userId })}
+          >
+            <Text style={styles.abrigoButtonText}>Ver Abrigo</Text>
+          </TouchableOpacity>
+        )}
+
       </ScrollView>
     </View>
   );
@@ -124,5 +133,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: '#e0e0e0',
+  },
+  abrigoButton: {
+    backgroundColor: '#9333ea',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 24,
+    alignSelf: 'center',
+    elevation: 2,
+  },
+  abrigoButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

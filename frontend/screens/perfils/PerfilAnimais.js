@@ -114,46 +114,56 @@ function PerfilAnimal({ route }) {
       </View>
     );
   }
-  const InfoRow = ({ label, value, style }) => (
+  const InfoRow = ({ label, value, style }) => {
+  let displayValue = value;
+  if (Array.isArray(value)) {
+    displayValue = value.length > 0 ? value.join(', ') : 'Nenhuma informada';
+  } else if (typeof value === 'string' && value.trim() === '') {
+    displayValue = 'Nenhuma informada';
+  }
+  return (
     <View style={[styles.infoRowBase, style]}>
       <Text style={styles.label}>{label}: </Text>
-      <Text style={styles.value}>{value}</Text>
+      <Text style={styles.value}>{displayValue}</Text>
     </View>
   );
-  return (
-    <ScrollView style={styles.scrollContainer}>
-      <Image
-        source={{ uri: `http://${urlIp}:3000/animais/${animalDetalhes.id}/imagem?${Date.now()}` }}
-        style={styles.animalHeaderImage}
-        resizeMode="cover"
-      />
-      <View style={styles.detailsContainer}>
+};
 
-        <View style={styles.infoGridContainer}>
-          <InfoRow label="Nome" value={animalDetalhes.nome} style={styles.infoGridItem} />
-          <InfoRow label="Sexo" value={animalDetalhes.sexo} style={styles.infoGridItem} />
+return (
+  <ScrollView style={styles.scrollContainer}>
+    <Image
+      source={{ uri: `http://${urlIp}:3000/animais/${animalDetalhes.id}/imagem?${Date.now()}` }}
+      style={styles.animalHeaderImage}
+      resizeMode="cover"
+    />
+    <View style={styles.detailsContainer}>
 
-          <InfoRow label="Data de Nascimento" value={animalDetalhes.dataNascimento} style={styles.infoGridItemWide} />
-          <InfoRow label="Espécie" value={animalDetalhes.especie} style={styles.infoGridItem} />
-          <InfoRow label="Raça" value={animalDetalhes.raca} style={styles.infoGridItem} />
-          <InfoRow label="Porte" value={animalDetalhes.porte} style={styles.infoGridItem} />
-          <InfoRow label="Castrado(a)" value={animalDetalhes.castrado ? 'Sim' : 'Não'} style={styles.infoGridItem} />
+      <View style={styles.infoGridContainer}>
+        <InfoRow label="Nome" value={animalDetalhes.nome} style={styles.infoGridItem} />
+        <InfoRow label="Sexo" value={animalDetalhes.sexo} style={styles.infoGridItem} />
 
-          <InfoRow label="Doenças" value={animalDetalhes.doencas || 'Nenhuma informada'} style={styles.infoGridItemWide} />
-          <InfoRow label="Deficiências" value={animalDetalhes.deficiencias || 'Nenhuma informada'} style={styles.infoGridItemWide} />
-          <InfoRow label="Sobre" value={animalDetalhes.informacoes || 'Nenhuma informação adicional'} style={styles.infoGridItemWide} />
-        </View>
+        <InfoRow label="Data de Nascimento" value={animalDetalhes.dataNascimento} style={styles.infoGridItemWide} />
+        <InfoRow label="Espécie" value={animalDetalhes.especie} style={styles.infoGridItem} />
+        <InfoRow label="Raça" value={animalDetalhes.raca} style={styles.infoGridItem} />
+        <InfoRow label="Porte" value={animalDetalhes.porte} style={styles.infoGridItem} />
+        <InfoRow label="Castrado(a)" value={animalDetalhes.castrado ? 'Sim' : 'Não'} style={styles.infoGridItem} />
 
-        {animalDetalhes?.idDono && (
-          <TouchableOpacity
-            style={styles.abrigoButton}
-            onPress={() => navigation.navigate('Main', { abrigoId: animalDetalhes.idDono, userId: userId })}
-          >
-            <Text style={styles.abrigoButtonText}>Ver Abrigo</Text>
-          </TouchableOpacity>
-        )}
+        <InfoRow label="Doenças" value={animalDetalhes.doencas || 'Nenhuma informada'} style={styles.infoGridItemWide} />
+        <InfoRow label="Deficiências" value={animalDetalhes.deficiencias || 'Nenhuma informada'} style={styles.infoGridItemWide} />
+        <InfoRow label="Vacinas" value={animalDetalhes.vacinas || []} style={styles.infoGridItemWide} />
+        <InfoRow label="Sobre" value={animalDetalhes.informacoes || 'Nenhuma informação adicional'} style={styles.infoGridItemWide} />
       </View>
-    </ScrollView>
+
+      {animalDetalhes?.idDono && (
+        <TouchableOpacity
+          style={styles.abrigoButton}
+          onPress={() => navigation.navigate('Main', { abrigoId: animalDetalhes.idDono, userId: userId })}
+        >
+          <Text style={styles.abrigoButtonText}>Ver Abrigo</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  </ScrollView>
   );
 }
 

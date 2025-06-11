@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { urlIp } from '@env';
 import TelaFiltro from '../../components/TelaFiltro'; 
@@ -11,7 +11,7 @@ function HomeScreen() {
   const userId = route.params?.userId;
   const navigation = useNavigation();
 
-
+const [refreshing, setRefreshing] = useState(false);
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
   const [eventos, setEventos] = useState([]);
@@ -54,42 +54,48 @@ function HomeScreen() {
     });
   }, [navigation, userId]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const [animaisResponse, abrigosResponse, eventosResponse] = await Promise.all([
-          fetch(`http://${urlIp}:3000/animais/`),
-          fetch(`http://${urlIp}:3000/abrigos/`),
-          fetch(`http://${urlIp}:3000/eventos/`),
-        ]);
-        const errorDetails = [];
-        if (!animaisResponse.ok) errorDetails.push(`Animais: ${animaisResponse.status}`);
-        if (!abrigosResponse.ok) errorDetails.push(`Abrigos: ${abrigosResponse.status}`);
-        if (!eventosResponse.ok) errorDetails.push(`Eventos: ${eventosResponse.status}`);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [animaisResponse, abrigosResponse, eventosResponse] = await Promise.all([
+        fetch(`http://${urlIp}:3000/animais/`),
+        fetch(`http://${urlIp}:3000/abrigos/`),
+        fetch(`http://${urlIp}:3000/eventos/`),
+      ]);
+      const errorDetails = [];
+      if (!animaisResponse.ok) errorDetails.push(`Animais: ${animaisResponse.status}`);
+      if (!abrigosResponse.ok) errorDetails.push(`Abrigos: ${abrigosResponse.status}`);
+      if (!eventosResponse.ok) errorDetails.push(`Eventos: ${eventosResponse.status}`);
 
-        if (errorDetails.length > 0) {
-          throw new Error(errorDetails.join(', '));
-        }
-
-        const animaisData = await animaisResponse.json();
-        const abrigosData = await abrigosResponse.json();
-        const eventosData = await eventosResponse.json();
-
-        setAnimais(animaisData);
-        setAbrigos(abrigosData);
-        setEventos(eventosData);
-      } catch (err) {
-        console.error('Erro ao buscar dados:', err);
-        setError(`Falha ao carregar dados: ${err.message}`);
-      } finally {
-        setLoading(false);
+      if (errorDetails.length > 0) {
+        throw new Error(errorDetails.join(', '));
       }
-    };
 
+      const animaisData = await animaisResponse.json();
+      const abrigosData = await abrigosResponse.json();
+      const eventosData = await eventosResponse.json();
+
+      setAnimais(animaisData);
+      setAbrigos(abrigosData);
+      setEventos(eventosData);
+    } catch (err) {
+      console.error('Erro ao buscar dados:', err);
+      setError(`Falha ao carregar dados: ${err.message}`);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [urlIp]);
+
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, [fetchData]);
 
   const exibirDetalhesAnimal = (animal) => {
     navigation.navigate('PerfilAnimal', { animalId: animal.id, abrigoId: animal.idDono, animal: animal, userId: userId });
@@ -145,7 +151,16 @@ function HomeScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#8A2BE2']}
+        />
+      }
+    >
       <Text style={styles.title}>O que você procura hoje?</Text>
 
       <View style={styles.searchAndFilterContainer}>
@@ -196,7 +211,7 @@ function HomeScreen() {
         <Text style={styles.sectionTitle}>Próximos Eventos</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {eventosFiltrados.length > 0 ? eventosFiltrados.map((evento) => (
-            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento)}>
+            <TouchableOpacity key={evento.id} style={styles.listItem} onPress={() => exibirDetalhesEvento(evento, userId)}>
               <Image
                 source={{ uri: `http://${urlIp}:3000/eventos/${evento.id}/imagem?${Date.now()}` }}
                 style={styles.listImage}
