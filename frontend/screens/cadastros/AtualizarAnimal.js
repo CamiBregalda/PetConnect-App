@@ -112,9 +112,9 @@ function AtualizarAnimalScreen() {
             onChangeVacinas(data.vacinas.length > 0 ? data.vacinas : [""]);
             onChangeInformacoes(data.informacoes);
 
-            const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`);
+            const responseImage = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem?${Date.now()}`);
             if (responseImage.ok) {
-                onChangeImageUri(`http://${urlIp}:3000/animais/${animalId}/imagem`);
+                onChangeImageUri(`http://${urlIp}:3000/animais/${animalId}/imagem?${Date.now()}`);
             }
         } catch (error) {
             console.error('Erro ao buscar animal:', error);
@@ -151,7 +151,7 @@ function AtualizarAnimalScreen() {
         });
 
         try {
-            const response = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem`, {
+            const response = await fetch(`http://${urlIp}:3000/animais/${animalId}/imagem?${Date.now()}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',

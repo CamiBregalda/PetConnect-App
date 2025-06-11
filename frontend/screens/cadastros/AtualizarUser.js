@@ -118,7 +118,7 @@ function AtualizarUserScreen() {
 
         try {
             console.log('Enviando imagem para o servidor...');
-            const response = await fetch(`http://${urlIp}:3000/users/${userId}/imagem`, {
+            const response = await fetch(`http://${urlIp}:3000/users/${userId}/imagem?${Date.now()}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',

@@ -83,9 +83,9 @@ function AtualizarAbrigoScreen() {
                     }
             );
 
-            const responseImage = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`);
+            const responseImage = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem?${Date.now()}`);
             if (responseImage.ok) {
-                setImageUri(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`);
+                setImageUri(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem?${Date.now()}`);
             }
         } catch (error) {
             console.error('Erro ao buscar abrigo:', error);
@@ -109,7 +109,7 @@ function AtualizarAbrigoScreen() {
         });
 
         try {
-            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem`, {
+            const response = await fetch(`http://${urlIp}:3000/abrigos/${abrigoId}/imagem?${Date.now()}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'multipart/form-data',

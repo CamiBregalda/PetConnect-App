@@ -108,7 +108,7 @@ function InfoAdm() {
         try {
           const endpoint = abrigoInfo.userId === userId
             ? `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`
-            : `http://${urlIp}:3000/eventos`;
+            : `http://${urlIp}:3000/eventos/abrigo/${currentAbrigoId}`
           const res = await fetch(endpoint);
           if (!res.ok) throw new Error('Erro ao buscar eventos');
           const data = await res.json();
