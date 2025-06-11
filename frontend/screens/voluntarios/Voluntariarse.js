@@ -20,7 +20,6 @@ function VoluntarioFormScreen() {
   const [error, setError] = useState(null);
   const [jaInscrito, setJaInscrito] = useState(false);
   const route = useRoute();
-  // Obter abrigoId e userId dos parâmetros da rota
   const { abrigoId, userId } = route.params || {};
 
   const verificarInscricao = async () => {
@@ -273,7 +272,6 @@ function VoluntarioFormScreen() {
         <Text style={styles.title}>Você já está inscrito, aguarde o resultado.</Text>
       ) : (
         <>
-          <Text style={styles.title}>Candidatar-se como Voluntário</Text>
           <TextInput
             style={styles.input}
             placeholder="Nome Completo"
@@ -372,6 +370,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     marginTop: 20,
+    paddingBottom: 55,
   },
   title: {
     fontSize: 24,
@@ -398,6 +397,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 40,
+    marginTop: 20,
   },
   errorText: {
     color: 'red',

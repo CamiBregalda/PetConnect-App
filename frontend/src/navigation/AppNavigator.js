@@ -226,7 +226,6 @@ export default function AppNavigator() {
         <Stack.Screen name="RegistroAbandono" component={RegistroAbandono} />
         <Stack.Screen name="AnimaisUser" component={AnimaisUser} />
         <Stack.Screen name="ListaEventos" component={ListaEventos} />
-        <Stack.Screen name="EventoDetalhe" component={EventoDetalhe} />
         <Stack.Screen name="InfoAdm" component={InfoAdm} />
         <Stack.Screen name="VoluntariosEvento" component={VoluntariosEvento} />
         <Stack.Screen name="EditarEvento" component={EditarEvento} />
@@ -278,6 +277,19 @@ export default function AppNavigator() {
             ),
           })}
         />
+
+        <Stack.Screen
+          name="EventoDetalhe" component={EventoDetalhe}
+          options={({ navigation }) => ({
+            headerShown: true,
+            title: 'Detalhes do Evento',
+            headerStyle: {
+              backgroundColor: '#8A2BE2',
+            },
+            headerTintColor: 'white',
+          })}
+        />
+
         <Stack.Screen
           name="Candidatos" component={Candidatos}
           options={{
@@ -294,7 +306,7 @@ export default function AppNavigator() {
           component={Voluntariarse}
           options={{
             headerShown: true,
-            title: 'Voluntariar-se',
+            title: 'Candidatar-se como voluntário',
             headerStyle: {
               backgroundColor: '#8A2BE2',
             },
