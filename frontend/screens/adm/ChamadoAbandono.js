@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import MapViewComponent from '../../components/MapView'; // Importe o componente MapView
 import { urlIp } from '@env';
@@ -8,7 +8,6 @@ const ChamadoAbandono = () => {
     const route = useRoute(); // Use o hook useRoute para acessar os parâmetros da rota
     const { abrigoId } = route.params; // Acesse o parâmetro abrigoId
 
-    console.log('abrigoId:', abrigoId);
     const [abandonos, setAbandonos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -36,19 +35,6 @@ const ChamadoAbandono = () => {
     useEffect(() => {
         fetchAbandonos();
     }, []);
-
-    useLayoutEffect(() => {
-      navigation.setOptions({
-        headerRight: () => (
-          <TouchableOpacity
-            style={{ marginRight: 20 }}
-            onPress={() => navigation.navigate('AtualizarAbrigo', { abrigoId: currentAbrigoId, userId })}
-          >
-            <Ionicons name="add-circle-outline" size={30} color="white" />
-          </TouchableOpacity>
-        ),
-      });
-    }, [navigation, currentAbrigoId, userId]);
 
     const handleResgatarAnimal = async (abandonoId) => {
         try {

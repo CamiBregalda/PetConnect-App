@@ -217,6 +217,7 @@ export default function AppNavigator() {
         <Stack.Screen name="TelaInicial" component={TelaInicial} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="CadastroUser" component={CadastroUser} />
+        <Stack.Screen name="AtualizarUser" component={AtualizarUser} />
         <Stack.Screen name="CadastroAbrigo" component={CadastroAbrigo} />
         <Stack.Screen name="AtualizarAbrigo" component={AtualizarAbrigo} />
         <Stack.Screen name="CadastroAnimal" component={CadastroAnimal} />
@@ -232,7 +233,6 @@ export default function AppNavigator() {
         <Stack.Screen name="CriarEvento" component={CriarEvento} />
         <Stack.Screen name="ChamadoAbandono" component={ChamadoAbandono} />
         <Stack.Screen name="AdocaoAnimal" component={AdocaoAnimal} />
-        <Stack.Screen name="AtualizarUser" component={AtualizarUser} />
 
         <Stack.Screen name="InicialUser"
           component={UserTabs}

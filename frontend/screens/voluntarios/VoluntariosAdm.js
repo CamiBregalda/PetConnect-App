@@ -14,8 +14,7 @@ function Voluntarios() {
   const navigation = useNavigation();
   const route = useRoute();
   const { userId: loggedInUserId } = route.params || {};
-  console.log('VoluntariosAdm - loggedInUserId from route.params:', loggedInUserId);
-  console.log('VoluntariosAdm - currentAbrigoId from AbrigoContext:', currentAbrigoId);
+
 
   // Buscar detalhes do abrigo (inclui userId do admin)
   useEffect(() => {
@@ -34,7 +33,7 @@ function Voluntarios() {
         }
         const data = await response.json();
         setAbrigoDetails(data);
-        console.log('VoluntariosAdm - AbrigoDetails fetched:', data);
+
       } catch (e) {
         console.error("VoluntariosAdm: Erro ao buscar detalhes do abrigo:", e);
         setError(e.message);
@@ -68,7 +67,6 @@ function Voluntarios() {
 
         const data = await response.json();
         setCuidadores(data.cuidadores || []);
-        console.log('VoluntariosAdm: Voluntários do abrigo carregados:', data.cuidadores);
       } catch (err) {
         console.error('VoluntariosAdm: Erro ao buscar voluntários:', err);
         setError(err.message);
@@ -89,7 +87,7 @@ function Voluntarios() {
       abrigoDetails &&
       abrigoDetails.userId // userid do admin do abrigo
     ) {
-      console.log('VoluntariosAdm - Comparando loggedInUserId:', loggedInUserId, 'com adminUserId:', abrigoDetails.userid);
+
 
       if (String(loggedInUserId) === String(abrigoDetails.userId)) {
         navigation.setOptions({
@@ -115,7 +113,8 @@ function Voluntarios() {
 
   const exibirPerfil = (cuidador) => {
     navigation.navigate('PerfilCuidador', {
-      userId: cuidador.id,
+      cuidadorId: cuidador.id,
+      userId: loggedInUserId,
       abrigoId: currentAbrigoId,
     });
   };

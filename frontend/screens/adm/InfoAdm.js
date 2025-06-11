@@ -8,11 +8,7 @@ function InfoAdm() {
   const navigation = useNavigation();
   const route = useRoute();
   const { userId } = route.params || {};
-
   const { currentAbrigoId } = useContext(AbrigoContext);
-
-  console.log('InfoAdm - userId from route.params:', userId);
-  console.log('[InfoAdm Render Start] currentAbrigoId:', currentAbrigoId);
 
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [cuidadores, setCuidadores] = useState([]);
@@ -148,7 +144,11 @@ function InfoAdm() {
   };
 
   const exibirDetalhesVoluntario = (cuidador) => {
-    navigation.navigate('PerfilCuidador', { cuidadoresId: cuidador.id, userId: userId });
+    navigation.navigate('PerfilCuidador', {
+      cuidadorId: cuidador.id,
+      userId: userId,
+      abrigoId: currentAbrigoId,
+    });
   };
 
   if (loading) {
