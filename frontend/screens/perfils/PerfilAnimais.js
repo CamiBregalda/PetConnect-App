@@ -9,9 +9,6 @@ function PerfilAnimal({ route }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigation = useNavigation();
-console.log('PerfilAnimal - animalId:', animalId);
-console.log('PerfilAnimal - abrigoId:', abrigoId);
-console.log('PerfilAnimal - userId:', userId);
   // Configura o header da tela
   useLayoutEffect(() => {
     if (animalDetalhes) {

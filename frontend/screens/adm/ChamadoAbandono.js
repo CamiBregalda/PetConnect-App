@@ -8,7 +8,6 @@ const ChamadoAbandono = () => {
     const route = useRoute(); // Use o hook useRoute para acessar os parâmetros da rota
     const { abrigoId } = route.params; // Acesse o parâmetro abrigoId
 
-    console.log('abrigoId:', abrigoId);
     const [abandonos, setAbandonos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
