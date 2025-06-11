@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import CandidaturaModel from "../models/Candidatura";
 import { CandidaturaAttributes } from "../models/Candidatura";
 import * as CuidadorService from './cuidadorService';
+import * as AbrigoService from './abrigoService';
 import * as UserService from './userService';
 import { CandidaturaResponse } from "../models/responses/CandidaturaResponse";
 
@@ -66,7 +67,8 @@ export const updateCandidatura = async (id: string, updatedData: Partial<Candida
         const candidatura = await CandidaturaModel.findByIdAndUpdate(id, updatedFields, { new: true });
 
         if (candidatura && candidatura.aprovacao && candidatura.aprovacao === true) {
-            CuidadorService.createCuidadorByUserId(candidatura.userId.toString(), candidatura.abrigoId.toString());
+            const cuidador = await CuidadorService.createCuidadorByUserId(candidatura.userId.toString(), candidatura.abrigoId.toString());
+            await AbrigoService.addCuidadorToAbrigo(candidatura.abrigoId.toString(), cuidador.id);
         }
 
         return candidatura;

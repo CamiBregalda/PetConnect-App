@@ -36,8 +36,6 @@ export default function InicialUser() {
     const resAdminRecord = await fetch(`http://${urlIp}:3000/admAbrigo/${userId}/user`);
 
     const text = await resAdminRecord.text();
-    console.log('resAdminRecord status:', resAdminRecord.status);
-    console.log('resAdminRecord body:', text);
 
     let adminData;
     try {

@@ -146,7 +146,7 @@ function CadastroAnimalScreen() {
                 await handleImageUpdate(data.id);
             }
 
-            navigation.navigate('AnimaisAdm', { abrigoId: idDono, userId: userId });
+            navigation.navigate('Main', { abrigoId: idDono, userId: userId });
         } catch (error) {
             console.error('Erro ao fazer cadastro:', error);
             Alert.alert('Erro', 'Cadastro inválido');

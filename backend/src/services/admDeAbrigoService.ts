@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import AdmDeAbrigoModel from "../models/AdmDeAbrigo";
 import * as AbrigoService from './abrigoService';
 import * as UserService from './userService';
@@ -58,6 +59,10 @@ export const getAdmDeAbrigoByUserId = async (id: string) => {
     } catch (error: any) {
         throw new Error('Erro ao buscar administrador de abrigo: ' + error.message);
     }
+};
+
+export const getAdmDeAbrigoByUserIdNotException = async (id: Types.ObjectId) => {
+    return await AdmDeAbrigoModel.findOne({ userId: id, ativo: true });
 };
 
 export const getAdmDeAbrigoWithAbrigo = async (admId: string) => {

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Image, Pressable, ScrollView, StyleSheet, Text,Alert, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text,Alert, View, TouchableOpacity } from 'react-native';
 import TextCadastroAbrigoInput from '../../components/TextCadastroAbrigoInput';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { urlIp } from '@env';
 
 function CadastroAbrigoScreen() {
@@ -174,6 +175,10 @@ function CadastroAbrigoScreen() {
 
     return (
         <ScrollView>
+            <TouchableOpacity onPress={() => navigation.navigate('TelaPrincipal', { userId: userId })} style={styles.backButton}>
+                <Ionicons name="arrow-back" size={28} color="#333" />
+            </TouchableOpacity>
+
             <View style={styles.divCadastro} edges={['top']}>
                 <Text style={styles.title}>Cadastrar Abrigo</Text>
                 <TextCadastroAbrigoInput
@@ -218,6 +223,12 @@ function CadastroAbrigoScreen() {
 }
 
 const styles = StyleSheet.create({
+    backButton: {
+        position: 'absolute',
+        top: 40,    
+        left: 16,
+        zIndex: 1,
+    },
     divCadastro: {
         flex: 1,
         alignItems: 'center',

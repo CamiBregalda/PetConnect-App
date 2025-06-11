@@ -1,11 +1,11 @@
+import { Types } from "mongoose";
 import AbrigoModel from '../models/Abrigo';
 import { getAnimaisByAbrigoId } from './animalService';
-import { getCuidadoresByAbrigoId } from './cuidadorService';
 import * as AdmDeAbrigoService from '../services/admDeAbrigoService';
+import * as CuidadorService from './cuidadorService';
 import { AbrigoComAnimaisResponse } from "../models/responses/AbrigoComAnimaisResponse";
 import { AbrigoComCuidadoresResponse } from "../models/responses/AbrigoComCuidadoresResponse";
 import { AbrigoComUserIdResponse } from '../models/responses/AbrigoComUserIdResponse';
-
 
 export const createAbrigo = async (userId: string, abrigoData: any) => {
     try {
@@ -96,7 +96,7 @@ export const getAbrigoWithAnimais = async (abrigoId: string) => {
 export const getAbrigoWithCuidadores = async (abrigoId: string) => {
     try {
         const abrigo = await getAbrigoById(abrigoId);
-        const cuidadores = await getCuidadoresByAbrigoId(abrigoId);
+        const cuidadores = await CuidadorService.getCuidadoresByAbrigoId(abrigoId);
 
         return AbrigoComCuidadoresResponse.fromEntities(abrigo, cuidadores);
     } catch (error: any) {
@@ -106,8 +106,10 @@ export const getAbrigoWithCuidadores = async (abrigoId: string) => {
 
 export const getAbrigosPorUsuario = async (userId: string) => {
     try {
-        const abrigos = await AbrigoModel.find({ cuidadores: userId, ativo: true }).select('-image');
-        const abrigoAdm = await AdmDeAbrigoService.getAdmDeAbrigoByUserId(userId);
+        const cuidador = await CuidadorService.getCuidadorByUserId(userId);
+        const abrigos = await AbrigoModel.find({ cuidadores: cuidador.id, ativo: true }).select('-image');
+        const objectUserId = new Types.ObjectId(userId);
+        const abrigoAdm = await AdmDeAbrigoService.getAdmDeAbrigoByUserIdNotException(objectUserId);
         if (abrigoAdm && abrigoAdm.id) {
             const abrigo = await getAbrigoByAdmId(abrigoAdm.id);
             abrigos.push(abrigo);
@@ -138,6 +140,28 @@ export const updateAbrigo = async (id: string, updatedData: any) => {
         return await AbrigoModel.findByIdAndUpdate(id, updatedFields, { new: true });
     } catch (error: any) {
         throw new Error('Erro ao atualizar abrigo: ' + error.message);
+    }
+};
+
+export const addCuidadorToAbrigo = async (abrigoId: string, cuidadorId: Types.ObjectId) => {
+    try {
+        const abrigo = await AbrigoModel.findOne({ _id: abrigoId, ativo: true });
+        if (!abrigo) {
+            throw new Error('Abrigo não encontrado');
+        }
+
+        if (!abrigo.cuidadores) {
+            abrigo.cuidadores = [];
+        }
+
+        if (!abrigo.cuidadores.includes(cuidadorId)) {
+            abrigo.cuidadores.push(cuidadorId);
+            await abrigo.save();
+        }
+
+        return abrigo;
+    } catch (error: any) {
+        throw new Error('Erro ao adicionar cuidador ao abrigo: ' + error.message);
     }
 };
 
