@@ -106,8 +106,10 @@ const TextCadastroAnimalInput = (
                 <Picker
                     selectedValue={sexo}
                     onValueChange={(itemValue) => onChangeSexo(itemValue)}
-                    style={styles.picker}
-
+                    style={[
+                        styles.picker,
+                        { color: sexo === '' ? '#808080' : '#000000' }
+                    ]}
                 >
                     <Picker.Item label="Sexo" value="" style={styles.pickerItem} />
                     <Picker.Item label="Feminino" value="Feminino" style={styles.pickerItemValue} />
@@ -142,7 +144,10 @@ const TextCadastroAnimalInput = (
                         onChangeEspecie(itemValue);
                         fetchRacas(itemValue);
                     }}
-                    style={styles.picker}
+                    style={[
+                        styles.picker,
+                        { color: especie === '' ? '#808080' : '#000000' }
+                    ]}
                 >
                     <Picker.Item label="Espécie" value="" style={styles.pickerItem} />
                     {listaEspecies.map((item, index) => (
@@ -155,7 +160,10 @@ const TextCadastroAnimalInput = (
                 <Picker
                     selectedValue={raca}
                     onValueChange={(itemValue) => onChangeRaca(itemValue)}
-                    style={styles.picker}
+                    style={[
+                        styles.picker,
+                        { color: raca === '' ? '#808080' : '#000000' }
+                    ]}
                 >
                     <Picker.Item label="Raça" value="" style={styles.pickerItem} />
                     {listaRacas.map((item, index) => (
@@ -168,7 +176,10 @@ const TextCadastroAnimalInput = (
                 <Picker
                     selectedValue={porte}
                     onValueChange={(itemValue) => onChangePorte(itemValue)}
-                    style={styles.picker}
+                    style={[
+                        styles.picker,
+                        { color: porte === '' ? '#808080' : '#000000' }
+                    ]}
                 >
                     <Picker.Item label="Porte" value="" style={styles.pickerItem} />
                     {listaPorte.map((item, index) => (
@@ -181,7 +192,10 @@ const TextCadastroAnimalInput = (
                 <Picker
                     selectedValue={castrado}
                     onValueChange={(itemValue) => onChangeCastrado(itemValue)}
-                    style={styles.picker}
+                    style={[
+                            styles.picker,
+                            { color: castrado === null ? '#808080' : '#000000' }
+                        ]}
                 >
                     <Picker.Item label="Castrado" value={null} style={styles.pickerItem} />
                     <Picker.Item label="Sim" value={true} style={styles.pickerItemValue} />
