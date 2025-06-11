@@ -125,7 +125,7 @@ const TextAtualizacaoAnimalInput = (
             )}
 
             <View style={styles.containerInput}>
-                <Text style={styles.label}>Sexo:</Text>
+                <Text style={styles.label}>Especie:</Text>
                 <View style={[styles.inputSelect, { width: 230 }]}>
                 <Picker
                     selectedValue={especie}

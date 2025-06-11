@@ -227,7 +227,7 @@ function InfoAdm() {
                       abrigoId: currentAbrigoId
                     });
                   } else {
-                    navigation.navigate('EventoDetalhe', { evento });
+                    navigation.navigate('EventoDetalhe', { evento, userId, abrigoId: currentAbrigoId });
                   }
                 }}
               >
