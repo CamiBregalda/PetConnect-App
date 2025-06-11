@@ -233,6 +233,7 @@ export default function AppNavigator() {
         <Stack.Screen name="CriarEvento" component={CriarEvento} />
         <Stack.Screen name="ChamadoAbandono" component={ChamadoAbandono} />
         <Stack.Screen name="AdocaoAnimal" component={AdocaoAnimal} />
+        
         <Stack.Screen name="InicialUser"
           component={UserTabs}
           options={{

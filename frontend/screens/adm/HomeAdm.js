@@ -10,7 +10,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 function HomeAdm({ route }) {
   const userId = route?.params?.userId;
   const abrigoId = route?.params?.abrigoId;
-  console.log('HomeAdm userId:', userId, 'abrigoId:', abrigoId);
   const [abrigoInfo, setAbrigoInfo] = useState(null);
   const [adminInfo, setAdminInfo] = useState(null);
   const [loading, setLoading] = useState(true);

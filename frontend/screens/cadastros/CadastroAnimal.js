@@ -8,7 +8,6 @@ import { urlIp } from '@env';
 function CadastroAnimalScreen() {
     const route = useRoute();
     const idDono = route.params.abrigoId;
-    console.log('CadastroAnimalScreen - idDono:', idDono);
     const navigation = useNavigation();
 
     const [nome, onChangeNome] = React.useState('');

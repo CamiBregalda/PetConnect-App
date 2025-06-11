@@ -182,7 +182,6 @@ function PerfilCuidador({ route }) {
     </View>
   );
 
-  console.log('abrigoUserId:', abrigoUserId, 'userId:', userId);
 
   return (
     <ScrollView style={styles.scrollContainer}>

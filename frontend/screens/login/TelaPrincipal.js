@@ -12,7 +12,7 @@ function HomeScreen() {
   // Pega o userId passado por parâmetro da tela anterior
   const userId = route.params?.userId;
   const navigation = useNavigation();
-  console.log('TelaPrincipal - userId:', userId); // Log para verificar se o userId está sendo passado corretamente
+
 
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
@@ -98,7 +98,6 @@ function HomeScreen() {
   };
 
  const exibirDetalhesAbrigo = (idDoAbrigo, userId) => {
-  console.log('TelaPrincipal - Saindo com userId:', userId, 'para abrigoId:', idDoAbrigo);
   navigation.navigate('Main', { abrigoId: idDoAbrigo, userId: userId });
 };
 
@@ -107,7 +106,6 @@ function HomeScreen() {
   };
 
   const exibirDetalhesEvento = (evento) => {
-    console.log('buscando abrigoId do evento:', evento.idAbrigo);
     navigation.navigate('EventoDetalhe', { eventoId: evento.id, evento: evento, userId: userId, abrigoId: evento.idAbrigo });
   };
 

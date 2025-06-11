@@ -36,7 +36,6 @@ const MapView = ({ enderecoAbrigo }) => {
         const { nativeEvent } = syntheticEvent;
         console.warn('MapView WebView error: ', nativeEvent);
       }}
-      onLoad={() => console.log("WebView do mapa (com endereço) carregado.")}
     />
   );
 };

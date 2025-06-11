@@ -17,7 +17,6 @@ function AnimaisAdm() { // Removido route como prop
     porte: null,
   });
   const [searchTerm, setSearchTerm] = useState('');
-  console.log('AnimaisAdm - userId from route.params:', userId);
 
   const { currentAbrigoId } = useContext(AbrigoContext);
   const [todosAnimais, setTodosAnimais] = useState([]);
@@ -51,7 +50,6 @@ useLayoutEffect(() => {
 }, [navigation, currentAbrigoId, userId, abrigoInfo]);
 
   const buscarDados = useCallback(async () => {
-    console.log('AnimaisAdm buscarDados - currentAbrigoId:', currentAbrigoId, 'userId:', userId);
     setLoading(true);
     setError(null);
     try {
@@ -93,7 +91,6 @@ useLayoutEffect(() => {
   const exibirDetalhesAnimal = (animal) => {
     // Passar userId para PerfilAnimal
     navigation.navigate('PerfilAnimal', { animalId: animal.id, userId: userId, abrigoId: currentAbrigoId /* ou animal.idDono */ });
-    console.log('AnimaisAdm exibirDetalhesAnimal - animalId:', animal.id, 'userId:', userId);
   };
 
   // Filtragem dos animais

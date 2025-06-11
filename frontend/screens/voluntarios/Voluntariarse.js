@@ -134,7 +134,6 @@ function VoluntarioFormScreen() {
         responseData = await volunteerResponse.text();
       }
 
-      console.log('Resposta da candidatura:', responseData);
 
       if (!volunteerResponse.ok) {
         const errorMessage = typeof responseData === 'object' && responseData.message ?
