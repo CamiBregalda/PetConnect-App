@@ -106,7 +106,7 @@ function CadastroUserScreen() {
             const data = await response.json();
             navigation.navigate('Login');
         } catch (error) {
-            console.error('Erro ao fazer cadastro:', error);
+            console.error(error);
             Alert.alert('Erro', 'Cadastro inválido');
         }
     };

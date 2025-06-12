@@ -44,7 +44,7 @@ function LoginScreen() {
 
 
       if (!response.ok) {
-        throw new Error('Login inválido');
+        throw new Error('Credenciais inválidas');
       }
 
       const data = await response.json();
@@ -54,7 +54,7 @@ function LoginScreen() {
       
       
     } catch (error) {
-      console.error('Erro ao fazer login:', error);
+      console.error(error);
       Alert.alert('Erro', 'Login ou senha inválidos');
     }
   };

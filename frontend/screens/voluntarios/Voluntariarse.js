@@ -54,7 +54,7 @@ function VoluntarioFormScreen() {
     });
 
     if (!response.ok) {
-      throw new Error(`Erro ao verificar inscrição: ${response.status}`);
+      throw new Error(`Erro ao verificar inscrição`);
     }
 
     const data = await response.json();

@@ -19,9 +19,13 @@ export const createCandidatura = async (data: any) => {
     }
 };
 
-export const getCandidaturas = async () => {
+export const getCandidaturas = async (userId?: string, abrigoId?: string) => {
     try {
-        const listCandidaturas = await CandidaturaModel.find({ ativo: true }).populate('userId');
+        const query: any = { ativo: true };
+        if (userId) query.userId = userId;
+        if (abrigoId) query.abrigoId = abrigoId;
+
+        const listCandidaturas = await CandidaturaModel.find(query).populate('userId');
         return listCandidaturas.map((candidatura) => CandidaturaResponse.fromEntities(candidatura));
     } catch (error: any) {
         throw new Error("Erro ao buscar candidaturas: " + error.message);

@@ -168,7 +168,7 @@ function CadastroAbrigoScreen() {
             navigation.navigate('TelaPrincipal', { userId: userId });
             Alert.alert('Sucesso', 'Abrigo cadastrado com sucesso!');
         } catch (error) {
-            console.error('Erro ao fazer cadastro:', error);
+            console.error(error);
             Alert.alert('Erro', 'Cadastro inválido');
         }
     };

@@ -148,7 +148,7 @@ function CadastroAnimalScreen() {
 
             navigation.navigate('Main', { abrigoId: idDono, userId: userId });
         } catch (error) {
-            console.error('Erro ao fazer cadastro:', error);
+            console.error(error);
             Alert.alert('Erro', 'Cadastro inválido');
         }
     };

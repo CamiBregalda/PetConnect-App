@@ -12,7 +12,10 @@ export const createCandidatura = async (req: Request, res: Response) => {
 
 export const getCandidaturas = async (req: Request, res: Response) => {
     try {
-        const candidaturas = await CandidaturaService.getCandidaturas();
+        const userId = req.query.userId as string;
+        const abrigoId = req.query.abrigoId as string;
+
+        const candidaturas = await CandidaturaService.getCandidaturas(userId, abrigoId);
         res.status(200).json(candidaturas);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
