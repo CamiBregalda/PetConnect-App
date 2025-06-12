@@ -33,69 +33,51 @@ export default function EventosAdm() {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    const fetchEventos = async () => {
-      if (!abrigoId) { 
-        setLoading(false);
-        setError('ID do abrigo não fornecido.');
-        return;
+useEffect(() => {
+  const fetchEventos = async () => {
+    if (!abrigoId) { 
+      setLoading(false);
+      setError('ID do abrigo não fornecido.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`http://${urlIp}:3000/eventos/abrigo/${abrigoId}`);
+      if (response.status === 404) {
+        setEventos([]); // <-- Não define erro, apenas lista vazia
+        setError(null);
+      } else if (!response.ok) {
+        throw new Error('Erro ao buscar eventos');
+      } else {
+        const data = await response.json();
+        setEventos(data);
       }
-      setLoading(true);
-      setError(null);
-      try {
-       
-        const response = await fetch(`http://${urlIp}:3000/eventos/abrigo/${abrigoId}`);
-        if (response.status === 404) {
-          setEventos([]);
-        } else if (!response.ok) {
-          throw new Error('Erro ao buscar eventos');
-        } else {
-          const data = await response.json();
-          setEventos(data);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    if (isFocused) fetchEventos();
-  }, [isFocused, abrigoId]); 
+  if (isFocused) fetchEventos();
+}, [isFocused, abrigoId]); 
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#9333ea" />
-        <Text style={{ marginTop: 10 }}>Carregando eventos...</Text>
-      </View>
-    );
-  }
+return (
+  <View style={styles.container}>
+    <TouchableOpacity
+      style={styles.botaoCriar}
+      onPress={() => navigation.navigate('CriarEvento', { userId, abrigoId })}
+    >
+      <Text style={styles.textoBotao}>Criar Evento</Text>
+    </TouchableOpacity>
 
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={{ color: 'red' }}>Erro: {error}</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.container}>
-
-      <TouchableOpacity
-        style={styles.botaoCriar}
-        onPress={() => navigation.navigate('CriarEvento', { userId, abrigoId })}
-      >
-        <Text style={styles.textoBotao}>Criar Evento</Text>
-      </TouchableOpacity>
-
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {eventos.length === 0 ? (
-          <Text style={{ textAlign: 'center', marginTop: 30, color: '#555' }}>
-            Nenhum evento cadastrado para este abrigo.
-          </Text>
-        ) : (
+    <ScrollView contentContainerStyle={styles.scroll}>
+      {eventos.length === 0 ? (
+        <Text style={{ textAlign: 'center', marginTop: 30, color: '#555' }}>
+          Nenhum evento cadastrado para este abrigo.
+        </Text>
+      ) : (
           eventos.map(evento => (
             <View key={evento.id} style={styles.cardContainer}>
               <TouchableOpacity

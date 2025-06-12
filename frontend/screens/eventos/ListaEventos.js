@@ -14,60 +14,44 @@ export default function ListaEventos() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchEventos = async () => {
-      if (!abrigoId) {
-        setLoading(false);
-        setError('ID do abrigo não fornecido.');
-        return;
-      }
-      setLoading(true);
-      setError(null);
-      try {
-  
-        const response = await fetch(`http://${urlIp}:3000/eventos/abrigo/${abrigoId}`);
-        if (response.status === 404) {
-          setEventos([]); 
-        } else if (!response.ok) {
-          throw new Error('Erro ao buscar eventos');
-        } else {
-          const data = await response.json();
-          setEventos(data);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (isFocused) {
-      fetchEventos();
+  const fetchEventos = async () => {
+    if (!abrigoId) { 
+      setLoading(false);
+      setError('ID do abrigo não fornecido.');
+      return;
     }
-  }, [isFocused, abrigoId]); 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#9333ea" />
-        <Text style={{ marginTop: 10 }}>Carregando eventos do abrigo...</Text>
-      </View>
-    );
-  }
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`http://${urlIp}:3000/eventos/abrigo/${abrigoId}`);
+      if (response.status === 404) {
+        setEventos([]); // <-- Não define erro, apenas lista vazia
+        setError(null);
+      } else if (!response.ok) {
+        throw new Error('Erro ao buscar eventos');
+      } else {
+        const data = await response.json();
+        setEventos(data);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text style={{ color: 'red' }}>Erro: {error}</Text>
-      </View>
-    );
-  }
+  if (isFocused) fetchEventos();
+}, [isFocused, abrigoId]); 
 
-  return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {eventos.length === 0 ? (
-          <Text style={{ textAlign: 'center', marginTop: 20, color: '#555' }}>
-            Não há eventos cadastrados para este abrigo.
-          </Text>
-        ) : (
+
+return (
+  <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scroll}>
+      {eventos.length === 0 ? (
+        <Text style={{ textAlign: 'center', marginTop: 30, color: '#555' }}>
+          Nenhum evento cadastrado para este abrigo.
+        </Text>
+      ) : (
           eventos.map((evento) => (
             <TouchableOpacity
               key={evento.id}
