@@ -7,7 +7,7 @@ import TelaFiltro from '../../components/TelaFiltro';
 
 function HomeScreen() {
   const route = useRoute();
- 
+
   const userId = route.params?.userId;
   const navigation = useNavigation();
 
@@ -15,6 +15,7 @@ const [refreshing, setRefreshing] = useState(false);
   const [animais, setAnimais] = useState([]);
   const [abrigos, setAbrigos] = useState([]);
   const [eventos, setEventos] = useState([]);
+  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -58,15 +59,17 @@ const [refreshing, setRefreshing] = useState(false);
     setLoading(true);
     setError(null);
     try {
-      const [animaisResponse, abrigosResponse, eventosResponse] = await Promise.all([
+      const [animaisResponse, abrigosResponse, eventosResponse, userResponse] = await Promise.all([
         fetch(`http://${urlIp}:3000/animais/`),
         fetch(`http://${urlIp}:3000/abrigos/`),
         fetch(`http://${urlIp}:3000/eventos/`),
+        fetch(`http://${urlIp}:3000/users/${userId}`)
       ]);
       const errorDetails = [];
       if (!animaisResponse.ok) errorDetails.push(`Animais: ${animaisResponse.status}`);
       if (!abrigosResponse.ok) errorDetails.push(`Abrigos: ${abrigosResponse.status}`);
       if (!eventosResponse.ok) errorDetails.push(`Eventos: ${eventosResponse.status}`);
+      if (!userResponse.ok) errorDetails.push(`Usuário: ${userResponse.status}`);
 
       if (errorDetails.length > 0) {
         throw new Error(errorDetails.join(', '));
@@ -75,10 +78,12 @@ const [refreshing, setRefreshing] = useState(false);
       const animaisData = await animaisResponse.json();
       const abrigosData = await abrigosResponse.json();
       const eventosData = await eventosResponse.json();
+      const userData = await userResponse.json();
 
       setAnimais(animaisData);
       setAbrigos(abrigosData);
       setEventos(eventosData);
+      setUser(userData);
     } catch (err) {
       console.error('Erro ao buscar dados:', err);
       setError(`Falha ao carregar dados: ${err.message}`);
@@ -131,7 +136,18 @@ const [refreshing, setRefreshing] = useState(false);
     return nomeMatch && especieMatch && racaMatch && porteMatch && adotadoMatch;
   });
 
-  const abrigosFiltrados = abrigos.filter(abrigo =>
+  const abrigosOrdenados = [...abrigos].sort((a, b) => {
+    const getScore = (abrigo) => {
+      if (abrigo.endereco.rua.trim() === user.endereco.rua.trim()) return 4;
+      if (abrigo.endereco.cidade.trim() === user.endereco.cidade.trim()) return 3;
+      if (abrigo.endereco.estado.trim() === user.endereco.estado.trim()) return 2;
+      if (abrigo.endereco.cep.trim() === user.endereco.cep.trim()) return 1;
+      return 0;
+    };
+    return getScore(b) - getScore(a);
+  });
+
+  const abrigosFiltrados = abrigosOrdenados.filter(abrigo =>
     abrigo.nome ? abrigo.nome.toLowerCase().includes(searchTerm.toLowerCase()) : true
   );
 

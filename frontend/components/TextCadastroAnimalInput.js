@@ -58,7 +58,7 @@ const TextCadastroAnimalInput = (
         const fetchPorte = async () => {
             try {
                 const response = await fetch(`http://${urlIp}:3000/portes`);
-              
+
                 if (!response.ok) throw new Error('Erro ao buscar portes');
                 const data = await response.json();
                 setListaPorte(data);

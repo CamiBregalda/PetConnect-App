@@ -1,31 +1,6 @@
 import React, { useEffect, useState }  from 'react';
 import {StyleSheet, TextInput, View} from 'react-native';
 import TextEnderecoInput from './TextEnderecoInput';
-/*import * as Location from 'expo-location';
-
-// Dentro do seu componente CadastroAbrigoScreen:
-const [endereco, setEndereco] = useState('');
-
-useEffect(() => {
-    (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            console.log('Permissão de localização negada');
-            return;
-        }
-
-        let location = await Location.getCurrentPositionAsync({});
-        let [geo] = await Location.reverseGeocodeAsync({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-        });
-
-        if (geo) {
-            setEndereco(`${geo.street}, ${geo.subregion} - ${geo.region}`);
-        }
-    })();
-}, []);*/
-
 
 const TextCadastroAbrigoInput = ({nome, onChangeNome, cnpj, onChangeCnpj, email, onChangeEmail, telefone, onChangeTelefone, endereco, onChangeEndereco, descricao, onChangeDescricao, errors}) => {
     const getInputStyle = (fieldError) => [
@@ -53,7 +28,7 @@ const TextCadastroAbrigoInput = ({nome, onChangeNome, cnpj, onChangeCnpj, email,
                 onChangeText={onChangeCnpj}
                 value={cnpj}
                 placeholder="CNPJ"
-                keyboardType="Cnpj"
+                keyboardType="number-pad"
             />
             <TextInput
                 style={getInputStyle(errors.email)}

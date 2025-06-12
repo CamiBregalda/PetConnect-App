@@ -24,6 +24,7 @@ const TextAtualizacaoAbrigoInput = ({nome, onChangeNome, cnpj, onChangeCnpj, ema
                     onChangeText={onChangeCnpj}
                     value={cnpj}
                     placeholder="CNPJ"
+                    keyboardType="number-pad"
                 />
             </View>
 

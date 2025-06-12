@@ -23,7 +23,7 @@ const TextCadastroUserInput = ({ name, onChangeName, cpf, onChangeCpf, email, on
           onChangeText={onChangeCpf}
           value={cpf}
           placeholder="CPF"
-          keyboardType="Cpf"
+          keyboardType="number-pad"
         />
         <TextInput
           style={getInputStyle(errors.email)}

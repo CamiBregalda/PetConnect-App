@@ -24,7 +24,7 @@ const TextAtualizarUserInput = ({ nome, onChangeNome, cpf, onChangeCpf, telefone
             onChangeText={onChangeCpf}
             value={cpf}
             placeholder="CPF"
-            keyboardType="default"
+            keyboardType="number-pad"
           />
         </View>
 
