@@ -83,7 +83,7 @@ const ChamadoAbandono = () => {
         try {
             return email.split('@')[0];
         } catch (error) {
-            console.error("Erro ao extrair o nome do usuário do email:", error);
+            console.error("Erro ao extrair o nome do usuário por email:", error);
             return "Usuário";
         }
     };
